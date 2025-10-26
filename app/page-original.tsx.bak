@@ -1,0 +1,231 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useExamStore } from '@/lib/store';
+import { motion } from 'framer-motion';
+import {
+  Clock,
+  FileText,
+  Trophy,
+  Brain,
+  Sparkles,
+  Play,
+  BarChart3,
+} from 'lucide-react';
+import questions from '@/data/questions.json';
+
+export default function Home() {
+  const router = useRouter();
+  const { startExam, resetExam, getScore, isExamCompleted } = useExamStore();
+  const [examDuration, setExamDuration] = useState(90);
+
+  const handleStartExam = () => {
+    resetExam();
+    startExam(examDuration);
+    router.push('/exam');
+  };
+
+  const handleViewResults = () => {
+    router.push('/results');
+  };
+
+  const score = isExamCompleted ? getScore() : null;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500">
+      <div className="min-h-screen bg-black bg-opacity-30 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto px-4 py-12">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-12"
+          >
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Trophy className="w-12 h-12 text-yellow-300" />
+              <h1 className="text-5xl font-bold text-white">
+                OCI Exam Simulator
+              </h1>
+            </div>
+            <p className="text-xl text-blue-100">
+              Oracle Cloud Infrastructure Certification 1Z0-1151-25
+            </p>
+            <p className="text-lg text-blue-200 mt-2">
+              Practice with AI-powered explanations
+            </p>
+          </motion.div>
+
+          {/* Main Card */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-2xl shadow-2xl overflow-hidden"
+          >
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8 bg-gradient-to-r from-blue-50 to-purple-50">
+              <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
+                <FileText className="w-10 h-10 text-blue-600" />
+                <div>
+                  <p className="text-3xl font-bold text-gray-800">
+                    {questions.length}
+                  </p>
+                  <p className="text-sm text-gray-600">Total Questions</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
+                <Clock className="w-10 h-10 text-purple-600" />
+                <div>
+                  <p className="text-3xl font-bold text-gray-800">{examDuration}</p>
+                  <p className="text-sm text-gray-600">Minutes</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
+                <Brain className="w-10 h-10 text-pink-600" />
+                <div>
+                  <p className="text-3xl font-bold text-gray-800">AI</p>
+                  <p className="text-sm text-gray-600">Powered Explanations</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-8">
+              {/* Previous Score */}
+              {isExamCompleted && score && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border-2 border-green-200"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <BarChart3 className="w-8 h-8 text-green-600" />
+                      <div>
+                        <p className="text-sm text-gray-600 font-medium">
+                          Your Last Score
+                        </p>
+                        <p className="text-3xl font-bold text-gray-800">
+                          {score.correct} / {score.total}
+                          <span className="text-xl ml-2 text-green-600">
+                            ({score.percentage}%)
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleViewResults}
+                      className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+                    >
+                      View Results
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Features */}
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                  Features
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                    <Sparkles className="w-6 h-6 text-purple-600 mt-1" />
+                    <div>
+                      <h3 className="font-semibold text-gray-800">
+                        AI Explanations
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Get detailed explanations powered by Google Gemini AI
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                    <Clock className="w-6 h-6 text-blue-600 mt-1" />
+                    <div>
+                      <h3 className="font-semibold text-gray-800">Timed Mode</h3>
+                      <p className="text-sm text-gray-600">
+                        Practice under real exam conditions with a timer
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                    <Trophy className="w-6 h-6 text-yellow-600 mt-1" />
+                    <div>
+                      <h3 className="font-semibold text-gray-800">
+                        Track Progress
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Monitor your performance and identify weak areas
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                    <FileText className="w-6 h-6 text-green-600 mt-1" />
+                    <div>
+                      <h3 className="font-semibold text-gray-800">
+                        Real Questions
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Practice with actual OCI certification questions
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Exam Duration Selector */}
+              <div className="mb-8">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Exam Duration
+                </label>
+                <div className="flex gap-3">
+                  {[30, 60, 90, 120].map((duration) => (
+                    <button
+                      key={duration}
+                      onClick={() => setExamDuration(duration)}
+                      className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                        examDuration === duration
+                          ? 'bg-blue-600 text-white shadow-lg scale-105'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    >
+                      {duration} min
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Start Button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleStartExam}
+                className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xl font-bold rounded-lg shadow-xl transition-all flex items-center justify-center gap-3"
+              >
+                <Play className="w-6 h-6" />
+                Start Exam
+              </motion.button>
+            </div>
+          </motion.div>
+
+          {/* Footer */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-center text-blue-100 mt-8"
+          >
+            Powered by Google Gemini AI • {questions.length} Questions
+          </motion.p>
+        </div>
+      </div>
+    </div>
+  );
+}

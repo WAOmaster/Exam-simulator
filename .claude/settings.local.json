@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app:*)",
+      "Bash(npm install:*)",
+      "Bash(cp:*)",
+      "Bash(mkdir:*)",
+      "Bash(node scripts/parse-questions.js:*)",
+      "Bash(node scripts/inspect-docx.js:*)",
+      "Bash(npm run dev:*)",
+      "Bash(node scripts/test-gemini-api.js:*)",
+      "Bash(node scripts/list-models.js:*)",
+      "Bash(curl:*)",
+      "Bash(taskkill:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(rm:*)",
+      "Bash(timeout /t 10)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "outputStyle": "default"
+}

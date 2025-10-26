@@ -1,0 +1,3512 @@
+[
+  {
+    "id": 1,
+    "question": "Which Autonomous Database deployment option offers exclusive use of Exadata hardware?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Exclusive Deployment"
+      },
+      {
+        "id": "B",
+        "text": "Standalone Deployment"
+      },
+      {
+        "id": "C",
+        "text": "Dedicated Deployment"
+      },
+      {
+        "id": "D",
+        "text": "Serverless"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 2,
+    "question": "Which statement accurately describes the difference between public peering and private peering in OCI FastConnect?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Public peering and private peering cannot be configured simultaneously in a single OCI FastConnect setup."
+      },
+      {
+        "id": "B",
+        "text": "Both public and private peering require the use of the Oracle Services Network to connect to Oracle Cloud resources."
+      },
+      {
+        "id": "C",
+        "text": "Private peering allows direct access to resources within a Virtual Cloud Network (VCN) using private IP addresses, while public peering provides access to Oracle public-facing services, bypassing the Internet."
+      },
+      {
+        "id": "D",
+        "text": "Public peering is used to connect on-premises networks to private OCI resources, while private peering is used to connect to Oracle public-facing services such as Object Storage."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 3,
+    "question": "ABC company uses Okta as its identity provider and wants to federate with OCI to enable single sign-on (SSO) for accessing OCI resources. Users should be granted access to OCI compartments based on their Okta group memberships.Which is the most direct and recommended approach to achieve this?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Configure Okta as a SAML 2.0 Identity Provider in OCI and map Okta groups to OCI groups."
+      },
+      {
+        "id": "B",
+        "text": "Use SCIM provisioning to create and manage OCI users based on Okta user attributes and group memberships."
+      },
+      {
+        "id": "C",
+        "text": "Establish a VPN connection between your on-premises network and OCI and configure Active Directory Federation Services (AD FS) to bridge Okta and OCI."
+      },
+      {
+        "id": "D",
+        "text": "Create a custom application in Okta that uses the OCI API to authenticate users and authorize access to resources."
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 4,
+    "question": "Which statement is true for a private offer purchase option?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Consult Oracle Sales to create a private offer in Google Cloud Marketplace."
+      },
+      {
+        "id": "B",
+        "text": "Raise a purchase private offer directly from Google Cloud Marketplace."
+      },
+      {
+        "id": "C",
+        "text": "Consult Oracle Sales to create a private offer in OCI Marketplace."
+      },
+      {
+        "id": "D",
+        "text": "You must have an OCI account to create a private offer."
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 5,
+    "question": "How do you ensure that traffic between your OCI VCN and Azure Virtual Network uses the interconnect and not the public internet?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Configure security lists in both OCI and Azure to block traffic over the internet."
+      },
+      {
+        "id": "B",
+        "text": "Configure route tables in both OCI and Azure to prioritize routes through the interconnect."
+      },
+      {
+        "id": "C",
+        "text": "Disable public IP addresses on instances in both environments."
+      },
+      {
+        "id": "D",
+        "text": "Enable private peering between the VCN and the Virtual Network."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 6,
+    "question": "How can the organization ensure secure and efficient data transfer between the frontend applications and the backend data warehouse in this scenario?",
+    "options": [
+      {
+        "id": "A",
+        "text": "By using public internet connections to transfer data between Azure and OCI, encrypting the data in transit"
+      },
+      {
+        "id": "B",
+        "text": "By establishing a dedicated, private connection between Azure and OCI using Azure ExpressRoute and Oracle FastConnect"
+      },
+      {
+        "id": "C",
+        "text": "By implementing a hybrid cloud approach that integrates on-premises infrastructure with both Azure and OCI"
+      },
+      {
+        "id": "D",
+        "text": "By leveraging a VPN Gateway to create an encrypted tunnel between Azure and OCI for secure data transfer"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 7,
+    "question": "In the context of Oracle Database@Google Cloud, what is the role of the OCI Dynamic Routing Gateway (DRG)?",
+    "options": [
+      {
+        "id": "A",
+        "text": "It acts as a firewall controlling traffic between the Exadata systems and Google Cloud VPCs."
+      },
+      {
+        "id": "B",
+        "text": "It provides Network Address Translation (NAT) for the Exadata systems."
+      },
+      {
+        "id": "C",
+        "text": "It facilitates BGP routing between the OCI FastConnect and the Google Cloud Router for dynamic route exchange."
+      },
+      {
+        "id": "D",
+        "text": "It manages the physical cross-connect between the Oracle and Google Cloud networks."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 8,
+    "question": "What is the key difference between the purchase workflows for the private and public offers of Oracle Database@Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The private offer requires approval from Google Cloud, while the public offer does not."
+      },
+      {
+        "id": "B",
+        "text": "The public offer allows for the use of existing OCI accounts, while the private offer does not."
+      },
+      {
+        "id": "C",
+        "text": "The private offer involves negotiating a contract with an Oracle sales representative, while the public offer does not."
+      },
+      {
+        "id": "D",
+        "text": "The public offer is billed through Oracle, while the private offer is billed through Google Cloud."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 9,
+    "question": "How does Oracle Database on Google Cloud simplify database management for customers?",
+    "options": [
+      {
+        "id": "A",
+        "text": "OCI offers a management console within Google Cloud to simplify database management."
+      },
+      {
+        "id": "B",
+        "text": "It automatically transfers all database management tasks to the Oracle Cloud Infrastructure console."
+      },
+      {
+        "id": "C",
+        "text": "It requires customers to use Oracle-specific management tools."
+      },
+      {
+        "id": "D",
+        "text": "It enables customers to manage databases through the Google Cloud console or Google Cloud automation tools."
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 10,
+    "question": "Which of the Autonomous Database deployment options gives you exclusive use of Exadata hardware?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Standalone Deployment"
+      },
+      {
+        "id": "B",
+        "text": "Exclusive Deployment"
+      },
+      {
+        "id": "C",
+        "text": "Serverless"
+      },
+      {
+        "id": "D",
+        "text": "Dedicated Deployment"
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 11,
+    "question": "Which type of traffic is NOT supported by the cross-cloud connection between OCI and Microsoft Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Traffic from the Azure VNet to a peered OCI VCN in a different OCI region"
+      },
+      {
+        "id": "B",
+        "text": "Traffic from the Azure VNet to a peered OCI VCN in the same OCI region"
+      },
+      {
+        "id": "C",
+        "text": "Traffic between your on-premises network and the OCI VCN through the Azure VNet"
+      },
+      {
+        "id": "D",
+        "text": "Traffic between the Azure VNet and OCI VCN using private IP addresses"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 12,
+    "question": "What is the first action that needs to be completed during the onboarding of Oracle Database@Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Linking the OCI account is recommended (but optional) during onboarding to avoid logging in to the OCI account by manually providing credentials each time."
+      },
+      {
+        "id": "B",
+        "text": "An active Azure subscription is linked with the OCI tenancy for billing purposes."
+      },
+      {
+        "id": "C",
+        "text": "The customer consults Oracle Sales for a price agreement, which is then created as a Private Offer in the Azure marketplace by Oracle to be purchased by the customer."
+      },
+      {
+        "id": "D",
+        "text": "The onboarding step is preceded by a private offer purchase from the Oracle Private Offer marketplace."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 13,
+    "question": "What does Oracle Base Database Service use in Oracle Cloud Infrastructure to provide high availability and disaster recovery?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Availability set"
+      },
+      {
+        "id": "B",
+        "text": "Availability zone"
+      },
+      {
+        "id": "C",
+        "text": "Geography"
+      },
+      {
+        "id": "D",
+        "text": "Availability domains and fault domains"
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 14,
+    "question": "When configuring a Site-to-Site VPN, which component resides on the customer's on-premises network?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Dynamic Routing Gateway (DRG)"
+      },
+      {
+        "id": "B",
+        "text": "Customer Premises Equipment (CPE)"
+      },
+      {
+        "id": "C",
+        "text": "Virtual Private Gateway (VPG)"
+      },
+      {
+        "id": "D",
+        "text": "IPSec tunnel"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 15,
+    "question": "Which role is required under the Microsoft Customer Agreement to accept a private offer in the Azure Marketplace for Oracle Database@Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Free + Paid permissions"
+      },
+      {
+        "id": "B",
+        "text": "User access administrator role"
+      },
+      {
+        "id": "C",
+        "text": "Billing account owner or contributor role"
+      },
+      {
+        "id": "D",
+        "text": "Enterprise administrator role"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 16,
+    "question": "While configuring Oracle Interconnect for Google Cloud, which specific Interconnect Type must users select when creating a VLAN attachment on the Google Cloud Platform (GCP) console?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Partner Interconnect Connection"
+      },
+      {
+        "id": "B",
+        "text": "Cross-Cloud Interconnect Connection"
+      },
+      {
+        "id": "C",
+        "text": "Dedicated Interconnect Connection"
+      },
+      {
+        "id": "D",
+        "text": "VPN Interconnect Connection"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 17,
+    "question": "In the Oracle Database@Azure service, how are resources provisioned?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Both Oracle Exadata Infrastructure and VM Cluster, as well as Oracle container and pluggable databases, are provisioned through the Azure portal."
+      },
+      {
+        "id": "B",
+        "text": "Oracle Exadata Infrastructure and VM Cluster are set up in the OCI console, while Oracle container and pluggable databases are managed in the Azure portal."
+      },
+      {
+        "id": "C",
+        "text": "Oracle Exadata VM Cluster and container databases are provisioned via the OCI console."
+      },
+      {
+        "id": "D",
+        "text": "Oracle Exadata Infrastructure and VM Cluster are provisioned exclusively in the Azure portal."
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 18,
+    "question": "Which interface can you use to provision Oracle Database at Azure Exadata Infrastructure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "OCI console"
+      },
+      {
+        "id": "B",
+        "text": "Azure Terraform scripts"
+      },
+      {
+        "id": "C",
+        "text": "Azure portal and APIs"
+      },
+      {
+        "id": "D",
+        "text": "OCI Terraform scripts"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 19,
+    "question": "Which OCI native database service can you provision with Oracle Database@Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Base Database Service"
+      },
+      {
+        "id": "B",
+        "text": "Autonomous Database on Dedicated Infrastructure"
+      },
+      {
+        "id": "C",
+        "text": "HeatWave"
+      },
+      {
+        "id": "D",
+        "text": "HeatWave"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 20,
+    "question": "What is the function of a NAT Gateway in an OCI VCN?",
+    "options": [
+      {
+        "id": "A",
+        "text": "To provide a secure tunnel for connecting to on-premises networks."
+      },
+      {
+        "id": "B",
+        "text": "To allow instances in private subnets to initiate outbound connections to the internet without having public IP addresses."
+      },
+      {
+        "id": "C",
+        "text": "To balance network traffic across multiple instances in a subnet."
+      },
+      {
+        "id": "D",
+        "text": "To provide DNS resolution for instances within the VCN."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 21,
+    "question": "Which of the following components is NOT a core part of the Oracle Database@Google Cloud architecture within the Google Cloud environment?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Google Cloud Project and VPC"
+      },
+      {
+        "id": "B",
+        "text": "Google Cloud Router"
+      },
+      {
+        "id": "C",
+        "text": "Oracle Exadata Infrastructure"
+      },
+      {
+        "id": "D",
+        "text": "Google Cloud Storage Buckets directly mounted to Exadata compute nodes."
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 22,
+    "question": "Which of the following scenarios would NOT be a valid example of how multicloud might help in this objective?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Leveraging specific cloud providers that offer significant discounts on compute instances during off-peak hours."
+      },
+      {
+        "id": "B",
+        "text": "Using a consistent pricing model for all services regardless of the cloud provider."
+      },
+      {
+        "id": "C",
+        "text": "Deploying workloads on cloud providers that offer better pricing for specific services used by the application."
+      },
+      {
+        "id": "D",
+        "text": "Employing a multi-cloud container orchestration platform to effectively utilize existing resources across different environments."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 23,
+    "question": "Which regions support Oracle Interconnect for Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "All OCI and GCP regions globally"
+      },
+      {
+        "id": "B",
+        "text": "Specific OCI and GCP regions where Interconnect partnership is established"
+      },
+      {
+        "id": "C",
+        "text": "Only regions in North America"
+      },
+      {
+        "id": "D",
+        "text": "Only regions with Oracle FastConnect availability"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 24,
+    "question": "What is an IdP in the context of federating Oracle Cloud Infrastructure with external identity providers?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A service that calls upon a service provider to authenticate users"
+      },
+      {
+        "id": "B",
+        "text": "A security protocol used to authenticate users in a federated environment"
+      },
+      {
+        "id": "C",
+        "text": "A service that provides identifying credentials and authentication for users"
+      },
+      {
+        "id": "D",
+        "text": "An Oracle Cloud Infrastructure component that manages access to resources"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 25,
+    "question": "What types of metrics can be monitored for Oracle databases using Azure services in Oracle Database@Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Block changes, OCPU utilization, and database wait time"
+      },
+      {
+        "id": "B",
+        "text": "Node status, ASM diskgroup utilization, and file system utilization"
+      },
+      {
+        "id": "C",
+        "text": "Automatic backup configuration and database PSU updates"
+      },
+      {
+        "id": "D",
+        "text": "Invoice payments, storage usage reports, and support rewards"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 26,
+    "question": "Which of the following components is NOT part of the physical architecture of an OCI pod deployed within an Azure data center for Oracle Database@Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Exadata compute servers"
+      },
+      {
+        "id": "B",
+        "text": "Exadata storage servers"
+      },
+      {
+        "id": "C",
+        "text": "Azure Virtual Machines acting as Database servers"
+      },
+      {
+        "id": "D",
+        "text": "High-speed, low-latency interconnect fabric"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 27,
+    "question": "In a disaster recovery scenario for Oracle Database@Azure using Data Guard, where would the standby database typically reside?",
+    "options": [
+      {
+        "id": "A",
+        "text": "In a different Azure region."
+      },
+      {
+        "id": "B",
+        "text": "In a separate OCI region."
+      },
+      {
+        "id": "C",
+        "text": "On a set of Azure Virtual Machines in the same Azure region."
+      },
+      {
+        "id": "D",
+        "text": "In a separate Availability Domain within the same Azure data center."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 28,
+    "question": "What is the role of BGP dynamic routing in the connection between an Azure VNet and OCI VCN for ABC Private Limited?",
+    "options": [
+      {
+        "id": "A",
+        "text": "It is used to create a static routing configuration for the VNet and VCN."
+      },
+      {
+        "id": "B",
+        "text": "It is used to automatically select the best route between the VNet and VCN."
+      },
+      {
+        "id": "C",
+        "text": "It is used to establish a direct connection between the VNet and VCN without a virtual circuit."
+      },
+      {
+        "id": "D",
+        "text": "It is used to manage the security rules for the VNet and VCN."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 29,
+    "question": "Which scenario is least likely to need Oracle Interconnect for Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Migrating data from an on-premises data center to OCI"
+      },
+      {
+        "id": "B",
+        "text": "Deploying a multicloud disaster recovery solution"
+      },
+      {
+        "id": "C",
+        "text": "Running latency-sensitive applications across OCI and GCP"
+      },
+      {
+        "id": "D",
+        "text": "Leveraging OCI's Autonomous Database with GCP's AI tools"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 30,
+    "question": "Which of the following actions requires coordination with Oracle support when working with Oracle Database@Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Creating a new database within an existing Exadata VM Cluster."
+      },
+      {
+        "id": "B",
+        "text": "Scaling up the compute resources of an Exadata VM Cluster."
+      },
+      {
+        "id": "C",
+        "text": "Applying database patches to a CDB (Container Database)."
+      },
+      {
+        "id": "D",
+        "text": "Backing up a PDB (Pluggable Database) to OCI Object Storage."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 31,
+    "question": "What is the purpose of federating the Azure tenant's Microsoft Entra ID with an OCI identity domain?",
+    "options": [
+      {
+        "id": "A",
+        "text": "To specify an Azure Virtual Network (VNet) in Azure during provisioning"
+      },
+      {
+        "id": "B",
+        "text": "To specify an Azure Virtual Network (VNet) in Azure during provisioning"
+      },
+      {
+        "id": "C",
+        "text": "To allow Azure users to log in to the OCI Console using the same Azure credentials used for Azure"
+      },
+      {
+        "id": "D",
+        "text": "To enable bi-directional communication between Azure and OCI"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 32,
+    "question": "What is required to configure Oracle Interconnect for Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Direct Internet connection"
+      },
+      {
+        "id": "B",
+        "text": "Integration with Microsoft Active Directory"
+      },
+      {
+        "id": "C",
+        "text": "Virtual Circuits on OCI and Partner Interconnects on GCP"
+      },
+      {
+        "id": "D",
+        "text": "A public subnet on both OCI and GCP"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 33,
+    "question": "which of the following components is primarily responsible for managing the BGP peering and dynamic route exchange between the two cloud environments?",
+    "options": [
+      {
+        "id": "A",
+        "text": "OCI Dynamic Routing Gateway (DRG) and Google Cloud Virtual Private Cloud (VPC) Network"
+      },
+      {
+        "id": "B",
+        "text": "OCI Customer-Premises Equipment (CPE) and Google Cloud Router"
+      },
+      {
+        "id": "C",
+        "text": "OCI Virtual Cloud Network (VCN) and Google Cloud Interconnect Attachment"
+      },
+      {
+        "id": "D",
+        "text": "OCI FastConnect and Google Cloud Partner Interconnect"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 34,
+    "question": "Which interface is available for you to provision Oracle Database@Azure Exadata Infrastructure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "OCI console"
+      },
+      {
+        "id": "B",
+        "text": "OCI Terraform scripts"
+      },
+      {
+        "id": "C",
+        "text": "Azure Terraform scripts"
+      },
+      {
+        "id": "D",
+        "text": "Azure portal and APIs"
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 35,
+    "question": "A company operates in multiple regions and needs to comply with data residency regulations. They want to utilize both OCI and AWS for their application infrastructure, storing data in the region where it's generated. Which aspect of multicloud architecture is MOST critical for achieving this goal?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Network connectivity between cloud providers."
+      },
+      {
+        "id": "B",
+        "text": "Unified identity management across clouds."
+      },
+      {
+        "id": "C",
+        "text": "Centralized monitoring and logging."
+      },
+      {
+        "id": "D",
+        "text": "Provider-specific data storage and regional availability."
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 36,
+    "question": "A company is migrating its Oracle database to Oracle Database@Azure and wants to configure automatic backups and Oracle Data Guard for high availability. Which configuration will ensure automated backups and high availability for both primary and standby databases in Oracle Database@Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable Oracle Data Guard only and do not configure automatic backups for the databases."
+      },
+      {
+        "id": "B",
+        "text": "Use third-party backup tools and configure Data Guard for high availability."
+      },
+      {
+        "id": "C",
+        "text": "Configure backups manually and rely on Oracle Data Guard for high availability without using OCI Object Storage."
+      },
+      {
+        "id": "D",
+        "text": "Enable automatic backups and Oracle Data Guard with local and remote standby databases, storing backups in OCI Object Storage."
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 37,
+    "question": "When configuring Data Guard for Oracle Database@Azure, what network connectivity is required between the primary (in Azure) and the standby (in OCI)?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A direct connection through Azure ExpressRoute."
+      },
+      {
+        "id": "B",
+        "text": "A VPN connection over the public internet."
+      },
+      {
+        "id": "C",
+        "text": "Oracle Interconnect for Azure combined with FastConnect in the DR OCI region."
+      },
+      {
+        "id": "D",
+        "text": "A Site-to-Site VPN between the Azure VNet and the OCI VCN."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 38,
+    "question": "Which of the following is NOT a common driver for organizations to adopt a multicloud strategy?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The desire to leverage cutting-edge machine learning and artificial intelligence capabilities available from specific providers."
+      },
+      {
+        "id": "B",
+        "text": "The need to achieve geographic redundancy and enhance business continuity."
+      },
+      {
+        "id": "C",
+        "text": "The preference for sticking to a single cloud vendor to keep management and development workflows consistent."
+      },
+      {
+        "id": "D",
+        "text": "The goal of avoiding vendor lock-in and gaining more negotiating power over cloud service pricing."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 39,
+    "question": "Regarding the benefits of multicloud, which of the following statements is NOT accurate?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Multicloud enables businesses to avoid vendor lock-in, providing greater flexibility in choosing services."
+      },
+      {
+        "id": "B",
+        "text": "Multicloud allows organizations to utilize specialized, best-of-breed services available from different vendors."
+      },
+      {
+        "id": "C",
+        "text": "A major advantage of Multicloud is to simplify the management of the different services into a single pane of glass."
+      },
+      {
+        "id": "D",
+        "text": "By distributing workloads across multiple providers, multicloud improves overall resilience and reduces the impact of localized failures."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 40,
+    "question": "Which task is the customer responsible for when using Oracle Database on Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Provision containers and pluggable databases in the Google Cloud Console"
+      },
+      {
+        "id": "B",
+        "text": "Update infrastructure and software in OCI"
+      },
+      {
+        "id": "C",
+        "text": "Provision Exadata VM cluster in OCI"
+      },
+      {
+        "id": "D",
+        "text": "Provision Exadata Infrastructure through the Google Cloud Console"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 41,
+    "question": "Which method is NOT a valid approach to scale the Exadata VM Cluster's compute resources?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Manually scaling up or down the number of CPU cores allocated to the cluster's VMs via the OCI Console."
+      },
+      {
+        "id": "B",
+        "text": "Using the Oracle Cloud Infrastructure API to programmatically adjust the compute resource allocation."
+      },
+      {
+        "id": "C",
+        "text": "Leveraging Google Cloud's managed instance groups to automatically scale the number of compute instances in the Exadata VM Cluster."
+      },
+      {
+        "id": "D",
+        "text": "Utilizing OCI's autoscaling functionality through OCI Console that allows for scaling based on performance metrics."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 42,
+    "question": "What is the main requirement for subscribing to Oracle Database@Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "An existing Azure subscription"
+      },
+      {
+        "id": "B",
+        "text": "Custom Identity domain"
+      },
+      {
+        "id": "C",
+        "text": "Linked Azure and Oracle Cloud Infrastructure account"
+      },
+      {
+        "id": "D",
+        "text": "Private interconnect between OCI and Azure"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 43,
+    "question": "Which of the following statements is incorrect regarding the IP addressing requirements for establishing Oracle Interconnect for Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The Oracle Cloud Infrastructure (OCI) FastConnect virtual circuit requires two pairs of BGP IP addresses: a primary and a secondary pair."
+      },
+      {
+        "id": "B",
+        "text": "Each BGP session established over Oracle Interconnect for Azure uses a /30 subnet for the link local addresses."
+      },
+      {
+        "id": "C",
+        "text": "The IP addresses used for the BGP sessions must be private IP addresses within the 169.254.0.0/16 range."
+      },
+      {
+        "id": "D",
+        "text": "The customer is responsible for providing the BGP IP addresses for both the OCI and Azure sides of the connection."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 44,
+    "question": "Why would you federate the Azure tenant's Microsoft Entra ID with an OCI identity domain?",
+    "options": [
+      {
+        "id": "A",
+        "text": "To define an Azure Virtual Network (VNet) during provisioning"
+      },
+      {
+        "id": "B",
+        "text": "To enable two-way communication between Azure and OCI"
+      },
+      {
+        "id": "C",
+        "text": "To manage and create resources in the subscription"
+      },
+      {
+        "id": "D",
+        "text": "To enable Azure users to log in to the OCI Console using their Azure credentials"
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 45,
+    "question": "During the onboarding process for Oracle Database@Azure, what role does the Customer-Managed Key (CMK) play?",
+    "options": [
+      {
+        "id": "A",
+        "text": "It encrypts the communication between the OCI control plane and the Exadata infrastructure."
+      },
+      {
+        "id": "B",
+        "text": "It encrypts the data at rest on the Exadata storage servers."
+      },
+      {
+        "id": "C",
+        "text": "It authenticates the connection between the OCI and Azure environments."
+      },
+      {
+        "id": "D",
+        "text": "It authorizes access to the Exadata systems from Azure applications."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 46,
+    "question": "A company is utilizing OCI for its core application infrastructure and AWS for its machine learning workloads. They need to ensure secure and low-latency communication between these two clouds for real-time data processing. Which solution is the MOST optimal and cost-effective for this scenario?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Establish a VPN connection between OCI and AWS."
+      },
+      {
+        "id": "B",
+        "text": "Utilize Oracle Cloud Infrastructure FastConnect and AWS Direct Connect with a third-party provider offering connectivity between them."
+      },
+      {
+        "id": "C",
+        "text": "Transfer data between OCI Object Storage and AWS S3 using public internet and HTTPS."
+      },
+      {
+        "id": "D",
+        "text": "Implement a message queue service in each cloud provider and asynchronously transfer data between them."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 47,
+    "question": "What steps must be completed during the onboarding process for Oracle Database@Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Purchase and configuration"
+      },
+      {
+        "id": "B",
+        "text": "Google Cloud project creation and OCI account subscription"
+      },
+      {
+        "id": "C",
+        "text": "My Oracle Support registration and RBAC assignment"
+      },
+      {
+        "id": "D",
+        "text": "Account linking and identity federation"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 48,
+    "question": "Which first action needs to be completed during the onboarding of Oracle Database@Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Linking the OCI account is recommended (but optional) during onboarding to avoid logging in to the OCI account by manually providing credentials each time."
+      },
+      {
+        "id": "B",
+        "text": "An active Azure subscription is linked with the OCI tenancy for billing purposes."
+      },
+      {
+        "id": "C",
+        "text": "The customer consults Oracle Sales for a price agreement, which is then created as a Private Offer in the Azure Marketplace by Oracle to be purchased by the customer."
+      },
+      {
+        "id": "D",
+        "text": "The onboarding step is preceded by a private offer purchase from the Oracle Private Offer Marketplace."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 49,
+    "question": "A company XYZ has been using Oracle Cloud Infrastructure to host their mission-critical applications, but they have decided to start using Azure for some of their workloads. They want to enable connectivity between their Oracle Cloud Infrastructure and Microsoft Azure to create a multicloud architecture.",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use a VPN connection to connect the two clouds."
+      },
+      {
+        "id": "B",
+        "text": "Use public Internet to connect the two clouds."
+      },
+      {
+        "id": "C",
+        "text": "Use OCI-Azure Interconnect to establish a private, high-bandwidth, low-latency connection between the two clouds."
+      },
+      {
+        "id": "D",
+        "text": "None of the above."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 50,
+    "question": "Which type of routing does Oracle FastConnect use to exchange routing information between on-premises networks and Oracle Cloud Infrastructure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "OSPF"
+      },
+      {
+        "id": "B",
+        "text": "BGP"
+      },
+      {
+        "id": "C",
+        "text": "RIP"
+      },
+      {
+        "id": "D",
+        "text": "Static Routing"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 51,
+    "question": "Where do you obtain the Partner Service Key while setting up Oracle Interconnect for Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "From OCI when creating the Dynamic Routing Gateway"
+      },
+      {
+        "id": "B",
+        "text": "From Microsoft when setting up the ExpressRoute circuit"
+      },
+      {
+        "id": "C",
+        "text": "From Microsoft when setting up a Site-to-Site VPN connection"
+      },
+      {
+        "id": "D",
+        "text": "From OCI when setting up the FastConnect virtual circuit"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 52,
+    "question": "Which of the following tasks is the customer's responsibility when managing Oracle Database@Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Maintaining the physical Exadata hardware within the Google Cloud data center."
+      },
+      {
+        "id": "B",
+        "text": "Applying operating system patches to the Exadata compute nodes."
+      },
+      {
+        "id": "C",
+        "text": "Creating and managing databases within the Exadata VM Cluster."
+      },
+      {
+        "id": "D",
+        "text": "Managing the network connectivity between the Google Cloud VPC and the Oracle FastConnect circuit."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 53,
+    "question": "Which OCI native database service can be provisioned using Oracle Database at Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Autonomous Database Serverless"
+      },
+      {
+        "id": "B",
+        "text": "Base Database Service"
+      },
+      {
+        "id": "C",
+        "text": "Autonomous Database on Dedicated Infrastructure"
+      },
+      {
+        "id": "D",
+        "text": "HeatWave"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 54,
+    "question": "Which of the following is NOT a benefit of using Oracle Interconnect for Azure compared to an IPsec VPN solution for connecting OCI and Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Higher bandwidth and lower latency."
+      },
+      {
+        "id": "B",
+        "text": "Dynamic routing with BGP."
+      },
+      {
+        "id": "C",
+        "text": "Simplified network management."
+      },
+      {
+        "id": "D",
+        "text": "Inherent encryption of all traffic traversing the connection."
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 55,
+    "question": "Where can you obtain the Partner Service Key when setting up Oracle Interconnect for Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "From OCI when creating the Dynamic Routing Gateway"
+      },
+      {
+        "id": "B",
+        "text": "From Microsoft when setting up the ExpressRoute circuit"
+      },
+      {
+        "id": "C",
+        "text": "From OCI when setting up the FastConnect virtual circuit"
+      },
+      {
+        "id": "D",
+        "text": "From Microsoft when setting up a Site-to-Site VPN connection"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 56,
+    "question": "How can an organization ensure secure and efficient data transfer between their frontend data analytics applications in Microsoft Azure and the backend Oracle Autonomous Data Warehouse in Oracle Cloud Infrastructure (OCI) in a multicloud solution?",
+    "options": [
+      {
+        "id": "A",
+        "text": "By leveraging a VPN Gateway to create an encrypted tunnel between Azure and OCI for secure data transfer"
+      },
+      {
+        "id": "B",
+        "text": "By using public internet connections to transfer data between Azure and OCI, encrypting the data in transit"
+      },
+      {
+        "id": "C",
+        "text": "By implementing a hybrid cloud approach that integrates on-premises infrastructure with both Azure and OCI"
+      },
+      {
+        "id": "D",
+        "text": "By establishing a dedicated, private connection between Azure and OCI using Azure ExpressRoute and Oracle FastConnect"
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 57,
+    "question": "When using the Oracle Database at Azure, which tasks are carried out in the Azure portal?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Configuring Oracle database homes"
+      },
+      {
+        "id": "B",
+        "text": "Enabling Data Guard for database backups"
+      },
+      {
+        "id": "C",
+        "text": "Managing and maintaining Exadata VM cluster and infrastructure"
+      },
+      {
+        "id": "D",
+        "text": "Provisioning container and pluggable databases"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 58,
+    "question": "What is the recommended approach if the application needs to connect to an Autonomous Database from an on-premises environment and you want to establish a secure and dedicated connection?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Connect directly using the public IP address of the Autonomous Database."
+      },
+      {
+        "id": "B",
+        "text": "Use an IPSec VPN tunnel between your on-premises network and your OCI VCN."
+      },
+      {
+        "id": "C",
+        "text": "Use FastConnect to establish a dedicated connection between your on-premises network and your OCI VCN."
+      },
+      {
+        "id": "D",
+        "text": "Configure a reverse proxy server in your OCI VCN."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 59,
+    "question": "When configuring Oracle Interconnect for Google Cloud, what key resource must be created in the Google Cloud environment?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Shared VPC with OCI"
+      },
+      {
+        "id": "B",
+        "text": "Partner Interconnect VLAN attachment"
+      },
+      {
+        "id": "C",
+        "text": "Google Cloud NAT gateway"
+      },
+      {
+        "id": "D",
+        "text": "Cross-Cloud Interconnect VLAN attachment"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 60,
+    "question": "How are backups of databases running on Oracle Database@Google Cloud typically handled?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Backups are automatically stored in Google Cloud Storage."
+      },
+      {
+        "id": "B",
+        "text": "Backups can be configured to use OCI Object Storage or other customer-managed storage locations accessible from the Exadata system."
+      },
+      {
+        "id": "C",
+        "text": "Backups are stored on a separate Exadata storage array within the same Google Cloud data center."
+      },
+      {
+        "id": "D",
+        "text": "Backups are managed exclusively using Google Cloud Backup and DR service."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 61,
+    "question": "How are resources provisioned in Oracle Database@Azure service?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Oracle Exadata Infrastructure and Oracle Exadata VM Cluster are provisioned in the Azure portal."
+      },
+      {
+        "id": "B",
+        "text": "Oracle Exadata VM Cluster and Oracle container databases are provisioned in the OCI console."
+      },
+      {
+        "id": "C",
+        "text": "Oracle Exadata Infrastructure and Oracle Exadata VM Cluster are provisioned in the OCI console and Oracle container and pluggable databases in the Azure portal."
+      },
+      {
+        "id": "D",
+        "text": "Oracle Exadata Infrastructure, Oracle Exadata VM Cluster, Oracle container, and pluggable databases are provisioned in the Azure portal."
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 62,
+    "question": "Which use case is least likely to require Oracle Interconnect for Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Leveraging OCI's Autonomous Database with GCP's AI tools"
+      },
+      {
+        "id": "B",
+        "text": "Migrating data from an on-premises data center to OCI"
+      },
+      {
+        "id": "C",
+        "text": "Deploying a multicloud disaster recovery solution"
+      },
+      {
+        "id": "D",
+        "text": "Running latency-sensitive applications across OCI and GCP"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 63,
+    "question": "ABC company has a strict security policy requiring multi-factor authentication (MFA) for all access to cloud resources. You are federating OCI with an identity provider that already enforces MFA.How can you ensure MFA is enforced for OCI access?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Configure MFA directly within the OCI Identity Domain."
+      },
+      {
+        "id": "B",
+        "text": "Rely on the IdP's existing MFA implementation."
+      },
+      {
+        "id": "C",
+        "text": "Implement a separate MFA solution in front of OCI."
+      },
+      {
+        "id": "D",
+        "text": "MFA is not possible with federated access."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 64,
+    "question": "Which feature is supported in all Oracle Database editions in Oracle Cloud Infrastructure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Real Application Clusters (RAC)"
+      },
+      {
+        "id": "B",
+        "text": "In-Memory Database"
+      },
+      {
+        "id": "C",
+        "text": "Data Guard"
+      },
+      {
+        "id": "D",
+        "text": "Advanced Security"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 65,
+    "question": "When setting up the Azure side of the Interconnect connection, which Azure resource is required to connect to the Oracle virtual circuit?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Azure ExpressRoute circuit"
+      },
+      {
+        "id": "B",
+        "text": "Azure VPN Gateway"
+      },
+      {
+        "id": "C",
+        "text": "Azure Virtual Network Gateway"
+      },
+      {
+        "id": "D",
+        "text": "Azure Load Balancer"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 66,
+    "question": "What are the main types of purchase offers for Oracle Database@Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Basic and Advanced"
+      },
+      {
+        "id": "B",
+        "text": "Public and Private"
+      },
+      {
+        "id": "C",
+        "text": "Standard and Premium"
+      },
+      {
+        "id": "D",
+        "text": "Free Tier and Paid"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 67,
+    "question": "What is the role of a Dynamic Routing Gateway (DRG) in an OCI VCN?",
+    "options": [
+      {
+        "id": "A",
+        "text": "To provide internet connectivity for instances within the VCN."
+      },
+      {
+        "id": "B",
+        "text": "To establish secure connections between VCNs in the same region."
+      },
+      {
+        "id": "C",
+        "text": "To connect the VCN to networks outside of OCI, such as on-premises networks via FastConnect or VPN Connect, or to other VCNs in different regions."
+      },
+      {
+        "id": "D",
+        "text": "To provide access to Oracle services, such as Object Storage, without traversing the public internet."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 68,
+    "question": "ABC Private Limited has been using Oracle Cloud Infrastructure (OCI) to host their mission-critical applications but has decided to start using Microsoft Azure for some of their workloads. They want to enable connectivity between OCI and Azure to create a multicloud architecture. What should ABC Private Limited do to enable connectivity between OCI and Microsoft Azure for a multicloud setup?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use a third-party cloud provider to host the workloads that need to communicate between the two clouds."
+      },
+      {
+        "id": "B",
+        "text": "Use the OCI-Azure Interconnect to establish a private, high-bandwidth, low-latency connection between the two clouds."
+      },
+      {
+        "id": "C",
+        "text": "Use the public internet to connect the two clouds."
+      },
+      {
+        "id": "D",
+        "text": "Use a VPN connection to connect the two clouds."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 69,
+    "question": "What is the primary purpose of the Database Management service's Performance Hub in relation to OCI Databases?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Performance Hub provides automated backups and recovery for all OCI Database services."
+      },
+      {
+        "id": "B",
+        "text": "Performance Hub offers detailed performance diagnostics, allowing analysis of SQL activity, identification of bottlenecks, and drill-down into individual queries."
+      },
+      {
+        "id": "C",
+        "text": "Performance Hub manages the patching and upgrading of database software for Base Databases."
+      },
+      {
+        "id": "D",
+        "text": "Performance Hub provides a centralized console for managing all aspects of OCI Database security."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 70,
+    "question": "Which of the following is NOT a primary benefit typically associated with adopting a multicloud strategy?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Reduced risk of vendor lock-in, fostering greater negotiating power."
+      },
+      {
+        "id": "B",
+        "text": "Access to a wide array of specialized services from different providers, driving innovation."
+      },
+      {
+        "id": "C",
+        "text": "Simplified operational management through a unified, multi-cloud platform."
+      },
+      {
+        "id": "D",
+        "text": "Improved resilience and business continuity by distributing workloads across multiple environments"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 71,
+    "question": "What is the primary purpose of a Local Peering Gateway (LPG) in OCI?",
+    "options": [
+      {
+        "id": "A",
+        "text": "To connect a VCN to an on-premises network via FastConnect."
+      },
+      {
+        "id": "B",
+        "text": "To establish a connection between two VCNs within the same region."
+      },
+      {
+        "id": "C",
+        "text": "To provide internet connectivity for instances within a VCN."
+      },
+      {
+        "id": "D",
+        "text": "To connect VCNs in different regions."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 72,
+    "question": "What is a key benefit of using Oracle Autonomous Database on Shared Exadata Infrastructure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Automatic database tuning and patching"
+      },
+      {
+        "id": "B",
+        "text": "Seamless integration with third-party cloud providers"
+      },
+      {
+        "id": "C",
+        "text": "Unlimited storage capacity"
+      },
+      {
+        "id": "D",
+        "text": "Enhanced physical security of hardware"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 73,
+    "question": "What BGP IP addresses are necessary when configuring the Oracle virtual circuit in Oracle Interconnect for Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Only a secondary pair of BGP addresses is required."
+      },
+      {
+        "id": "B",
+        "text": "BGP addresses are not required for setting up the Oracle virtual circuit."
+      },
+      {
+        "id": "C",
+        "text": "Both a primary and secondary pair of BGP addresses are required."
+      },
+      {
+        "id": "D",
+        "text": "Only a primary pair of BGP addresses is required."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 74,
+    "question": "Which of the following is NOT a key consideration when designing a hybrid cloud architecture with FastConnect?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Bandwidth requirements"
+      },
+      {
+        "id": "B",
+        "text": "Number of required public IP addresses"
+      },
+      {
+        "id": "C",
+        "text": "Availability domain selection for FastConnect termination"
+      },
+      {
+        "id": "D",
+        "text": "Redundancy requirements"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 75,
+    "question": "For disaster recovery of Oracle Database@Azure to a separate OCI region, which of the following Oracle technologies is primarily used?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Azure Site Recovery"
+      },
+      {
+        "id": "B",
+        "text": "Oracle Data Guard"
+      },
+      {
+        "id": "C",
+        "text": "Oracle GoldenGate"
+      },
+      {
+        "id": "D",
+        "text": "Oracle Cloud Infrastructure Object Storage replication"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 76,
+    "question": "Which of the following components is NOT a core part of the Oracle Database@Google Cloud architecture within the Google Cloud environment?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Oracle Exadata Infrastructure"
+      },
+      {
+        "id": "B",
+        "text": "Google Cloud Project and VPC"
+      },
+      {
+        "id": "C",
+        "text": "Google Cloud Storage Buckets directly mounted to Exadata compute nodes."
+      },
+      {
+        "id": "D",
+        "text": "Google Cloud Router"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 77,
+    "question": "In the architecture of Oracle Database@Google Cloud, where does the primary management and control plane for the Exadata Database Service reside?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Within the customer's Google Cloud Project."
+      },
+      {
+        "id": "B",
+        "text": "Within an Oracle-managed OCI region."
+      },
+      {
+        "id": "C",
+        "text": "Partially in the customer's Google Cloud project and partially in an Oracle-managed OCI region."
+      },
+      {
+        "id": "D",
+        "text": "Within the customer's on-premises data center."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 78,
+    "question": "How does network connectivity between Google Cloud Virtual Private Clouds (VPCs) and the Exadata systems in Oracle Database@Google Cloud primarily function?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Through a direct, physical cross-connect between Google Cloud and OCI networks."
+      },
+      {
+        "id": "B",
+        "text": "Using Google Cloud's Partner Interconnect service combined with Oracle FastConnect."
+      },
+      {
+        "id": "C",
+        "text": "Via an IPsec VPN tunnel established over the public internet between Google Cloud and OCI."
+      },
+      {
+        "id": "D",
+        "text": "By leveraging Google Cloud's Cloud VPN service to connect to an OCI Virtual Cloud Network (VCN)."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 79,
+    "question": "What does Oracle Base Database Service utilize in Oracle Cloud Infrastructure to ensure high availability and disaster recovery?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Geography"
+      },
+      {
+        "id": "B",
+        "text": "Availability set"
+      },
+      {
+        "id": "C",
+        "text": "Availability domains and fault domains"
+      },
+      {
+        "id": "D",
+        "text": "Availability zone"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 80,
+    "question": "What is the significance of the \"customer tenancy\" in the context of provisioning Oracle Database@Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "It refers to the Azure subscription where the cross-connect is established."
+      },
+      {
+        "id": "B",
+        "text": "It represents the OCI tenancy where the Exadata resources are provisioned."
+      },
+      {
+        "id": "C",
+        "text": "It defines the network connectivity between the Exadata systems and the Azure Virtual Network."
+      },
+      {
+        "id": "D",
+        "text": "It specifies the billing relationship between Oracle and the customer for the service."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 81,
+    "question": "What BGP IP addresses are required when setting up the Oracle virtual circuit in Oracle Interconnect for Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Only a primary pair of BGP addresses is required."
+      },
+      {
+        "id": "B",
+        "text": "BGP addresses are not required for setting up the Oracle virtual circuit."
+      },
+      {
+        "id": "C",
+        "text": "Both a primary and secondary pair of BGP addresses are required."
+      },
+      {
+        "id": "D",
+        "text": "Only a secondary pair of BGP addresses is required."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 82,
+    "question": "What is the primary difference between using Oracle FastConnect with an Oracle partner and using FastConnect with colocation with Oracle?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The geographical locations available for connections"
+      },
+      {
+        "id": "B",
+        "text": "The number of available redundancy models"
+      },
+      {
+        "id": "C",
+        "text": "The type of virtual circuits supported"
+      },
+      {
+        "id": "D",
+        "text": "The method of establishing the physical connection to Oracle Cloud Infrastructure"
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 83,
+    "question": "What is the primary purpose of the MySQL Database Service HeatWave option in Oracle Cloud Infrastructure (OCI)?",
+    "options": [
+      {
+        "id": "A",
+        "text": "To provide a distributed in-memory query accelerator"
+      },
+      {
+        "id": "B",
+        "text": "To enable seamless database migration from on-premises to OCI"
+      },
+      {
+        "id": "C",
+        "text": "To ensure high availability and fault tolerance"
+      },
+      {
+        "id": "D",
+        "text": "To offer a serverless MySQL deployment"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 84,
+    "question": "Which is a prerequisite for subscribing to Oracle Database@Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Private interconnect between OCI and Azure"
+      },
+      {
+        "id": "B",
+        "text": "An existing Azure subscription"
+      },
+      {
+        "id": "C",
+        "text": "Linked Azure and Oracle Cloud Infrastructure account"
+      },
+      {
+        "id": "D",
+        "text": "Custom Identity domain"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 85,
+    "question": "What types of metrics can be monitored for Oracle databases using Azure services in Oracle Database@Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Node status, ASM diskgroup utilization, and file system utilization"
+      },
+      {
+        "id": "B",
+        "text": "Invoice payments, storage usage reports, and support rewards"
+      },
+      {
+        "id": "C",
+        "text": "Block changes, OCPU utilization, and database wait time"
+      },
+      {
+        "id": "D",
+        "text": "Automatic backup configuration and database PSU updates"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 86,
+    "question": "What is the primary role of the Azure Portal in the provisioning process of Oracle Database@Azure after the Oracle Exadata Infrastructure is created?",
+    "options": [
+      {
+        "id": "A",
+        "text": "To create and manage the Oracle Exadata VM Cluster."
+      },
+      {
+        "id": "B",
+        "text": "To solely provide monitoring and logging of the Oracle resources."
+      },
+      {
+        "id": "C",
+        "text": "To provide overall management of the Oracle service on the Azure side and to monitor and check the status of the Exadata Infrastructure."
+      },
+      {
+        "id": "D",
+        "text": "To perform all aspects of Oracle Database administration."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 87,
+    "question": "which statement accurately describes the physical location and operational ownership of the underlying Exadata infrastructure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The Exadata infrastructure is physically located within the Azure data center but managed entirely by Oracle."
+      },
+      {
+        "id": "B",
+        "text": "The Exadata infrastructure is physically located within the nearest Oracle Cloud Infrastructure (OCI) region and managed entirely by Oracle."
+      },
+      {
+        "id": "C",
+        "text": "The Exadata infrastructure is physically co-located between Azure and OCI data centers, with management shared by both providers."
+      },
+      {
+        "id": "D",
+        "text": "The Exadata infrastructure is deployed within the customer's on-premises data center as a dedicated instance and managed by the customer."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 88,
+    "question": "What is used to monitor and analyze Oracle Exadata VM Cluster metrics in Azure for ABC Private Limited?",
+    "options": [
+      {
+        "id": "A",
+        "text": "OCI Monitoring services"
+      },
+      {
+        "id": "B",
+        "text": "Microsoft Defender"
+      },
+      {
+        "id": "C",
+        "text": "Oracle Database Management Tool"
+      },
+      {
+        "id": "D",
+        "text": "Azure Monitoring services"
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 89,
+    "question": "Which is a valid statement for a private offer purchase option?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Consult Oracle Sales to create a private offer in OCI Marketplace."
+      },
+      {
+        "id": "B",
+        "text": "Consult Oracle Sales to create a private offer in Google Cloud Marketplace."
+      },
+      {
+        "id": "C",
+        "text": "You must have an OCI account to create a private offer."
+      },
+      {
+        "id": "D",
+        "text": "Raise a purchase private offer directly from Google Cloud Marketplace."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 90,
+    "question": "What is the purpose of Oracle Interconnect for Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Establishing a secure, low-latency connection between OCI and GCP"
+      },
+      {
+        "id": "B",
+        "text": "Migrating on-premises workloads to Oracle Cloud"
+      },
+      {
+        "id": "C",
+        "text": "Hosting Oracle Database on-premises"
+      },
+      {
+        "id": "D",
+        "text": "Managing hybrid cloud deployments involving Oracle Cloud and Azure"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 91,
+    "question": "How does Oracle Database on Google Cloud simplify database management for customers?",
+    "options": [
+      {
+        "id": "A",
+        "text": "It automatically transfers all database management tasks to the Oracle Cloud Infrastructure console."
+      },
+      {
+        "id": "B",
+        "text": "OCI offers a management console within Google Cloud to simplify database management."
+      },
+      {
+        "id": "C",
+        "text": "It requires customers to use Oracle-specific management tools."
+      },
+      {
+        "id": "D",
+        "text": "It enables customers to manage databases through the Google Cloud console or Google Cloud automation tools."
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 92,
+    "question": "How is Oracle Database@Google Cloud connected to the broader Oracle Cloud Infrastructure (OCI)?",
+    "options": [
+      {
+        "id": "A",
+        "text": "By leveraging a shared virtual private network (VPN) connection"
+      },
+      {
+        "id": "B",
+        "text": "Via a dedicated and redundant dark fiber network managed by Oracle"
+      },
+      {
+        "id": "C",
+        "text": "Through a public Internet connection with robust security measures"
+      },
+      {
+        "id": "D",
+        "text": "Using Google Cloud's internal network infrastructure for seamless communication"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 93,
+    "question": "Which statement accurately describes Oracle Database@Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "It requires complex cross-cloud network configuration for access."
+      },
+      {
+        "id": "B",
+        "text": "It allows customers to run OCI-native Oracle database services within Google Cloud data centers."
+      },
+      {
+        "id": "C",
+        "text": "It is only accessible via public internet connections."
+      },
+      {
+        "id": "D",
+        "text": "It excludes Autonomous Database features."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 94,
+    "question": "Which of the following is NOT a factor influencing the bandwidth options available for your connection?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The location of your Azure region"
+      },
+      {
+        "id": "B",
+        "text": "The location of your OCI region"
+      },
+      {
+        "id": "C",
+        "text": "The subnet size in your Azure Virtual Network"
+      },
+      {
+        "id": "D",
+        "text": "The availability of interconnect partners in the region"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 95,
+    "question": "What is the role of the \"Availability Domain\" concept in the context of Oracle Database@Azure provisioning?",
+    "options": [
+      {
+        "id": "A",
+        "text": "It maps directly to Azure Availability Zones."
+      },
+      {
+        "id": "B",
+        "text": "It is not relevant as the Exadata system is deployed in a single Azure data center."
+      },
+      {
+        "id": "C",
+        "text": "It determines the physical location of the Exadata hardware within the Azure data center."
+      },
+      {
+        "id": "D",
+        "text": "It plays the same role as in a standard OCI region, providing fault tolerance within the Exadata deployment."
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 96,
+    "question": "Which of the following is not a primary driver for using multiple clouds?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Cost Optimization"
+      },
+      {
+        "id": "B",
+        "text": "Best of Breed Cloud Services"
+      },
+      {
+        "id": "C",
+        "text": "Redundancy/Disaster Recovery"
+      },
+      {
+        "id": "D",
+        "text": "Content Delivery Network"
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 97,
+    "question": "You are troubleshooting a federation setup between OCI and Azure Active Directory (Azure AD). Users can authenticate through Azure AD, but their group memberships are not correctly reflected in OCI, leading to incorrect access permissions.Where should you focus your troubleshooting efforts first?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Verify the network connectivity between OCI and Azure AD."
+      },
+      {
+        "id": "B",
+        "text": "Check the SAML assertion configuration in Azure AD to ensure that group membership information is being included and correctly formatted."
+      },
+      {
+        "id": "C",
+        "text": "Examine the OCI IAM policies to confirm they are referencing the expected federated group names."
+      },
+      {
+        "id": "D",
+        "text": "Review the clock synchronization between OCI and Azure A"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 98,
+    "question": "When planning for disaster recovery for your federated identity solution with OCI, what is the most crucial consideration?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ensuring the high availability of the IdP."
+      },
+      {
+        "id": "B",
+        "text": "Configuring a secondary OCI Identity Domain in a different region."
+      },
+      {
+        "id": "C",
+        "text": "Implementing a backup and restore solution for the OCI Identity Domain configuration."
+      },
+      {
+        "id": "D",
+        "text": "Establishing a direct connection between OCI and the IdP's data center."
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 99,
+    "question": "What is Oracle Interconnect for Google Cloud designed for?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Managing hybrid cloud deployments involving Oracle Cloud and Azure"
+      },
+      {
+        "id": "B",
+        "text": "Migrating on-premises workloads to Oracle Cloud"
+      },
+      {
+        "id": "C",
+        "text": "Establishing a secure, low-latency connection between OCI and GCP"
+      },
+      {
+        "id": "D",
+        "text": "Hosting Oracle Database on premises"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 100,
+    "question": "Which tasks are performed in the Azure portal when using Oracle Database@Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enabling Data Guard for database backups"
+      },
+      {
+        "id": "B",
+        "text": "Configuring Oracle database homes"
+      },
+      {
+        "id": "C",
+        "text": "Managing and maintaining Exadata VM cluster and infrastructure"
+      },
+      {
+        "id": "D",
+        "text": "Provisioning container and pluggable databases"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 101,
+    "question": "Which type of storage is used as a backup destination for an autonomous database provisioned in Oracle Database@Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Google Cloud Persistent Disks"
+      },
+      {
+        "id": "B",
+        "text": "OCI Object Storage"
+      },
+      {
+        "id": "C",
+        "text": "Google Cloud Filestore"
+      },
+      {
+        "id": "D",
+        "text": "None of the above"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 102,
+    "question": "An e-commerce company experiences periodic surges in traffic during seasonal sales events. Their core application is hosted on OCI, while their AI-powered recommendation engine runs on Google Cloud. To handle these traffic surges efficiently, the company requires: * A quick way to scale bandwidth between OCI and Google Cloud * Minimal disruption to existing configurations when making adjustments. What is the most appropriate configuration to address the company's requirements during traffic surges?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use Oracle Interconnect for Google Cloud to provision an additional virtual circuit and configure it for Equal-Cost Multi-Path Routing (ECMP)."
+      },
+      {
+        "id": "B",
+        "text": "Upgrade the existing bandwidth during traffic surges and downgrade it once the surge ends."
+      },
+      {
+        "id": "C",
+        "text": "Deploy a VPN connection to handle additional traffic."
+      },
+      {
+        "id": "D",
+        "text": "Use public internet with increased capacity during surges."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 103,
+    "question": "Which of the following is NOT a requirement for establishing Oracle Interconnect for Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A FastConnect virtual circuit in OCI."
+      },
+      {
+        "id": "B",
+        "text": "A Partner Interconnect connection in Google Cloud."
+      },
+      {
+        "id": "C",
+        "text": "A Shared VPC between OCI and Google Cloud."
+      },
+      {
+        "id": "D",
+        "text": "A Cloud Router in Google Cloud."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 104,
+    "question": "Which workload type is NOT optimized for Oracle Autonomous Database on Shared Exadata Infrastructure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Data warehousing"
+      },
+      {
+        "id": "B",
+        "text": "Mixed workloads"
+      },
+      {
+        "id": "C",
+        "text": "High-performance computing"
+      },
+      {
+        "id": "D",
+        "text": "Transaction processing"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 105,
+    "question": "What encryption protocol is used to secure data transmission in an OCI Site-to-Site VPN connection?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Secure Sockets Layer (SSL)"
+      },
+      {
+        "id": "B",
+        "text": "Datagram Transport Layer Security (DTLS)"
+      },
+      {
+        "id": "C",
+        "text": "Transport Layer Security (TLS)"
+      },
+      {
+        "id": "D",
+        "text": "Internet Protocol Security (IPsec)"
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 106,
+    "question": "What is the role of BGP dynamic routing in the connection between an Azure VNet and OCI VCN?",
+    "options": [
+      {
+        "id": "A",
+        "text": "It is used to create a static routing configuration for the VNet and VCN."
+      },
+      {
+        "id": "B",
+        "text": "It is used to establish a direct connection between the VNet and VCN without a virtual circuit."
+      },
+      {
+        "id": "C",
+        "text": "It is used to manage the security rules for the VNet and VCN."
+      },
+      {
+        "id": "D",
+        "text": "It is used to automatically select the best route between the VNet and VCN."
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 107,
+    "question": "Suppose you have a highly sensitive dataset stored in an Autonomous Database. What is the BEST way to ensure that no data leaves the EU?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Configure a Virtual Cloud Network (VCN) with a security list blocking all outbound traffic."
+      },
+      {
+        "id": "B",
+        "text": "Use Data Masking to obfuscate sensitive data before it leaves the database."
+      },
+      {
+        "id": "C",
+        "text": "Select an EU region for your Autonomous Database deployment and enable customer-managed encryption keys."
+      },
+      {
+        "id": "D",
+        "text": "Implement Transparent Data Encryption (TDE) with a customer-managed key."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 108,
+    "question": "A company wants to implement a hybrid cloud strategy using OCI and their on-premises data center. They need to extend their existing Active Directory to OCI for seamless user authentication and authorization. Which service is BEST suited for this scenario?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Oracle Identity Cloud Service (IDCS)"
+      },
+      {
+        "id": "B",
+        "text": "Oracle Cloud Infrastructure Identity and Access Management (IAM)"
+      },
+      {
+        "id": "C",
+        "text": "Microsoft Azure Active Directory"
+      },
+      {
+        "id": "D",
+        "text": "OCI Active Directory integration through VPN or FastConnect."
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 109,
+    "question": "Which components are required to establish a Site-to-Site VPN connection in Oracle Cloud Infrastructure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Internet Gateway (IG), Network Address Translation (NAT) Gateway, and IPsec tunnel"
+      },
+      {
+        "id": "B",
+        "text": "Dynamic Routing Gateway (DRG), NAT Gateway, and IPsec tunnel"
+      },
+      {
+        "id": "C",
+        "text": "Internet Gateway, Customer Premises Equipment (CPE), and IPsec tunnel"
+      },
+      {
+        "id": "D",
+        "text": "Dynamic Routing Gateway (DRG), Customer Premises Equipment (CPE), and IPsec tunnel"
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 110,
+    "question": "When setting up Oracle Interconnect for Google Cloud, which critical resource needs to be created in the Google Cloud environment?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Cross-Cloud Interconnect VLAN attachment"
+      },
+      {
+        "id": "B",
+        "text": "Partner Interconnect VLAN attachment"
+      },
+      {
+        "id": "C",
+        "text": "Google Cloud NAT gateway"
+      },
+      {
+        "id": "D",
+        "text": "Shared VPC with OCI"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 111,
+    "question": "During provisioning in Oracle Database@Azure, delegated subnets are linked with OCI VCN inside the OCI pods in Azure. When do you perform this step during provisioning?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Delegated subnets attachment happens when you provide the VCN details during the provisioning of container databases in OCI."
+      },
+      {
+        "id": "B",
+        "text": "Delegated subnets attachment with OCI pods containing the Exadata Database Service is a prerequisite action that is completed during the OCI account linking."
+      },
+      {
+        "id": "C",
+        "text": "Delegated subnets attachment happens when you provide the subnet details during provisioning of Oracle Exadata Database Service in Azure."
+      },
+      {
+        "id": "D",
+        "text": "Delegated subnets attachment happens when you provide the subnet details during provisioning of Oracle Exadata VM Cluster."
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 112,
+    "question": "What is the role of BGP dynamic routing in the connection between an Azure VNet and OCI VCN?",
+    "options": [
+      {
+        "id": "A",
+        "text": "It is used to create a static routing configuration for the VNet and VCN."
+      },
+      {
+        "id": "B",
+        "text": "It is used to automatically select the best route between the VNet and VCN."
+      },
+      {
+        "id": "C",
+        "text": "It is used to establish a direct connection between the VNet and VCN without a virtual circuit."
+      },
+      {
+        "id": "D",
+        "text": "It is used to manage the security rules for the VNet and VCN."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 113,
+    "question": "In the context of Oracle Database@Azure, how is an Oracle Data Guard standby database typically provisioned when implementing cross-region disaster recovery?",
+    "options": [
+      {
+        "id": "A",
+        "text": "It is automatically created by the Oracle Database@Azure service as part of the initial configuration in the OCI console."
+      },
+      {
+        "id": "B",
+        "text": "It requires a separate Exadata Infrastructure and VM Cluster to be provisioned in the target Azure region, and then configured for database sync."
+      },
+      {
+        "id": "C",
+        "text": "It is replicated through Azure Site Recovery"
+      },
+      {
+        "id": "D",
+        "text": "It's configured by leveraging native Azure Database services."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 114,
+    "question": "How does Oracle Database on Google Cloud make database management easier for customers?",
+    "options": [
+      {
+        "id": "A",
+        "text": "It enables customers to manage databases through the Google Cloud console or Google Cloud automation tools."
+      },
+      {
+        "id": "B",
+        "text": "It automatically transfers all database management tasks to the Oracle Cloud Infrastructure console."
+      },
+      {
+        "id": "C",
+        "text": "OCI offers a management console within Google Cloud to simplify database management."
+      },
+      {
+        "id": "D",
+        "text": "It requires customers to use Oracle-specific management tools."
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 115,
+    "question": "What comprises the physical architecture of Oracle Database@Azure for ABC Private Limited?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Oracle places three of the Oracle Cloud Infrastructure (OCI) availability domains, one in each of the three Azure availability zones."
+      },
+      {
+        "id": "B",
+        "text": "Oracle creates an OCI pod closest to the Azure Data Center and connects it with the nearest OCI region via a low-latency Oracle-managed network link."
+      },
+      {
+        "id": "C",
+        "text": "OCI pods in the Azure data center contain the Exadata Database Service stack, but all other dependencies and controls reside in the nearest OCI data center."
+      },
+      {
+        "id": "D",
+        "text": "OCI pods created inside the Azure data center are an extension of the OCI data center, with the same OCI infrastructure and service stack, including the Exadata Database Service, along with all dependencies."
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 116,
+    "question": "Which approach is the BEST practice for achieving extremely high availability and redundancy for a connection between your on-premises network and OCI?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A single Site-to-Site VPN connection with multiple tunnels."
+      },
+      {
+        "id": "B",
+        "text": "A single FastConnect connection with multiple virtual circuits."
+      },
+      {
+        "id": "C",
+        "text": "Multiple FastConnect connections from different physical locations and multiple Site-to-Site VPN connections as a backup."
+      },
+      {
+        "id": "D",
+        "text": "A single FastConnect connection with a Site-to-Site VPN connection as a backup."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 117,
+    "question": "Which statement BEST describes the deployment model of Oracle Database@Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Oracle deploys virtualized Exadata systems on Google Compute Engine instances."
+      },
+      {
+        "id": "B",
+        "text": "Oracle deploys dedicated Exadata hardware within Google Cloud data centers, managed by the OCI control plane."
+      },
+      {
+        "id": "C",
+        "text": "Oracle deploys a software-defined version of Exadata that runs on Google Kubernetes Engine."
+      },
+      {
+        "id": "D",
+        "text": "Oracle uses Google Cloud's Bare Metal Solution to host Exadata systems, with management delegated to Google Cloud."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 118,
+    "question": "what is the first and essential resource that needs to be created before establishing the Partner Interconnect VLAN attachment?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A Google Cloud Router with the appropriate ASN."
+      },
+      {
+        "id": "B",
+        "text": "A Cross-Cloud Interconnect VLAN attachment."
+      },
+      {
+        "id": "C",
+        "text": "A Google Cloud Firewall Rule allowing BGP."
+      },
+      {
+        "id": "D",
+        "text": "A Shared VPC in Google Cloud."
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 119,
+    "question": "What comprises the physical architecture of Oracle Database@Azure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "OCI pods in Azure data centers contain the Exadata Database Service stack, but all other dependencies and controls reside in the nearest OCI data center."
+      },
+      {
+        "id": "B",
+        "text": "OCI pods created inside the Azure data center are an extension of the OCI data center with the same OCI infrastructure, service stack, Exadata Database Service, and all dependencies."
+      },
+      {
+        "id": "C",
+        "text": "Oracle creates an OCI pod closest to the Azure Data Center and connects it with the nearest OCI region by a low-latency Oracle-managed network link."
+      },
+      {
+        "id": "D",
+        "text": "Oracle places three OCI availability domains, one in each of the three Azure availability zones."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 120,
+    "question": "Which operations are performed in the Azure portal to manage Oracle Database@Azure resources?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Scaling up database resources and configuring database backups"
+      },
+      {
+        "id": "B",
+        "text": "Monitoring database metrics and logs using OCI services"
+      },
+      {
+        "id": "C",
+        "text": "Scaling up the Exadata infrastructure and running software updates"
+      },
+      {
+        "id": "D",
+        "text": "Managing database encryption keys and disaster recovery configurations"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 121,
+    "question": "When configuring the network for Oracle Database@Google Cloud, what is the purpose of the Autonomous System Number (ASN)?",
+    "options": [
+      {
+        "id": "A",
+        "text": "It encrypts the traffic between OCI and Google Cloud."
+      },
+      {
+        "id": "B",
+        "text": "It identifies the network of each cloud provider (OCI and Google Cloud) for BGP routing."
+      },
+      {
+        "id": "C",
+        "text": "It authorizes access to the Exadata systems from Google Cloud."
+      },
+      {
+        "id": "D",
+        "text": "It assigns IP addresses to the Exadata compute nodes"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 122,
+    "question": "which of the following best describes the location of the Exadata compute and storage infrastructure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Within Google Cloud's virtual private cloud (VPC) as a managed service."
+      },
+      {
+        "id": "B",
+        "text": "In a dedicated OCI region that is physically co-located within the Google Cloud data center."
+      },
+      {
+        "id": "C",
+        "text": "In an OCI pod physically located within the Google Cloud data center, that also contains its own network fabric."
+      },
+      {
+        "id": "D",
+        "text": "As an extension of the customer's on-premises Exadata infrastructure, connected via a private link."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 123,
+    "question": "Which of the following statements accurately describes the IAM model in Oracle Database@Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Oracle IAM and Google Cloud IAM are fully integrated to provide centralized user management."
+      },
+      {
+        "id": "B",
+        "text": "Oracle IAM is used for the OCI resources in the OCI pod, and Google Cloud IAM controls access to the Google Cloud resources."
+      },
+      {
+        "id": "C",
+        "text": "Google Cloud IAM is used to control access to both Oracle and Google Cloud resources from a single Google identity."
+      },
+      {
+        "id": "D",
+        "text": "Oracle IAM is the only IAM model used in the entire deployment."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 124,
+    "question": "How are the resources provisioned in Oracle Database@Azure service?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Oracle Exadata Infrastructure and Oracle Exadata VM Cluster are provisioned in the Azure portal."
+      },
+      {
+        "id": "B",
+        "text": "Oracle Exadata Infrastructure, Oracle Exadata VM Cluster, Oracle container, and pluggable databases are provisioned in the Azure portal."
+      },
+      {
+        "id": "C",
+        "text": "Oracle Exadata Infrastructure and Oracle Exadata VM Cluster are provisioned in the OCI console and Oracle container and pluggable databases in the Azure portal."
+      },
+      {
+        "id": "D",
+        "text": "Oracle Exadata VM Cluster and Oracle container databases are provisioned in the OCI console."
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 125,
+    "question": "A company is deploying multiple applications in Google Cloud and wants to access a centralized Oracle Exadata Database Service located in Oracle Database@Google Cloud. They want to ensure that the applications in different VPCs can securely communicate with the database without any direct peering between the application VPCs. Which network topology should the company use to securely connect applications in different VPCs to the centralized Oracle Exadata Database Service?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Hub and spoke topology with a network virtual appliance (NVA) for centralized connectivity"
+      },
+      {
+        "id": "B",
+        "text": "Direct Connect between applications and Oracle Exadata Database Service"
+      },
+      {
+        "id": "C",
+        "text": "Mesh topology with VPC peering"
+      },
+      {
+        "id": "D",
+        "text": "Flat topology with public IPs"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 126,
+    "question": "Which of the following resources is configured primarily within the Google Cloud console during the Oracle Database@Google Cloud onboarding process?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Oracle Exadata Infrastructure"
+      },
+      {
+        "id": "B",
+        "text": "Oracle Exadata VM Cluster"
+      },
+      {
+        "id": "C",
+        "text": "Google Cloud Partner Interconnect attachment"
+      },
+      {
+        "id": "D",
+        "text": "Oracle Cloud Infrastructure Dynamic Routing Gateway (DRG)"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 127,
+    "question": "What is the purpose of a Network Security Group (NSG) in OCI?",
+    "options": [
+      {
+        "id": "A",
+        "text": "To define routing policies for subnets within a VCN."
+      },
+      {
+        "id": "B",
+        "text": "To act as a central point for managing internet access for all subnets in a VCN."
+      },
+      {
+        "id": "C",
+        "text": "To provide a virtual firewall at the VNIC level, allowing for granular security policies based on source and destination NSGs."
+      },
+      {
+        "id": "D",
+        "text": "To provide DNS resolution services for instances within a VCN."
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 128,
+    "question": "What is the primary function of the connectivity link between the OCI child site and the OCI parent site in the context of Oracle Database@Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "To enable seamless integration between Oracle and Google Cloud support teams"
+      },
+      {
+        "id": "B",
+        "text": "For control plane operations such as infrastructure management and data plane operations such as backups and disaster recovery"
+      },
+      {
+        "id": "C",
+        "text": "To provide public access to Google Cloud resources"
+      },
+      {
+        "id": "D",
+        "text": "To synchronize billing between OCI and GCP"
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 129,
+    "question": "Which is a database service that CANNOT be provisioned in the Oracle Public Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Autonomous Database on Shared Infrastructure"
+      },
+      {
+        "id": "B",
+        "text": "Autonomous Database on Dedicated Infrastructure"
+      },
+      {
+        "id": "C",
+        "text": "Exadata Database Service on Dedicated Infrastructure"
+      },
+      {
+        "id": "D",
+        "text": "Exadata Database Service on Shared Infrastructure"
+      }
+    ],
+    "correctAnswer": "C",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 130,
+    "question": "Which is the responsibility of a customer using Oracle Database on Google Cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Provision Exadata Infrastructure in Google Cloud Console"
+      },
+      {
+        "id": "B",
+        "text": "Update infrastructure and software in OCI"
+      },
+      {
+        "id": "C",
+        "text": "Provision containers and pluggable databases in Google Cloud Console"
+      },
+      {
+        "id": "D",
+        "text": "Provision Exadata VM cluster in OCI"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 131,
+    "question": "To minimize the cost of your Autonomous Database while ensuring it scales automatically to handle peak loads. Which configuration is MOST suitable?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Autonomous Database on Dedicated Infrastructure with manual scaling."
+      },
+      {
+        "id": "B",
+        "text": "Autonomous Database on Shared Infrastructure with auto-scaling enabled."
+      },
+      {
+        "id": "C",
+        "text": "Base Database on a virtual machine with auto-scaling configured."
+      },
+      {
+        "id": "D",
+        "text": "Base Database on bare metal with manual scaling."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 132,
+    "question": "You are provisioning Oracle Database@Azure. After creating the Exadata Infrastructure, what is the next essential step within the OCI console related to the database environment?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Creating the Azure Virtual Network Peering."
+      },
+      {
+        "id": "B",
+        "text": "Creating the Exadata VM Cluster."
+      },
+      {
+        "id": "C",
+        "text": "Configuring the Azure Network Security Groups."
+      },
+      {
+        "id": "D",
+        "text": "Setting up the cross-connect between OCI and Azure."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 133,
+    "question": "In the context of federating Oracle Cloud Infrastructure with external identity providers, what is an IdP?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A service that issues credentials and authenticates users"
+      },
+      {
+        "id": "B",
+        "text": "A service that requests authentication from a service provider"
+      },
+      {
+        "id": "C",
+        "text": "An Oracle Cloud Infrastructure feature that controls resource access"
+      },
+      {
+        "id": "D",
+        "text": "A security protocol for user authentication in a federated setup"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 134,
+    "question": "What is required to configure Oracle Interconnect for Google Cloud for ABC Private Limited?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Integration with Microsoft Active Directory"
+      },
+      {
+        "id": "B",
+        "text": "A public subnet on both OCI and GCP"
+      },
+      {
+        "id": "C",
+        "text": "Direct Internet connection"
+      },
+      {
+        "id": "D",
+        "text": "Virtual Circuits on OCI and Partner Interconnects on GCP"
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  },
+  {
+    "id": 135,
+    "question": "What is the purpose of federating the Azure tenant's Microsoft Entra ID with an OCI identity domain?",
+    "options": [
+      {
+        "id": "A",
+        "text": "To enable bi-directional communication between Azure and OCI"
+      },
+      {
+        "id": "B",
+        "text": "To specify an Azure Virtual Network (VNet) in Azure during provisioning"
+      },
+      {
+        "id": "C",
+        "text": "To specify an Azure Virtual Network (VNet) in Azure during provisioning"
+      },
+      {
+        "id": "D",
+        "text": "To allow Azure users to log in to the OCI Console using the same Azure credentials used for Azure"
+      }
+    ],
+    "correctAnswer": "D",
+    "explanation": "",
+    "category": "OCI 1Z0-1151-25",
+    "difficulty": "medium"
+  }
+]
