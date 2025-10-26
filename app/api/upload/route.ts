@@ -2,12 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseFile } from '@/lib/parsers';
 import { UploadResponse } from '@/lib/types';
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();

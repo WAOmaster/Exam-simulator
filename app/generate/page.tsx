@@ -12,7 +12,7 @@ import SaveDialog from '@/components/SaveDialog';
 import { useExamStore } from '@/lib/store';
 import { GenerationConfig, ContentSource, Question, QuestionSet } from '@/lib/types';
 
-type InputTab = 'upload' | 'url' | 'search' | 'text';
+type InputTab = 'upload' | 'url' | 'search' | 'manual';
 
 export default function GeneratePage() {
   const router = useRouter();
@@ -38,7 +38,7 @@ export default function GeneratePage() {
     { id: 'upload' as InputTab, label: 'Upload File', icon: Upload },
     { id: 'url' as InputTab, label: 'Fetch URL', icon: LinkIcon },
     { id: 'search' as InputTab, label: 'Search Knowledge', icon: Search },
-    { id: 'text' as InputTab, label: 'Paste Text', icon: FileText },
+    { id: 'manual' as InputTab, label: 'Paste Text', icon: FileText },
   ];
 
   const handleFileProcessed = (content: string, fileName: string) => {
@@ -78,7 +78,7 @@ export default function GeneratePage() {
         content: searchQuery,
         metadata: { searchQuery },
       };
-    } else if (activeTab === 'text') {
+    } else if (activeTab === 'manual') {
       if (!manualText.trim()) {
         setError('Please enter some text content');
         return;
@@ -279,7 +279,7 @@ export default function GeneratePage() {
                   </div>
                 )}
 
-                {activeTab === 'text' && (
+                {activeTab === 'manual' && (
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

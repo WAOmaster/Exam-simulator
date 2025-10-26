@@ -29,8 +29,8 @@ export async function parseDOCX(buffer: Buffer, fileName: string): Promise<Parse
 export async function parsePDF(buffer: Buffer, fileName: string): Promise<ParsedContent> {
   try {
     // Dynamic import to avoid build issues
-    const pdf = await import('pdf-parse/lib/pdf-parse.js');
-    const data = await pdf.default(buffer);
+    const { default: pdfParse } = await import('pdf-parse');
+    const data = await pdfParse(buffer);
 
     return {
       text: data.text,
