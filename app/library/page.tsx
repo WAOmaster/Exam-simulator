@@ -69,9 +69,17 @@ export default function LibraryPage() {
   };
 
   const handleStartExam = (questionSet: QuestionSet) => {
+    // First reset the exam
     resetExam();
-    setCurrentQuestionSet(questionSet.id);
+
+    // Then load the questions from the selected question set
+    loadQuestionSets(questionSets); // Ensure question sets are in store
+    setCurrentQuestionSet(questionSet.id); // Set questions from the set
+
+    // Now start the exam with the loaded questions
     startExam(90, 'exam', true);
+
+    // Navigate to exam page
     router.push('/exam');
   };
 

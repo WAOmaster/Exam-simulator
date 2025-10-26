@@ -28,35 +28,39 @@ export async function POST(request: NextRequest) {
     // Create the prompt based on whether the answer was correct or not
     let prompt: string;
 
+    const correctOptionText = options.find((opt: any) => opt.id === correctAnswer)?.text || 'N/A';
+    const userOptionText = options.find((opt: any) => opt.id === userAnswer)?.text || 'N/A';
+
     if (isCorrect) {
-      prompt = `You are an Oracle Cloud Infrastructure (OCI) certification expert. A student answered a question correctly.
+      prompt = `You are an expert exam tutor providing positive reinforcement for a correct answer.
 
 Question: ${question}
 
-Options:
-${options.map((opt: any) => `${opt.id}. ${opt.text}`).join('\n')}
+Correct Answer: ${correctAnswer}. ${correctOptionText}
 
-Correct Answer: ${correctAnswer}
-Student's Answer: ${userAnswer}
+Provide a concise explanation (100-150 words) that:
+1. Confirms why this answer is correct
+2. Explains the key concepts behind it
+3. Mentions practical applications or use cases
 
-Please provide a clear and concise explanation of why answer ${correctAnswer} is correct. Focus on the key OCI concepts and best practices. Keep it under 150 words.`;
+Use clear formatting with **bold** for key terms and numbered lists where appropriate.`;
     } else {
-      prompt = `You are an Oracle Cloud Infrastructure (OCI) certification expert. A student answered a question incorrectly.
+      prompt = `You are an expert exam tutor helping a student learn from their mistake.
 
 Question: ${question}
 
 Options:
 ${options.map((opt: any) => `${opt.id}. ${opt.text}`).join('\n')}
 
-Correct Answer: ${correctAnswer}
-Student's Answer: ${userAnswer}
+Student's Answer: ${userAnswer}. ${userOptionText}
+Correct Answer: ${correctAnswer}. ${correctOptionText}
 
-Please provide:
-1. Why the correct answer (${correctAnswer}) is right
-2. Why the student's answer (${userAnswer}) is wrong
-3. Why the other options are incorrect
+Provide a clear explanation (150-200 words) that:
+1. Explains why the correct answer (${correctAnswer}) is right
+2. Clarifies why the student's answer (${userAnswer}) is incorrect
+3. Briefly notes why other options don't fit
 
-Keep the explanation clear, concise, and educational. Focus on OCI concepts. Keep it under 200 words.`;
+Use clear formatting with **bold** for key terms and numbered lists where appropriate. Be encouraging but educational.`;
     }
 
     const result = await model.generateContent(prompt);

@@ -7,18 +7,17 @@ import Timer from '@/components/Timer';
 import ProgressBar from '@/components/ProgressBar';
 import EvaluationPane from '@/components/EvaluationPane';
 import { ChevronLeft, ChevronRight, Home, AlertCircle } from 'lucide-react';
-import questions from '@/data/questions.json';
 
 export default function PracticePage() {
   const router = useRouter();
   const {
+    questions,
     currentQuestionIndex,
     userAnswers,
     isExamStarted,
     examStartTime,
     examDuration,
     useTimer,
-    setQuestions,
     submitAnswer,
     nextQuestion,
     previousQuestion,
@@ -33,10 +32,11 @@ export default function PracticePage() {
       return;
     }
 
-    if (questions.length > 0) {
-      setQuestions(questions);
+    if (questions.length === 0) {
+      // No questions loaded, redirect to home
+      router.push('/');
     }
-  }, [isExamStarted, router, setQuestions]);
+  }, [isExamStarted, questions.length, router]);
 
   useEffect(() => {
     // Load saved answer for current question
@@ -269,6 +269,8 @@ export default function PracticePage() {
             selectedAnswer={selectedAnswer}
             correctAnswer={currentQuestion.correctAnswer}
             isCorrect={selectedAnswer === currentQuestion.correctAnswer}
+            explanation={currentQuestion.explanation}
+            questionId={currentQuestion.id}
           />
         )}
       </div>

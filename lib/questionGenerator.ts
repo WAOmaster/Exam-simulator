@@ -18,7 +18,14 @@ export async function generateQuestions(
   config: GenerationConfig
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
   const genAI = getGeminiClient();
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-2.5-flash',
+    generationConfig: {
+      temperature: 0.7,
+      topP: 0.95,
+      maxOutputTokens: 8192,
+    },
+  });
 
   // Build the prompt based on configuration
   const prompt = buildPrompt(content, config);
@@ -47,6 +54,11 @@ export async function generateQuestionsFromSearch(
   const genAI = getGeminiClient();
   const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
+    generationConfig: {
+      temperature: 0.7,
+      topP: 0.95,
+      maxOutputTokens: 8192,
+    },
   });
 
   const prompt = `You are an expert exam question generator. Use Google Search to find information about "${searchQuery}" and generate ${config.numberOfQuestions} exam questions.
@@ -162,13 +174,44 @@ function parseGeneratedQuestions(
   try {
     // Extract JSON from the response (remove markdown code blocks if present)
     let jsonText = text.trim();
+
+    // Remove markdown code blocks
     if (jsonText.startsWith('```json')) {
       jsonText = jsonText.replace(/```json\n?/, '').replace(/\n?```$/, '');
     } else if (jsonText.startsWith('```')) {
       jsonText = jsonText.replace(/```\n?/, '').replace(/\n?```$/, '');
     }
 
-    const parsed = JSON.parse(jsonText);
+    // Try to extract JSON object if there's extra text
+    const firstBrace = jsonText.indexOf('{');
+    const lastBrace = jsonText.lastIndexOf('}');
+
+    if (firstBrace !== -1 && lastBrace !== -1 && firstBrace < lastBrace) {
+      jsonText = jsonText.substring(firstBrace, lastBrace + 1);
+    }
+
+    // Clean up common JSON issues
+    jsonText = jsonText
+      .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
+      .replace(/\n/g, ' ') // Remove newlines
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .trim();
+
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonText);
+    } catch (parseError) {
+      // Log the problematic JSON for debugging
+      console.error('Failed to parse JSON. First 500 chars:', jsonText.substring(0, 500));
+      console.error('Last 500 chars:', jsonText.substring(Math.max(0, jsonText.length - 500)));
+      throw parseError;
+    }
+
+    // Validate the structure
+    if (!parsed.questions || !Array.isArray(parsed.questions)) {
+      throw new Error('Response does not contain a valid questions array');
+    }
+
     const questions: Question[] = parsed.questions.map((q: any, index: number) => ({
       id: Date.now() + index,
       question: q.question,

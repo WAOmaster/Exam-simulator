@@ -1,1 +1,896 @@
-[]
+[
+  {
+    "id": "1761510932028-vj3rmn961",
+    "title": "AWS Solutions Architect TEST",
+    "description": "",
+    "subject": "AWS Cloud Services",
+    "questions": [
+      {
+        "id": 1761510874763,
+        "question": "A Solutions Architect is designing a highly available and fault-tolerant web application on AWS. The application uses EC2 instances. Which strategy should be employed to maximize availability?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Deploy EC2 instances across multiple Availability Zones within a single AWS Region and use an Application Load Balancer."
+          },
+          {
+            "id": "B",
+            "text": "Deploy all EC2 instances in a single Availability Zone and use Auto Scaling Groups."
+          },
+          {
+            "id": "C",
+            "text": "Deploy EC2 instances across multiple AWS Regions and use Route 53 with failover routing."
+          },
+          {
+            "id": "D",
+            "text": "Deploy EC2 instances in a single EC2 Placement Group to ensure low latency."
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "To achieve high availability and fault tolerance within a single AWS Region, it's crucial to distribute resources across multiple Availability Zones (AZs). An Application Load Balancer (ALB) will then distribute incoming traffic across these instances, ensuring that if one AZ experiences an outage, traffic is routed to healthy instances in other AZs. Option B is incorrect as a single AZ deployment is a single point of failure. Option C describes a multi-region disaster recovery strategy, which is for even higher resilience but not the primary method for high availability within a region. Option D focuses on low latency for tightly coupled applications, not general high availability.",
+        "category": "AWS Cloud Services",
+        "difficulty": "medium",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761510874764,
+        "question": "A company needs to store petabytes of archival data that is rarely accessed but must be retained for compliance for several years. Retrieval times can be several hours, and cost optimization is a top priority. Which Amazon S3 storage class is most suitable for this requirement?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Amazon S3 Standard"
+          },
+          {
+            "id": "B",
+            "text": "Amazon S3 Glacier Deep Archive"
+          },
+          {
+            "id": "C",
+            "text": "Amazon S3 Standard-IA"
+          },
+          {
+            "id": "D",
+            "text": "Amazon S3 One Zone-IA"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Amazon S3 Glacier Deep Archive is designed for long-term archival data that is accessed rarely, making it the lowest-cost storage option in S3. It has retrieval times of 12-48 hours, which aligns with the requirement of tolerating several hours for retrieval. S3 Standard is for frequently accessed data. S3 Standard-IA and S3 One Zone-IA are for infrequently accessed data but have higher retrieval costs and faster retrieval times than Glacier Deep Archive, making them less cost-effective for true archival needs.",
+        "category": "AWS Cloud Services",
+        "difficulty": "medium",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761510874765,
+        "question": "Which AWS networking component acts as a virtual firewall for an EC2 instance, controlling inbound and outbound traffic at the instance level?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Network Access Control List (NACL)"
+          },
+          {
+            "id": "B",
+            "text": "Security Group"
+          },
+          {
+            "id": "C",
+            "text": "VPC Router"
+          },
+          {
+            "id": "D",
+            "text": "Internet Gateway"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "A Security Group acts as a stateful virtual firewall for your EC2 instances to control inbound and outbound traffic. It operates at the instance level. NACLs (Option A) are stateless firewalls that operate at the subnet level. A VPC Router (Option C) handles routing traffic within the VPC. An Internet Gateway (Option D) allows communication between instances in your VPC and the internet.",
+        "category": "AWS Cloud Services",
+        "difficulty": "easy",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761510874766,
+        "question": "A Solutions Architect needs to design a database solution for an e-commerce application that experiences unpredictable traffic spikes, requiring automatic read scaling to handle varying loads without manual intervention. Which AWS database service is best suited for this requirement?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Amazon RDS for MySQL"
+          },
+          {
+            "id": "B",
+            "text": "Amazon DynamoDB"
+          },
+          {
+            "id": "C",
+            "text": "Amazon Aurora Serverless"
+          },
+          {
+            "id": "D",
+            "text": "Amazon Redshift"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Amazon Aurora Serverless is designed for intermittent, spiky, or unpredictable workloads, offering automatic scaling for both read and write capacity without requiring manual provisioning or management of database instances. Amazon RDS for MySQL (Option A) requires manual scaling or setting up read replicas with Auto Scaling, which is not fully automatic. Amazon DynamoDB (Option B) is a NoSQL database that offers high scalability but might not be suitable if a relational model is strictly required, and its scaling is based on provisioned capacity or on-demand mode, which differs from Aurora Serverless's compute scaling. Amazon Redshift (Option D) is a data warehouse service, not suitable for transactional e-commerce applications.",
+        "category": "AWS Cloud Services",
+        "difficulty": "medium",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761510874767,
+        "question": "Which pillar of the AWS Well-Architected Framework focuses on the ability of a system to recover from infrastructure or service disruptions, dynamically acquire computing resources to meet demand, and mitigate disruptions such as misconfigurations or transient network issues?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Operational Excellence"
+          },
+          {
+            "id": "B",
+            "text": "Security"
+          },
+          {
+            "id": "C",
+            "text": "Reliability"
+          },
+          {
+            "id": "D",
+            "text": "Performance Efficiency"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "The Reliability pillar of the AWS Well-Architected Framework focuses on ensuring a workload performs its intended function correctly and consistently when it's expected to. This includes the ability to recover from failure, dynamically acquire resources, and mitigate disruptions. Operational Excellence (Option A) focuses on running and monitoring systems and continuously improving processes. Security (Option B) focuses on protecting information and systems. Performance Efficiency (Option D) focuses on using computing resources efficiently.",
+        "category": "AWS Cloud Services",
+        "difficulty": "easy",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761510874768,
+        "question": "A Solutions Architect needs to grant temporary, limited-privilege access to an AWS resource in Account A to a user from Account B. The access should be automatically revoked after a specific duration. What is the most secure and recommended AWS feature to achieve this?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Create an IAM user in Account A and share its credentials with the user in Account B."
+          },
+          {
+            "id": "B",
+            "text": "Create an IAM role in Account A with a trust policy allowing Account B to assume it, and configure a session duration."
+          },
+          {
+            "id": "C",
+            "D": "Create an S3 bucket policy in Account A allowing access from Account B's root user."
+          },
+          {
+            "id": "D",
+            "text": "Use AWS Organizations to consolidate accounts and grant direct access."
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Creating an IAM role in Account A with a trust policy that allows Account B to assume it is the most secure and recommended method for cross-account access. The role can have specific permissions, and when assumed, it provides temporary credentials with a defined session duration, which can be configured to expire automatically. Option A is highly insecure as sharing IAM user credentials is against best practices. Option C grants overly broad access to a specific S3 bucket and not a general mechanism for temporary access to various resources. Option D (AWS Organizations) helps manage multiple accounts but doesn't, by itself, grant temporary cross-account access; IAM roles are still used for that purpose.",
+        "category": "AWS Cloud Services",
+        "difficulty": "hard",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761510874769,
+        "question": "A company requires a dedicated, private network connection between its on-premises data center and its AWS VPC, ensuring consistent network performance and lower latency than an internet-based VPN. Which AWS service should the Solutions Architect recommend?",
+        "options": [
+          {
+            "id": "A",
+            "text": "AWS Site-to-Site VPN"
+          },
+          {
+            "id": "B",
+            "text": "AWS Direct Connect"
+          },
+          {
+            "id": "C",
+            "D": "AWS Transit Gateway"
+          },
+          {
+            "id": "D",
+            "text": "VPC Peering"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "AWS Direct Connect provides a dedicated private connection from your on-premises data center to AWS, offering consistent network performance and lower latency compared to an internet-based VPN. AWS Site-to-Site VPN (Option A) uses the public internet and doesn't guarantee consistent performance or lower latency in the same way. AWS Transit Gateway (Option C) is used to connect multiple VPCs and on-premises networks centrally but still relies on VPN or Direct Connect for the initial on-premises link. VPC Peering (Option D) connects two VPCs, not an on-premises data center to a VPC.",
+        "category": "AWS Cloud Services",
+        "difficulty": "hard",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761510874770,
+        "question": "A Solutions Architect is evaluating EC2 purchasing options for a mission-critical batch processing workload that runs continuously for three years and requires a consistent baseline performance. Cost optimization is a key concern. Which EC2 purchasing option offers the most cost-effective solution for this scenario?",
+        "options": [
+          {
+            "id": "A",
+            "text": "On-Demand Instances"
+          },
+          {
+            "id": "B",
+            "text": "Spot Instances"
+          },
+          {
+            "id": "C",
+            "D": "Reserved Instances (Standard, 3-year, All Upfront)"
+          },
+          {
+            "id": "D",
+            "text": "Savings Plans (Compute Savings Plan, 3-year)"
+          }
+        ],
+        "correctAnswer": "D",
+        "explanation": "For a continuous, long-term workload (3 years) with a consistent baseline, both Reserved Instances and Savings Plans offer significant cost savings over On-Demand. However, Savings Plans (especially Compute Savings Plan) provide more flexibility than Reserved Instances. A 3-year Compute Savings Plan offers the deepest discounts for a consistent compute usage commitment, regardless of instance family, size, or even Region (for EC2 Instances), making it generally more flexible and often more cost-effective than a specific Reserved Instance purchase if the workload might evolve. Reserved Instances (Option C) would also be highly cost-effective but less flexible. On-Demand (Option A) is the most expensive for long-term, continuous workloads. Spot Instances (Option B) are not suitable for mission-critical, continuous workloads due to their interruptible nature.",
+        "category": "AWS Cloud Services",
+        "difficulty": "hard",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761510874771,
+        "question": "Which AWS service allows you to run code without provisioning or managing servers, automatically scaling in response to demand and charging only for the compute time consumed?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Amazon EC2"
+          },
+          {
+            "id": "B",
+            "text": "AWS Lambda"
+          },
+          {
+            "id": "C",
+            "D": "Amazon ECS"
+          },
+          {
+            "id": "D",
+            "text": "AWS Fargate"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "AWS Lambda is a serverless compute service that runs your code in response to events and automatically manages the underlying compute resources. You only pay for the compute time consumed. Amazon EC2 (Option A) requires you to provision and manage servers. Amazon ECS (Option C) is a container orchestration service that still requires managing underlying EC2 instances or Fargate. AWS Fargate (Option D) is serverless for containers but still manages containers, not just raw code execution like Lambda.",
+        "category": "AWS Cloud Services",
+        "difficulty": "easy",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761510874772,
+        "question": "A Solutions Architect needs to implement a disaster recovery strategy for a critical application with a Recovery Time Objective (RTO) of minutes and a Recovery Point Objective (RPO) of seconds. Which disaster recovery approach is most suitable?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Backup and Restore"
+          },
+          {
+            "id": "B",
+            "text": "Pilot Light"
+          },
+          {
+            "id": "C",
+            "D": "Warm Standby"
+          },
+          {
+            "id": "D",
+            "text": "Multi-site Active/Active"
+          }
+        ],
+        "correctAnswer": "D",
+        "explanation": "For RTO in minutes and RPO in seconds, a Multi-site Active/Active (also known as Hot Standby or Multi-Region Active-Active) strategy is required. This approach involves running your application simultaneously in multiple active regions, allowing for immediate failover with minimal data loss. Backup and Restore (Option A) has the highest RTO/RPO. Pilot Light (Option B) has RTO in tens of minutes and RPO in minutes. Warm Standby (Option C) has RTO in minutes and RPO in minutes, but Multi-site Active/Active provides the lowest RTO/RPO, aligning with the requirement for RPO in seconds.",
+        "category": "AWS Cloud Services",
+        "difficulty": "medium",
+        "type": "multiple-choice"
+      }
+    ],
+    "metadata": {
+      "totalQuestions": 10,
+      "difficultyDistribution": {
+        "easy": 3,
+        "medium": 4,
+        "hard": 3
+      },
+      "questionTypes": {
+        "multiple-choice": 10,
+        "true-false": 0,
+        "scenario": 0
+      },
+      "topics": [
+        "AWS Cloud Services"
+      ]
+    },
+    "createdAt": "2025-10-26T20:35:14.213Z",
+    "updatedAt": "2025-10-26T20:35:32.028Z",
+    "isPublic": true,
+    "sourceType": "search"
+  },
+  {
+    "id": "1761511338226-9n15h2tuo",
+    "title": "Google Cloud",
+    "description": "",
+    "subject": "Google Cloud architect",
+    "questions": [
+      {
+        "id": 1761511304451,
+        "question": "A company wants to enforce consistent IAM policies across all its Google Cloud projects and ensure new projects automatically inherit these policies. What is the most effective Google Cloud resource hierarchy component to achieve this?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Projects"
+          },
+          {
+            "id": "B",
+            "text": "Folders"
+          },
+          {
+            "id": "C",
+            "text": "Organizations"
+          },
+          {
+            "id": "D",
+            "text": "Billing Accounts"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "The Organization resource is the root node in the Google Cloud resource hierarchy and allows for centralized management and policy enforcement across all projects and folders. Policies set at the Organization level are inherited by all child resources, ensuring consistency.",
+        "category": "Google Cloud architect",
+        "difficulty": "easy",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761511304452,
+        "question": "A development team needs to deploy a containerized microservice application that requires automatic scaling based on HTTP traffic, zero-downtime deployments, and minimal operational overhead for infrastructure management. Which Google Cloud compute service would be the most appropriate choice for this application?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Compute Engine"
+          },
+          {
+            "id": "B",
+            "text": "Google Kubernetes Engine (GKE)"
+          },
+          {
+            "id": "C",
+            "text": "Cloud Run"
+          },
+          {
+            "id": "D",
+            "text": "App Engine Standard"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Cloud Run is a serverless platform for containerized applications that automatically scales based on requests, offers zero-downtime deployments, and significantly reduces operational overhead by abstracting away infrastructure management. GKE provides more control but requires more operational effort. Compute Engine is IaaS. App Engine Standard is for specific language runtimes, not generic containers.",
+        "category": "Google Cloud architect",
+        "difficulty": "medium",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761511304453,
+        "question": "A financial institution is building a highly sensitive data analytics platform on Google Cloud. They need to prevent data exfiltration from their BigQuery datasets and Cloud Storage buckets to external, unauthorized projects or services, even if an attacker compromises a service account within their trusted VPC perimeter. Which Google Cloud security feature is specifically designed to create a security perimeter around resources and mitigate data exfiltration risks by restricting data movement?",
+        "options": [
+          {
+            "id": "A",
+            "text": "IAM Custom Roles"
+          },
+          {
+            "id": "B",
+            "text": "Firewall Rules"
+          },
+          {
+            "id": "C",
+            "text": "VPC Service Controls"
+          },
+          {
+            "id": "D",
+            "text": "Cloud Data Loss Prevention (DLP)"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "VPC Service Controls create security perimeters around Google Cloud resources (like BigQuery and Cloud Storage) to restrict data movement and prevent exfiltration. It ensures that data remains within the defined perimeter, even if credentials are compromised, by blocking unauthorized access from outside the perimeter. IAM controls who can access resources, firewall rules control network traffic, and DLP identifies sensitive data, but none directly establish a perimeter against exfiltration in this manner.",
+        "category": "Google Cloud architect",
+        "difficulty": "hard",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761511304454,
+        "question": "A company needs to store large archives of historical data that are accessed very infrequently (less than once a month) but must be available within milliseconds when needed. Cost optimization for storage is a primary concern. Which Google Cloud Storage class would be most suitable for this use case?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Standard Storage"
+          },
+          {
+            "id": "B",
+            "text": "Nearline Storage"
+          },
+          {
+            "id": "C",
+            "text": "Coldline Storage"
+          },
+          {
+            "id": "D",
+            "text": "Archive Storage"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Coldline Storage is designed for data accessed less than once a month, offering lower storage costs than Nearline but with higher retrieval costs and a 90-day minimum storage duration. It still provides millisecond access. Nearline is for data accessed less than once a month, but more frequently than Coldline. Archive is for data accessed less than once a year, with higher retrieval costs and a 365-day minimum. Standard is for frequently accessed data.",
+        "category": "Google Cloud architect",
+        "difficulty": "easy",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761511304455,
+        "question": "An e-commerce platform needs a globally distributed, highly consistent, relational database that can scale horizontally to handle millions of transactions per second with low latency, without requiring sharding or complex replication management. Which Google Cloud database service is best suited for these requirements?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Cloud SQL"
+          },
+          {
+            "id": "B",
+            "text": "Cloud Firestore"
+          },
+          {
+            "id": "C",
+            "text": "Cloud Spanner"
+          },
+          {
+            "id": "D",
+            "text": "Cloud Bigtable"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Cloud Spanner is a globally distributed, strongly consistent, relational database service built for mission-critical applications. It offers horizontal scalability, high availability, and transactional consistency across regions, eliminating the need for manual sharding. Cloud SQL is a regional relational database, Cloud Firestore is a NoSQL document database, and Cloud Bigtable is a NoSQL wide-column database, none of which perfectly match the 'globally distributed, relational, horizontally scalable without sharding' requirement.",
+        "category": "Google Cloud architect",
+        "difficulty": "medium",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761511304456,
+        "question": "A team is migrating an existing monolithic application into microservices, containerizing each service. They require an orchestration platform that can manage deployment, scaling, and networking of these containers across a cluster of VMs, providing high availability and declarative configuration. Which Google Cloud service would meet these requirements most effectively?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Compute Engine with Managed Instance Groups"
+          },
+          {
+            "id": "B",
+            "text": "Cloud Run"
+          },
+          {
+            "id": "C",
+            "text": "Google Kubernetes Engine (GKE)"
+          },
+          {
+            "id": "D",
+            "text": "App Engine Flexible"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "GKE is a managed service for deploying, managing, and scaling containerized applications using Kubernetes. It provides robust orchestration capabilities, including declarative configuration, self-healing, service discovery, and load balancing, making it ideal for microservices architectures. Compute Engine with MIGs provides VM management but not container orchestration. Cloud Run is serverless containers, suitable for simpler scenarios. App Engine Flexible is a PaaS that supports containers but GKE offers more direct Kubernetes control.",
+        "category": "Google Cloud architect",
+        "difficulty": "medium",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761511304457,
+        "question": "A startup is designing a new analytics platform that processes large datasets daily. The processing can tolerate some latency, and the compute resources are only needed during specific off-peak hours for batch jobs. The company wants to minimize compute costs significantly. Which combination of Google Cloud Compute Engine features and pricing models should the architect recommend for the batch processing component to achieve maximum cost savings?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Standard VMs with Sustained Use Discounts"
+          },
+          {
+            "id": "B",
+            "text": "Preemptible VMs with Managed Instance Groups"
+          },
+          {
+            "id": "C",
+            "text": "Sole-tenant Nodes with Custom Machine Types"
+          },
+          {
+            "id": "D",
+            "text": "Committed Use Discounts (CUDs) with Standard VMs"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Preemptible VMs are significantly cheaper (up to 80% off) because they can be terminated by Google Cloud if resources are needed elsewhere. They are ideal for fault-tolerant batch jobs that can tolerate interruptions. Using them with Managed Instance Groups allows for automatic recreation of preempted instances and scaling, ensuring the job eventually completes while maximizing cost savings. Sustained Use Discounts apply to regular VMs running for a significant portion of the month. CUDs require a commitment for 1 or 3 years. Sole-tenant nodes are for specific licensing or compliance needs and are more expensive.",
+        "category": "Google Cloud architect",
+        "difficulty": "hard",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761511304458,
+        "question": "A critical web application needs to achieve high availability and disaster recovery across multiple geographical regions to ensure business continuity even in the event of a regional outage. The application uses Compute Engine instances, Cloud Load Balancing, and Cloud SQL. What is the recommended architectural pattern for deploying this application to meet the multi-regional high availability and disaster recovery requirements?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Deploy all resources in a single region across multiple zones, with daily backups."
+          },
+          {
+            "id": "B",
+            "text": "Deploy identical application stacks in two separate regions, using a Global External HTTP(S) Load Balancer to distribute traffic and Cloud SQL cross-region replication."
+          },
+          {
+            "id": "C",
+            "text": "Deploy the application in a single zone within a region, relying on automatic instance restarts."
+          },
+          {
+            "id": "D",
+            "text": "Use App Engine Standard, as it inherently provides global availability."
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "To achieve multi-regional high availability and disaster recovery, the application stack (Compute Engine, databases, etc.) must be deployed redundantly in at least two distinct geographical regions. A Global External HTTP(S) Load Balancer can direct user traffic to the nearest healthy region. Cloud SQL's cross-region replicas provide data redundancy and failover capabilities for the database layer. Option A provides zone-level HA, not regional. Option C provides instance-level HA. Option D, while App Engine Standard can be multi-regional, the question specifies Compute Engine and Cloud SQL, and the solution needs to address those components explicitly.",
+        "category": "Google Cloud architect",
+        "difficulty": "medium",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761511304459,
+        "question": "A Google Cloud architect needs to set up comprehensive monitoring for a new application deployed on GKE, including metrics, logs, and uptime checks. Which integrated suite of Google Cloud services provides these capabilities?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Cloud Build"
+          },
+          {
+            "id": "B",
+            "text": "Cloud Deployment Manager"
+          },
+          {
+            "id": "C",
+            "text": "Operations (formerly Stackdriver)"
+          },
+          {
+            "id": "D",
+            "text": "Security Command Center"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Google Cloud Operations (formerly Stackdriver) is the integrated suite for monitoring, logging, tracing, and debugging applications on Google Cloud. It includes Cloud Monitoring (metrics, uptime checks, alerting) and Cloud Logging (log aggregation and analysis). Cloud Build is for CI/CD, Deployment Manager for infrastructure as code, and Security Command Center for security management.",
+        "category": "Google Cloud architect",
+        "difficulty": "easy",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761511304460,
+        "question": "A large enterprise plans to migrate an on-premises data warehouse (terabytes of data) to BigQuery. The migration needs to be completed with minimal downtime for the source system, and the data transfer must be secure and highly performant. The enterprise has a 10 Gbps dedicated interconnect to Google Cloud. What is the most appropriate and efficient data transfer strategy for this migration?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Transfer data using gsutil cp over the public internet."
+          },
+          {
+            "id": "B",
+            "text": "Use Storage Transfer Service to transfer data from on-premises to Cloud Storage, then load into BigQuery."
+          },
+          {
+            "id": "C",
+            "text": "Manually upload CSV files via the Google Cloud Console."
+          },
+          {
+            "id": "D",
+            "text": "Use Transfer Appliance for offline data transfer."
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Storage Transfer Service (STS) is designed for large-scale data transfers into Cloud Storage, including from on-premises sources. It can be configured to use Private Google Access or a VPN/Interconnect for secure and performant transfer, avoiding the public internet. After data is in Cloud Storage, BigQuery can efficiently load data from there. `gsutil cp` over the public internet might be slow and less secure for terabytes. Manual upload is impractical for large datasets. Transfer Appliance is for petabyte-scale transfers where network bandwidth is insufficient or prohibitively expensive, not typically for terabytes with a 10 Gbps interconnect.",
+        "category": "Google Cloud architect",
+        "difficulty": "hard",
+        "type": "multiple-choice"
+      }
+    ],
+    "metadata": {
+      "totalQuestions": 10,
+      "difficultyDistribution": {
+        "easy": 3,
+        "medium": 4,
+        "hard": 3
+      },
+      "questionTypes": {
+        "multiple-choice": 10,
+        "true-false": 0,
+        "scenario": 0
+      },
+      "topics": [
+        "Google Cloud architect"
+      ]
+    },
+    "createdAt": "2025-10-26T20:42:08.709Z",
+    "updatedAt": "2025-10-26T20:42:18.226Z",
+    "isPublic": true,
+    "sourceType": "search"
+  },
+  {
+    "id": "1761512363996-z55u5jy3k",
+    "title": "Google 2",
+    "description": "",
+    "subject": "Google Cloud architect",
+    "questions": [
+      {
+        "id": 1761512351092,
+        "question": "A large enterprise with multiple development teams, each managing their own GCP project, needs to share a common network infrastructure (e.g., VPN connections, firewalls) and centralize network administration, while keeping application resources separate within their respective projects. Which networking solution is most appropriate for this requirement?",
+        "options": [
+          {
+            "id": "A",
+            "text": "VPC Peering"
+          },
+          {
+            "id": "B",
+            "text": "Shared VPC"
+          },
+          {
+            "id": "C",
+            "text": "Cloud VPN"
+          },
+          {
+            "id": "D",
+            "text": "Service Networking"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Shared VPC (also known as XPN) allows an organization to connect multiple projects to a common Virtual Private Cloud (VPC) network, enabling centralized control over network resources like subnets, IP addresses, routes, and firewalls by a host project administrator. This is ideal for enterprises that need to maintain separate projects for billing or resource isolation but require a unified network architecture. VPC Peering connects two distinct VPC networks, which is useful for inter-project communication but doesn't centralize network administration. Cloud VPN connects your GCP network to an on-premises network. Service Networking is used for private connections to managed services like Cloud SQL or Memorystore.",
+        "category": "Google Cloud architect",
+        "difficulty": "medium",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761512351093,
+        "question": "A company needs to deploy a highly scalable, containerized microservices application that requires minimal operational overhead for infrastructure management and benefits from automatic scaling and self-healing capabilities. Which Google Cloud compute service would be the most suitable choice?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Compute Engine"
+          },
+          {
+            "id": "B",
+            "text": "Google Kubernetes Engine (GKE)"
+          },
+          {
+            "id": "C",
+            "text": "App Engine Standard"
+          },
+          {
+            "id": "D",
+            "text": "Cloud Functions"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Google Kubernetes Engine (GKE) is a managed service for deploying, managing, and scaling containerized applications using Kubernetes. It provides powerful features like automatic scaling, self-healing, and rolling updates, significantly reducing operational overhead for infrastructure management, making it ideal for microservices. Compute Engine offers virtual machines, requiring more manual management. App Engine Standard is a Platform as a Service (PaaS) suitable for web applications but might offer less flexibility for complex containerized microservices architectures than GKE. Cloud Functions are serverless for event-driven, single-purpose functions, not a full microservices application.",
+        "category": "Google Cloud architect",
+        "difficulty": "easy",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761512351094,
+        "question": "An architect is designing an IAM strategy for a new application that uses a custom service account to read objects from a specific Cloud Storage bucket. Following the principle of least privilege, which IAM role should be granted to the service account?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Storage Object Viewer (storage.objectViewer) on the specific bucket"
+          },
+          {
+            "id": "B",
+            "text": "Storage Admin (storage.admin) on the project"
+          },
+          {
+            "id": "C",
+            "text": "Project Editor (editor) on the project"
+          },
+          {
+            "id": "D",
+            "text": "Storage Object Creator (storage.objectCreator) on the specific bucket"
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "The principle of least privilege dictates that an entity should only be granted the minimum permissions necessary to perform its task. 'Storage Object Viewer' on the specific bucket grants read-only access to objects within that bucket, which perfectly matches the requirement to 'read objects from a specific Cloud Storage bucket'. 'Storage Admin' provides broad administrative access, 'Project Editor' provides extensive project-wide permissions, and 'Storage Object Creator' only allows creating objects, not reading them. All three violate the principle of least privilege for this scenario.",
+        "category": "Google Cloud architect",
+        "difficulty": "hard",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761512351095,
+        "question": "A global e-commerce platform requires a fully managed, horizontally scalable relational database that can handle millions of transactions per second with strong consistency and high availability across multiple geographic regions. Which Google Cloud database service is best suited for these requirements?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Cloud SQL"
+          },
+          {
+            "id": "B",
+            "text": "BigQuery"
+          },
+          {
+            "id": "C",
+            "text": "Cloud Spanner"
+          },
+          {
+            "id": "D",
+            "text": "Compute Engine with self-managed MySQL"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Cloud Spanner is a globally distributed, strongly consistent, and horizontally scalable relational database service designed for mission-critical applications requiring high transactional throughput and availability. It uniquely combines the benefits of relational databases (strong consistency, SQL queries) with the scalability of NoSQL databases. Cloud SQL is a managed relational database service but typically doesn't scale to 'millions of transactions per second globally' with the same ease as Spanner. BigQuery is an analytical data warehouse, not a transactional database. Running self-managed MySQL on Compute Engine would require significant operational overhead for scaling, high availability, and global distribution.",
+        "category": "Google Cloud architect",
+        "difficulty": "medium",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761512351096,
+        "question": "A developer needs to run a batch processing job on Compute Engine that can tolerate preemption and has flexible start/stop times. The primary goal is to minimize the cost of running this job. Which Compute Engine option should the developer choose?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Preemptible VMs"
+          },
+          {
+            "id": "B",
+            "text": "Sustained Use Discounts"
+          },
+          {
+            "id": "C",
+            "text": "Custom Machine Types"
+          },
+          {
+            "id": "D",
+            "text": "Committed Use Discounts"
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "Preemptible VMs are significantly cheaper than regular VMs because they can be preempted (stopped) by Google Cloud if resources are needed elsewhere. They are ideal for fault-tolerant batch jobs, scientific computing, or other processes that can handle interruptions and restart from checkpoints. Sustained Use Discounts apply automatically to regular VMs that run for a significant portion of the month. Custom Machine Types allow optimizing performance by tailoring CPU and memory, but don't directly reduce cost for interruptible workloads. Committed Use Discounts offer substantial savings for predictable, long-term workloads, but are not designed for interruptible jobs.",
+        "category": "Google Cloud architect",
+        "difficulty": "easy",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761512351097,
+        "question": "An architect is designing a highly available web application on GCP. Which Google Cloud networking component is crucial for distributing incoming traffic across multiple instances in different zones or regions and automatically failing over in case of an instance or zone failure?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Cloud CDN"
+          },
+          {
+            "id": "B",
+            "text": "Cloud Load Balancing"
+          },
+          {
+            "id": "C",
+            "text": "Cloud DNS"
+          },
+          {
+            "id": "D",
+            "text": "Cloud VPN"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Cloud Load Balancing is essential for highly available applications as it distributes user traffic across multiple backend instances (VMs, containers, etc.) and can be configured to span multiple zones and regions. It automatically detects unhealthy instances and directs traffic only to healthy ones, ensuring continuous availability. Cloud CDN (Content Delivery Network) is used for caching static content closer to users. Cloud DNS is for domain name resolution. Cloud VPN is used for securely connecting your on-premises network to your Google Cloud VPC.",
+        "category": "Google Cloud architect",
+        "difficulty": "medium",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761512351098,
+        "question": "A company needs to process petabytes of streaming data from IoT devices, perform real-time analytics, and store the results for historical analysis. Which combination of Google Cloud services would be most appropriate for this end-to-end data pipeline?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Cloud Pub/Sub, Dataflow, BigQuery"
+          },
+          {
+            "id": "B",
+            "text": "Cloud SQL, Compute Engine, Cloud Storage"
+          },
+          {
+            "id": "C",
+            "text": "Cloud Spanner, Cloud Functions, App Engine"
+          },
+          {
+            "id": "D",
+            "text": "Cloud Datastore, Cloud Run, Cloud Memorystore"
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "This combination is ideal for large-scale streaming data analytics. Cloud Pub/Sub is a real-time messaging service for ingesting streaming data. Dataflow is a fully managed service for executing Apache Beam pipelines, capable of processing both batch and streaming data at scale. BigQuery is a highly scalable, serverless data warehouse designed for petabyte-scale analytics. This combination provides a robust, managed, and scalable solution for the described requirements. The other options involve services not designed for petabyte-scale streaming analytics (Cloud SQL, Cloud Spanner, Datastore) or compute services that would require more management (Compute Engine) or are for different use cases (App Engine, Cloud Functions, Cloud Run, Memorystore).",
+        "category": "Google Cloud architect",
+        "difficulty": "hard",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761512351099,
+        "question": "A developer needs to create a small, event-driven function that automatically processes images uploaded to a Cloud Storage bucket, without managing any underlying servers or infrastructure. Which Google Cloud service is the most appropriate choice?",
+        "options": [
+          {
+            "id": "A",
+            "text": "App Engine Standard"
+          },
+          {
+            "id": "B",
+            "text": "Compute Engine"
+          },
+          {
+            "id": "C",
+            "text": "Cloud Functions"
+          },
+          {
+            "id": "D",
+            "text": "Google Kubernetes Engine (GKE)"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Cloud Functions is a serverless execution environment for building and connecting cloud services. It allows developers to write single-purpose functions that are automatically triggered by events (like an object being uploaded to Cloud Storage) without provisioning or managing any servers. App Engine Standard is a PaaS for full web applications. Compute Engine provides IaaS virtual machines, requiring server management. GKE is a container orchestration platform, which would be overkill for a single, event-driven function.",
+        "category": "Google Cloud architect",
+        "difficulty": "medium",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761512351100,
+        "question": "To gain comprehensive insights into the performance, health, and operational events of applications and infrastructure running on GCP, an architect needs a unified platform for collecting, analyzing, and alerting on logs, metrics, and traces. Which suite of Google Cloud services provides this capability?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Cloud Audit Logs and Security Command Center"
+          },
+          {
+            "id": "B",
+            "text": "Cloud Monitoring and Cloud Logging (formerly Stackdriver)"
+          },
+          {
+            "id": "C",
+            "D": "Cloud Trace and Cloud Debugger"
+          },
+          {
+            "id": "D",
+            "text": "Cloud Deployment Manager and Cloud Build"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Cloud Monitoring and Cloud Logging (part of the Google Cloud Operations suite, historically known as Stackdriver) provide a comprehensive solution for collecting and analyzing metrics, logs, and traces from applications and infrastructure. Cloud Monitoring focuses on metrics and alerting, while Cloud Logging handles log aggregation and analysis. Cloud Audit Logs and Security Command Center are focused on security and compliance. Cloud Trace and Cloud Debugger are specific tools for performance tracing and debugging code. Cloud Deployment Manager and Cloud Build are for infrastructure as code and CI/CD pipelines, respectively.",
+        "category": "Google Cloud architect",
+        "difficulty": "easy",
+        "type": "multiple-choice"
+      },
+      {
+        "id": 1761512351101,
+        "question": "A legacy monolithic application running on-premises needs to be migrated to Google Cloud. The business requires minimal downtime during migration and wants to take full advantage of cloud-native features in the long term, but refactoring the entire application immediately is not feasible due to time and resource constraints. What is the recommended migration strategy?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Immediately re-factor the entire application to serverless microservices."
+          },
+          {
+            "id": "B",
+            "text": "Perform a 'Lift and Shift' (re-host) migration, then progressively modernize (re-platform/re-factor) components."
+          },
+          {
+            "id": "C",
+            "text": "Migrate directly to Google Kubernetes Engine (GKE) as a containerized monolith."
+          },
+          {
+            "id": "D",
+            "text": "Keep the application on-premises and use Cloud Interconnect for hybrid connectivity."
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "A 'Lift and Shift' (re-host) approach allows migrating the application to GCP with minimal changes, reducing immediate downtime and complexity. This addresses the 'minimal downtime' and 'refactoring immediately is not feasible' requirements. Subsequently, a phased modernization strategy (re-platforming components to managed services like Cloud SQL or re-factoring parts into microservices) allows the business to 'take full advantage of cloud-native features in the long term' without a massive upfront refactoring effort. Immediately re-factoring is too disruptive and time-consuming. Migrating to GKE as a monolith is possible but doesn't immediately 'take full advantage of cloud-native features' beyond containerization and might still require significant effort. Keeping it on-premises doesn't meet the goal of migrating to GCP.",
+        "category": "Google Cloud architect",
+        "difficulty": "hard",
+        "type": "multiple-choice"
+      }
+    ],
+    "metadata": {
+      "totalQuestions": 10,
+      "difficultyDistribution": {
+        "easy": 3,
+        "medium": 4,
+        "hard": 3
+      },
+      "questionTypes": {
+        "multiple-choice": 10,
+        "true-false": 0,
+        "scenario": 0
+      },
+      "topics": [
+        "Google Cloud architect"
+      ]
+    },
+    "createdAt": "2025-10-26T20:59:14.510Z",
+    "updatedAt": "2025-10-26T20:59:23.996Z",
+    "isPublic": true,
+    "sourceType": "search"
+  }
+]

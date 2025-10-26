@@ -25,6 +25,13 @@ export default function ResultsPage() {
     setMounted(true);
   }, []);
 
+  // Redirect if exam not completed - do this in useEffect, not during render
+  useEffect(() => {
+    if (mounted && (!isExamCompleted || userAnswers.size === 0)) {
+      router.push('/');
+    }
+  }, [mounted, isExamCompleted, userAnswers.size, router]);
+
   if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -34,8 +41,11 @@ export default function ResultsPage() {
   }
 
   if (!isExamCompleted || userAnswers.size === 0) {
-    router.push('/');
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
   const score = getScore();

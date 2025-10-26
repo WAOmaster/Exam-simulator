@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, CheckCircle, XCircle, Brain } from 'lucide-react';
+import { formatExplanation } from '@/lib/formatExplanation';
+import { useExamStore } from '@/lib/store';
 
 interface EvaluationPaneProps {
   isOpen: boolean;
@@ -12,6 +14,8 @@ interface EvaluationPaneProps {
   selectedAnswer: string;
   correctAnswer: string;
   isCorrect: boolean;
+  explanation?: string; // Pre-generated explanation from the question
+  questionId?: number; // For saving fetched explanations
 }
 
 export default function EvaluationPane({
@@ -22,16 +26,26 @@ export default function EvaluationPane({
   selectedAnswer,
   correctAnswer,
   isCorrect,
+  explanation: preGeneratedExplanation,
+  questionId,
 }: EvaluationPaneProps) {
   const [explanation, setExplanation] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { updateQuestionExplanation } = useExamStore();
 
   useEffect(() => {
     if (isOpen && selectedAnswer) {
-      fetchExplanation();
+      // Use pre-generated explanation if available, otherwise fetch from AI
+      if (preGeneratedExplanation) {
+        setExplanation(preGeneratedExplanation);
+        setLoading(false);
+        setError('');
+      } else {
+        fetchExplanation();
+      }
     }
-  }, [isOpen, selectedAnswer]);
+  }, [isOpen, selectedAnswer, preGeneratedExplanation]);
 
   const fetchExplanation = async () => {
     setLoading(true);
@@ -46,6 +60,7 @@ export default function EvaluationPane({
           options,
           correctAnswer,
           userAnswer: selectedAnswer,
+          isCorrect,
         }),
       });
 
@@ -55,6 +70,11 @@ export default function EvaluationPane({
 
       const data = await response.json();
       setExplanation(data.explanation);
+
+      // Save the fetched explanation to the question for future use
+      if (questionId && data.explanation) {
+        updateQuestionExplanation(questionId, data.explanation);
+      }
     } catch (err) {
       setError('Failed to generate explanation. Please try again.');
       console.error('Error fetching explanation:', err);
@@ -163,9 +183,7 @@ export default function EvaluationPane({
 
                 {!loading && !error && explanation && (
                   <div className="prose dark:prose-invert max-w-none">
-                    <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                      {explanation}
-                    </div>
+                    {formatExplanation(explanation)}
                   </div>
                 )}
               </div>

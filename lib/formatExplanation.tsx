@@ -60,6 +60,7 @@ export function formatExplanation(text: string): React.ReactNode {
 function formatInlineText(text: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
   let lastIndex = 0;
+  let keyCounter = 0;
 
   // Pattern to match **bold** text
   const boldPattern = /\*\*(.+?)\*\*/g;
@@ -68,12 +69,16 @@ function formatInlineText(text: string): React.ReactNode {
   while ((match = boldPattern.exec(text)) !== null) {
     // Add text before the match
     if (match.index > lastIndex) {
-      parts.push(text.substring(lastIndex, match.index));
+      parts.push(
+        <span key={`text-${keyCounter++}`}>
+          {text.substring(lastIndex, match.index)}
+        </span>
+      );
     }
 
     // Add bold text
     parts.push(
-      <strong key={match.index} className="font-bold text-gray-900 dark:text-white">
+      <strong key={`bold-${keyCounter++}`} className="font-bold text-gray-900 dark:text-white">
         {match[1]}
       </strong>
     );
@@ -83,7 +88,11 @@ function formatInlineText(text: string): React.ReactNode {
 
   // Add remaining text
   if (lastIndex < text.length) {
-    parts.push(text.substring(lastIndex));
+    parts.push(
+      <span key={`text-${keyCounter++}`}>
+        {text.substring(lastIndex)}
+      </span>
+    );
   }
 
   // If no formatting was found, return original text

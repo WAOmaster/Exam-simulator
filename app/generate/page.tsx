@@ -173,8 +173,20 @@ export default function GeneratePage() {
       sourceType: activeTab,
     };
 
+    // Add the question set to the store
     addQuestionSet(tempSet);
-    router.push('/');
+
+    // Reset any previous exam state
+    resetExam();
+
+    // Set this as the current question set
+    setCurrentQuestionSet(tempSet.id);
+
+    // Start the exam in practice mode
+    startExam(60, 'practice', false);
+
+    // Navigate to practice page
+    router.push('/practice');
   };
 
   return (

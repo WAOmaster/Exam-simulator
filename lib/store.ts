@@ -35,6 +35,7 @@ interface ExamState {
   previousQuestion: () => void;
   goToQuestion: (index: number) => void;
   getScore: () => { correct: number; total: number; percentage: number };
+  updateQuestionExplanation: (questionId: number, explanation: string) => void;
 
   // Question set actions
   setCurrentQuestionSet: (questionSetId: string) => void;
@@ -124,15 +125,50 @@ export const useExamStore = create<ExamState>()(
         return { correct, total, percentage };
       },
 
+      updateQuestionExplanation: (questionId, explanation) =>
+        set((state) => {
+          // Update the question in the questions array
+          const updatedQuestions = state.questions.map((q) =>
+            q.id === questionId ? { ...q, explanation } : q
+          );
+
+          // Also update in available question sets if this question belongs to one
+          const updatedQuestionSets = state.availableQuestionSets.map((questionSet) => {
+            const hasQuestion = questionSet.questions.some((q) => q.id === questionId);
+            if (hasQuestion) {
+              return {
+                ...questionSet,
+                questions: questionSet.questions.map((q) =>
+                  q.id === questionId ? { ...q, explanation } : q
+                ),
+              };
+            }
+            return questionSet;
+          });
+
+          return {
+            questions: updatedQuestions,
+            availableQuestionSets: updatedQuestionSets,
+          };
+        }),
+
       // Question set actions
       setCurrentQuestionSet: (questionSetId) => {
         const state = get();
+        console.log('setCurrentQuestionSet called with ID:', questionSetId);
+        console.log('Available question sets:', state.availableQuestionSets.length);
+
         const questionSet = state.availableQuestionSets.find(set => set.id === questionSetId);
+
         if (questionSet) {
+          console.log('Found question set:', questionSet.title, 'with', questionSet.questions.length, 'questions');
           set({
             currentQuestionSetId: questionSetId,
             questions: questionSet.questions,
           });
+        } else {
+          console.error('Question set not found with ID:', questionSetId);
+          console.log('Available IDs:', state.availableQuestionSets.map(s => s.id));
         }
       },
 
@@ -148,6 +184,7 @@ export const useExamStore = create<ExamState>()(
     {
       name: 'exam-generator-storage',
       partialize: (state) => ({
+        questions: state.questions, // ✅ Persist current questions
         userAnswers: Array.from(state.userAnswers.entries()),
         isExamStarted: state.isExamStarted,
         isExamCompleted: state.isExamCompleted,
