@@ -36,9 +36,9 @@ export default function QuestionSetCard({ questionSet, onStart, onDelete }: Ques
               {questionSet.title}
             </h3>
             {questionSet.isPublic ? (
-              <Globe className="w-4 h-4 text-green-600 dark:text-green-400" title="Public" />
+              <Globe className="w-4 h-4 text-green-600 dark:text-green-400" />
             ) : (
-              <Lock className="w-4 h-4 text-gray-400" title="Private" />
+              <Lock className="w-4 h-4 text-gray-400" />
             )}
           </div>
           {questionSet.description && (

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
-import { Question } from '@/lib/store';
+import { Question } from '@/lib/types';
 
 interface QuestionCardProps {
   question: Question;

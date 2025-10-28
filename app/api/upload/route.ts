@@ -2,11 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseFile } from '@/lib/parsers';
 import { UploadResponse } from '@/lib/types';
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// No need for config.api.bodyParser in App Router - using native formData()
 
 export async function POST(request: NextRequest) {
   try {

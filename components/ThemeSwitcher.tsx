@@ -78,15 +78,9 @@ export default function ThemeSwitcher() {
                       }}
                       className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all ${
                         colorTheme === theme.name
-                          ? 'bg-gray-100 dark:bg-gray-700 ring-2 ring-offset-2 dark:ring-offset-gray-800'
+                          ? 'bg-gray-100 dark:bg-gray-700 ring-2 ring-primary ring-offset-2 dark:ring-offset-gray-800'
                           : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
                       }`}
-                      style={{
-                        ringColor:
-                          colorTheme === theme.name
-                            ? `var(--primary)`
-                            : 'transparent',
-                      }}
                     >
                       <div
                         className={`w-8 h-8 rounded-full bg-gradient-to-br ${theme.colors} shadow-md`}
