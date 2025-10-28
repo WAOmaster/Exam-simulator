@@ -19,13 +19,17 @@ import questions from '@/data/questions.json';
 
 export default function Home() {
   const router = useRouter();
-  const { startExam, resetExam, getScore, isExamCompleted } = useExamStore();
+  const { startExam, resetExam, getScore, isExamCompleted, setQuestions } = useExamStore();
   const [examDuration, setExamDuration] = useState(90);
   const [mode, setMode] = useState<'practice' | 'exam'>('exam');
   const [useTimer, setUseTimer] = useState(true);
 
   const handleStart = () => {
     resetExam();
+
+    // Load the default OCI questions into the store
+    setQuestions(questions as any);
+
     startExam(examDuration, mode, useTimer);
     router.push(mode === 'practice' ? '/practice' : '/exam');
   };
