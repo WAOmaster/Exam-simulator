@@ -79,11 +79,15 @@ export default function ExamPage() {
     // Submit the answer
     submitAnswer(currentQuestion.id, selectedAnswer, isCorrect);
 
-    // Show explanation modal
+    // In exam mode, don't show explanation automatically
     setTimeout(() => {
       setIsSubmitting(false);
-      setShowExplanation(true);
     }, 300);
+  };
+
+  const handleReviewAnswer = () => {
+    // User explicitly wants to review their answer
+    setShowExplanation(true);
   };
 
   const handleNext = () => {
@@ -201,24 +205,35 @@ export default function ExamPage() {
                 Previous
               </button>
 
-              {isAnswered && (
-                <button
-                  onClick={handleNext}
-                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
-                >
-                  {currentQuestionIndex < questions.length - 1 ? (
-                    <>
-                      Next
-                      <ChevronRight className="w-5 h-5" />
-                    </>
-                  ) : (
-                    <>
-                      Finish
-                      <Trophy className="w-5 h-5" />
-                    </>
-                  )}
-                </button>
-              )}
+              <div className="flex gap-3">
+                {isAnswered && !showExplanation && (
+                  <button
+                    onClick={handleReviewAnswer}
+                    className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
+                  >
+                    Review Answer
+                  </button>
+                )}
+
+                {isAnswered && (
+                  <button
+                    onClick={handleNext}
+                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
+                  >
+                    {currentQuestionIndex < questions.length - 1 ? (
+                      <>
+                        Next
+                        <ChevronRight className="w-5 h-5" />
+                      </>
+                    ) : (
+                      <>
+                        Finish
+                        <Trophy className="w-5 h-5" />
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
