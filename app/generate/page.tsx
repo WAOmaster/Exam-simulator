@@ -14,6 +14,11 @@ import { GenerationConfig, ContentSource, Question, QuestionSet } from '@/lib/ty
 
 type InputTab = 'upload' | 'url' | 'search' | 'text';
 
+// Helper function to convert InputTab to QuestionSet sourceType
+const getSourceType = (tab: InputTab): 'upload' | 'url' | 'search' | 'manual' | 'pre-built' => {
+  return tab === 'text' ? 'manual' : tab;
+};
+
 export default function GeneratePage() {
   const router = useRouter();
   const { addQuestionSet, resetExam, setCurrentQuestionSet, startExam } = useExamStore();
@@ -170,7 +175,7 @@ export default function GeneratePage() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isPublic: false,
-      sourceType: activeTab === 'text' ? 'manual' : activeTab,
+      sourceType: getSourceType(activeTab),
     };
 
     // Add the question set to the store
@@ -406,7 +411,7 @@ export default function GeneratePage() {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             isPublic: false,
-            sourceType: activeTab === 'text' ? 'manual' : activeTab,
+            sourceType: getSourceType(activeTab),
           }}
           onSave={handleSaveQuestionSet}
         />
