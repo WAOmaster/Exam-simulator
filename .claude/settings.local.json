@@ -15,7 +15,8 @@
       "Bash(netstat:*)",
       "Bash(findstr:*)",
       "Bash(rm:*)",
-      "Bash(timeout /t 10)"
+      "Bash(timeout /t 10)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

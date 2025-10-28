@@ -16,7 +16,7 @@ type InputTab = 'upload' | 'url' | 'search' | 'text';
 
 export default function GeneratePage() {
   const router = useRouter();
-  const { addQuestionSet } = useExamStore();
+  const { addQuestionSet, resetExam, setCurrentQuestionSet, startExam } = useExamStore();
 
   const [activeTab, setActiveTab] = useState<InputTab>('upload');
   const [contentSource, setContentSource] = useState<ContentSource | null>(null);
@@ -170,7 +170,7 @@ export default function GeneratePage() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isPublic: false,
-      sourceType: activeTab,
+      sourceType: activeTab === 'text' ? 'manual' : activeTab,
     };
 
     // Add the question set to the store
@@ -406,7 +406,7 @@ export default function GeneratePage() {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             isPublic: false,
-            sourceType: activeTab,
+            sourceType: activeTab === 'text' ? 'manual' : activeTab,
           }}
           onSave={handleSaveQuestionSet}
         />

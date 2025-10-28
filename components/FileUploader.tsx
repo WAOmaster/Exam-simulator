@@ -10,7 +10,7 @@ interface FileUploaderProps {
 
 export default function FileUploader({
   onFileProcessed,
-  acceptedTypes = '.pdf,.docx,.xlsx,.txt',
+  acceptedTypes = '.docx,.xlsx,.txt',
 }: FileUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -120,7 +120,7 @@ export default function FileUploader({
           </p>
 
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Supported: PDF, DOCX, Excel, TXT (Max 10MB)
+            Supported: DOCX, Excel, TXT (Max 10MB)
           </p>
         </div>
       ) : (

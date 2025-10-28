@@ -25,21 +25,10 @@ export async function parseDOCX(buffer: Buffer, fileName: string): Promise<Parse
 
 /**
  * Parse PDF file to extract text content
+ * Note: PDF parsing is currently not supported due to serverless environment limitations
  */
 export async function parsePDF(buffer: Buffer, fileName: string): Promise<ParsedContent> {
-  try {
-    // Dynamic import to avoid build issues
-    const pdf = await import('pdf-parse/lib/pdf-parse.js');
-    const data = await pdf.default(buffer);
-
-    return {
-      text: data.text,
-      fileName,
-      fileType: 'pdf',
-    };
-  } catch (error) {
-    throw new Error(`Failed to parse PDF file: ${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
+  throw new Error('PDF parsing is currently not supported. Please convert your PDF to DOCX, Excel, or TXT format and upload again.');
 }
 
 /**
