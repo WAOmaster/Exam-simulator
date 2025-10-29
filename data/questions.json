@@ -796,8 +796,8 @@
         "text": "Traffic between an Azure VNet and peered OCI VCNs in different regions"
       }
     ],
-    "correctAnswer": "D",
-    "explanation": "The interconnect links a specific Azure region to a specific OCI region. You can use the DRG to route traffic to VCNs peered in the *same region* (B) or even enable transit routing (C). However, the connection does **not** support native routing to OCI VCNs that are remotely peered in a **different OCI region**.",
+    "correctAnswer": "C",
+    "explanation": "The connection lets traffic flow from the VNet through the connected VCN to a peered VCN in the same Oracle Cloud Infrastructure region, or a different region.This cross-cloud connection doesn't enable traffic between the on-premises network through the VCN to the VNet, or from the on-premises network through the VNet to the VCN.",
     "category": "OCI 1Z0-1151-25",
     "difficulty": "medium"
   },
