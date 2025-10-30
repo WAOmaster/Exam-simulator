@@ -1157,10 +1157,10 @@
       },
       {
         "id": "D",
-        "text": "Customer consults Oracle Sales for a price agreement..."
+        "text": "Customer consults Oracle Sales for a price agreement, Which is then created as a Private Offer in the Azure Marketplace by Oracle to be purchased by the customer."
       }
     ],
-    "correctAnswer": "C",
+    "correctAnswer": "D",
     "explanation": "Assuming the purchase (public or private) has been made, the very first *onboarding* step is to establish the connection between the two cloud environments. This involves **linking your active Azure subscription with your OCI tenancy**, which creates the resource link and enables federated identity and billing.",
     "category": "OCI 1Z0-1151-25",
     "difficulty": "medium"
