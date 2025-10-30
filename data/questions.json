@@ -514,8 +514,8 @@
         "text": "Google Cloud"
       }
     ],
-    "correctAnswer": "A",
-    "explanation": "Oracle has major, strategic partnerships with **Microsoft Azure** (OCI-Azure Interconnect, Oracle Database@Azure) and **Google Cloud** (Oracle Interconnect for Google, Oracle Database@Google Cloud). Oracle and **AWS** are direct competitors and lack this level of strategic partnership, interconnect, or \"Database@\" service.",
+    "correctAnswer": "C",
+    "explanation": "Oracle’s public multicloud announcements name Amazon Web Services, Microsoft Azure, and Google Cloud as its multicloud partners (Oracle Database@AWS, @Azure, and @Google Cloud).IBM Cloud is not listed in those Oracle multicloud partnership announcements.",
     "category": "OCI 1Z0-1151-25",
     "difficulty": "medium"
   },
