@@ -72,8 +72,8 @@ async function extractAndCompleteQuestions(
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
   const genAI = getGeminiClient();
 
-  // Try gemini-2.5-flash first, fallback to gemini-1.5-flash if overloaded
-  const modelName = retryCount > 0 ? 'gemini-1.5-flash' : 'gemini-2.5-flash';
+  // Try gemini-2.5-flash first, fallback to gemini-1.5-pro if overloaded
+  const modelName = retryCount > 0 ? 'gemini-1.5-pro' : 'gemini-2.5-flash';
 
   const model = genAI.getGenerativeModel({
     model: modelName,
@@ -147,7 +147,7 @@ Return ONLY the JSON object, no markdown formatting.`;
 
     // Retry once with different model if overloaded and haven't retried yet
     if (isOverloadedError && retryCount === 0) {
-      console.log('Model overloaded, retrying with gemini-1.5-flash...');
+      console.log('Model overloaded, retrying with gemini-1.5-pro...');
       await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
       return extractAndCompleteQuestions(content, config, 1);
     }
@@ -166,8 +166,8 @@ export async function generateQuestions(
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
   const genAI = getGeminiClient();
 
-  // Try gemini-2.5-flash first, fallback to gemini-1.5-flash if overloaded
-  const modelName = retryCount > 0 ? 'gemini-1.5-flash' : 'gemini-2.5-flash';
+  // Try gemini-2.5-flash first, fallback to gemini-1.5-pro if overloaded
+  const modelName = retryCount > 0 ? 'gemini-1.5-pro' : 'gemini-2.5-flash';
 
   const model = genAI.getGenerativeModel({
     model: modelName,
@@ -198,7 +198,7 @@ export async function generateQuestions(
 
     // Retry once with different model if overloaded and haven't retried yet
     if (isOverloadedError && retryCount === 0) {
-      console.log('Model overloaded, retrying with gemini-1.5-flash...');
+      console.log('Model overloaded, retrying with gemini-1.5-pro...');
       await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
       return generateQuestions(content, config, 1);
     }
