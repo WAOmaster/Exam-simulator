@@ -350,12 +350,181 @@ To migrate from JSON to SQL:
 - Check if site has dynamic content (may not scrape well)
 - Use multiple URLs if single URL fails
 
+## Intelligent Question Extraction & Enhancement
+
+### Overview
+The system can detect if uploaded content contains existing questions and intelligently extract them, filling in missing fields (options, explanations, answers) rather than generating brand new questions.
+
+### How It Works
+
+**Detection (Frontend - `app/generate/page.tsx`):**
+- Uses 7 regex patterns to detect existing questions
+- Counts questions and estimates total
+- Shows green "Extraction Mode" UI vs blue "Generation Mode"
+- Passes `estimatedQuestionCount` to backend
+
+**Extraction (Backend - `lib/questionGenerator.ts`):**
+- `intelligentQuestionProcessing()` - Auto-routes to extraction or generation
+- `extractAndCompleteQuestions()` - Uses frontend count to override backend detection
+- `batchExtractAndCompleteQuestions()` - Handles large sets (>25 questions)
+
+### Batch Processing for Large Question Sets
+
+**Why Batching:**
+- Token limits: Gemini API has 8,192 token output limit
+- 15 questions per batch = ~6,000 tokens (safe margin)
+- Prevents JSON truncation errors
+
+**How Batching Works:**
+1. Frontend detects 90 questions
+2. Backend receives `estimatedQuestionCount: 90`
+3. Triggers batch extraction: 90 ÷ 15 = 6 batches
+4. `splitContentIntoQuestionBatches()` splits by question boundaries
+5. Process 3 batches in parallel (controlled concurrency)
+6. Each batch extracts 15 questions with retry logic
+7. Combine all results into single array
+
+**Code Flow:**
+```
+Frontend Analysis → Backend Routing → Batch Splitting → Parallel Processing → Combine Results
+     (90 q)              (>25?)          (6 batches)      (3 concurrent)        (90 q)
+```
+
+### Key Functions
+
+**`estimateQuestionCount(content: string): number`**
+- Patterns: "1. ", "Question 1", "Q1:", "1) "
+- Returns highest match count
+- Fallback: 10 if no patterns match
+
+**`extractBatch(content, expectedQuestions, config): Promise<Result>`**
+- Processes single batch of questions
+- Temperature: 0.3 (accurate extraction)
+- Max tokens: 8,192
+- Explanation limit: 50 words
+- Retry with gemini-1.5-pro if overloaded
+
+**`batchExtractAndCompleteQuestions(content, count, config): Promise<Result>`**
+- QUESTIONS_PER_BATCH = 15
+- CONCURRENT_BATCHES = 3
+- Splits content by question boundaries
+- Processes in parallel groups
+- 1-second delay between groups
+- Graceful error handling (continues if batch fails)
+
+### Configuration
+
+**GenerationConfig (lib/types.ts):**
+```typescript
+interface GenerationConfig {
+  numberOfQuestions: number;
+  difficulty: 'easy' | 'medium' | 'hard' | 'mixed';
+  questionTypes: ('multiple-choice' | 'true-false' | 'scenario')[];
+  topicFocus?: string;
+  subject: string;
+  estimatedQuestionCount?: number; // Frontend override
+}
+```
+
+### UI/UX Features
+
+**Extraction Mode (Green):**
+- Hides: Number of questions, Difficulty, Question types, Topic focus
+- Shows: Auto-detected subject (optional override)
+- Summary: "~90 questions detected • AI will extract and enhance"
+- Button: "Extract & Enhance Questions"
+
+**Generation Mode (Blue):**
+- Shows: All configuration controls
+- Summary: "25 questions • Difficulty: mixed • Types: multiple-choice"
+- Button: "Generate Questions"
+
+**Progress Messages:**
+- "Processing 90 questions in 6 batches..." (>25 questions)
+- "Extracting 10 questions..." (≤25 questions)
+- "Generating 25 questions..." (generation mode)
+
+### Token Optimization
+
+**Strategies:**
+1. Reduced batch size: 25 → 15 questions
+2. Strict explanation limit: 100 → 50 words
+3. Lower max tokens: 16,384 → 8,192
+4. Concise prompts: Removed verbose instructions
+5. Content truncation: 25,000 chars per batch
+
+**Prompt Enforcement:**
+```
+STRICT RULES - MUST FOLLOW:
+1. Extract ONLY {N} questions - NO MORE, NO LESS
+2. Keep explanations BRIEF (max 50 words each)
+3. DO NOT add extra details, examples, or context
+4. Return ONLY valid JSON, nothing else
+```
+
+### Error Handling
+
+**Auto-Recovery:**
+- JSON truncation detection
+- Closes unclosed brackets
+- Removes incomplete last question
+- Retries parse
+
+**Fallback Strategy:**
+1. Try extraction with gemini-2.5-flash
+2. If 503 overload → Retry with gemini-1.5-pro
+3. If extraction fails → Fall back to generation mode
+4. If batch fails → Continue with successful batches
+
+### Recent Fixes (Commit History)
+
+**`6dd9127` - Use frontend count override:**
+- Problem: Backend regex didn't match document format (estimated 10 vs actual 90)
+- Solution: Frontend passes `estimatedQuestionCount` to backend
+- Backend trusts frontend count over its own detection
+
+**`b1d55cf` - Enforce strict token limits:**
+- Problem: AI generated 49,515 chars for 10 questions (should be ~4,000)
+- Solution: Reduced tokens, stricter prompts, 50-word explanation limit
+
+**`31ae961` - Reduce batch size and fix splitting:**
+- Problem: Batch boundary calculation bug, 25 questions still too large
+- Solution: 25 → 15 per batch, fixed endIdx calculation
+
+**`2987cf9` - Intelligent batch processing:**
+- Problem: Large sets (90 questions) timed out and failed
+- Solution: Auto-detect count, split into batches, parallel processing
+
+### Testing & Debugging
+
+**Vercel Logs:**
+```bash
+vercel logs [deployment-url]
+```
+
+Look for:
+- "Estimated X questions" (backend detection)
+- "Using frontend-provided count: X" (override working)
+- "Splitting into X batches"
+- "Processing batch X/Y"
+- "Total questions extracted: X"
+
+**Common Issues:**
+1. **Only 10 extracted from 90** → Frontend count not passed
+2. **JSON parse error** → Token limit exceeded, reduce batch size
+3. **503 overload** → Retry logic will switch models
+4. **Save failed** → Check question set structure and db.ts
+
 ## Future Enhancements
 
+- [x] Intelligent question extraction and completion
+- [x] Batch processing for large question sets
+- [ ] Real-time progress tracking with visual feedback
+- [ ] Incremental temp JSON storage for batch results
+- [ ] Question editing after generation
 - [ ] Knowledge Areas browser with pre-built sets
 - [ ] Community question sets with ratings
 - [ ] Export questions to various formats
-- [ ] Question editing after generation
 - [ ] Real-time collaboration on question sets
 - [ ] Advanced analytics and insights
 - [ ] Mobile app version
