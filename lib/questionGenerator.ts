@@ -143,14 +143,12 @@ function splitContentIntoQuestionBatches(content: string, questionsPerBatch: num
   // Group questions into batches
   for (let i = 0; i < sortedBoundaries.length; i += questionsPerBatch) {
     const startIdx = sortedBoundaries[i];
-    const endIdx = sortedBoundaries[Math.min(i + questionsPerBatch, sortedBoundaries.length - 1)] || content.length;
-    batches.push(content.substring(startIdx, endIdx));
-  }
+    // Get the end index: either the start of the next batch or the end of content
+    const nextBatchStart = i + questionsPerBatch < sortedBoundaries.length
+      ? sortedBoundaries[i + questionsPerBatch]
+      : content.length;
 
-  // Add any remaining content
-  const lastBoundary = sortedBoundaries[sortedBoundaries.length - 1];
-  if (lastBoundary < content.length - 100) {
-    batches.push(content.substring(lastBoundary));
+    batches.push(content.substring(startIdx, nextBatchStart));
   }
 
   return batches;
@@ -225,7 +223,7 @@ IMPORTANT RULES:
 6. Make sure every question is complete and ready for exam use
 7. Return ONLY valid JSON, no additional text
 8. CRITICAL: Ensure all JSON strings are properly escaped (use \\" for quotes inside strings)
-9. Keep explanations concise (max 150 words) to avoid token limits
+9. Keep explanations VERY concise (max 100 words each) to avoid token limits
 10. Extract ALL questions from this batch, don't skip any
 
 Return ONLY the JSON object with properly formatted, valid JSON. No markdown code blocks, no additional text.`;
@@ -261,7 +259,7 @@ async function batchExtractAndCompleteQuestions(
   estimatedQuestions: number,
   config: GenerationConfig
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
-  const QUESTIONS_PER_BATCH = 25; // Based on token limits, 25 questions = ~8000 tokens
+  const QUESTIONS_PER_BATCH = 15; // Reduced from 25 to avoid token limits
   const numBatches = Math.ceil(estimatedQuestions / QUESTIONS_PER_BATCH);
 
   console.log(`Splitting into ${numBatches} batches of ~${QUESTIONS_PER_BATCH} questions each`);

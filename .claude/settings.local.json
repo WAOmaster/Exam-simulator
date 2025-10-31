@@ -19,7 +19,9 @@
       "Bash(npm run build:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(vercel logs:*)",
+      "Bash(vercel ls:*)"
     ],
     "deny": [],
     "ask": []

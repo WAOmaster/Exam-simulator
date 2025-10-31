@@ -186,7 +186,7 @@ export default function GeneratePage() {
       const estimatedQuestions = contentAnalysis?.questionCount || config.numberOfQuestions;
 
       if (isExtractionModeFinal && estimatedQuestions > 25) {
-        const numBatches = Math.ceil(estimatedQuestions / 25);
+        const numBatches = Math.ceil(estimatedQuestions / 15);
         setProgressMessage(`Processing ${estimatedQuestions} questions in ${numBatches} batches...`);
       } else if (isExtractionModeFinal) {
         setProgressMessage(`Extracting ${estimatedQuestions} questions...`);
