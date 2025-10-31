@@ -256,16 +256,181 @@ interface GenerationConfig {
 
 ## Storage System
 
-### JSON-Based Storage (`lib/db.ts`)
-- File-based storage in `data/db/` directory
-- Easy to migrate to SQL database later
-- CRUD operations for question sets and knowledge areas
-- Automatic directory initialization
-- Search and filter capabilities
+### Current: Client-Side Storage (localStorage)
+**Status:** ✅ Active - Works perfectly on Vercel
 
-**Files:**
-- `question-sets.json` - All saved question sets
-- `knowledge-areas.json` - Pre-built knowledge areas (future feature)
+**Implementation:**
+- Zustand store with persist middleware
+- Saves to browser's localStorage
+- No server-side database needed
+- Works on Vercel's read-only filesystem
+
+**Pros:**
+- Zero cost and zero setup
+- Instant save/load
+- Perfect for personal use
+- No network latency
+
+**Cons:**
+- Browser/device-specific (no cross-device sync)
+- Limited storage (~10MB per domain)
+- Data lost if browser cache cleared
+
+**Code Location:**
+- `lib/store.ts` - Zustand store with persist
+- `app/generate/page.tsx` - `handleSaveQuestionSet()` uses `addQuestionSet()`
+- `app/library/page.tsx` - Loads from `availableQuestionSets`
+
+### Future Migration Plans
+
+#### Option 1: Vercel Blob Storage (Simple Sync)
+**When to implement:** Need cross-device sync but not complex queries
+
+**Setup:**
+```bash
+npm install @vercel/blob
+```
+
+**Migration steps:**
+1. Replace `addQuestionSet()` to save JSON to Vercel Blob
+2. Replace library load from Blob storage
+3. Use `put()`, `get()`, `list()`, `del()` APIs
+4. Keep localStorage as cache for offline support
+
+**Pros:**
+- Native Vercel integration
+- 1GB free storage/month
+- CDN-backed (fast)
+- Simple key-value API
+
+**Cons:**
+- Still file-based (no queries)
+- Limited to 1GB transfer/month
+
+**Code changes needed:**
+```typescript
+// lib/storage.ts (new file)
+import { put, list, del } from '@vercel/blob';
+
+export async function saveQuestionSet(set: QuestionSet) {
+  const blob = await put(`question-sets/${set.id}.json`, JSON.stringify(set), {
+    access: 'public',
+  });
+  return blob;
+}
+
+export async function getQuestionSets() {
+  const { blobs } = await list({ prefix: 'question-sets/' });
+  // Fetch and parse each blob
+}
+```
+
+#### Option 2: Supabase (Full Database)
+**When to implement:** Need user accounts, sharing, search, or community features
+
+**Setup:**
+1. Create Supabase project: https://vercel.com/marketplace/supabase
+2. Install client: `npm install @supabase/supabase-js`
+3. Add env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+**Migration steps:**
+1. Create `question_sets` table in Supabase
+2. Create `users` table (if adding auth)
+3. Implement row-level security policies
+4. Update `lib/db.ts` to use Supabase client
+5. Migrate localStorage data to Supabase (one-time script)
+
+**Schema:**
+```sql
+CREATE TABLE question_sets (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title text NOT NULL,
+  description text,
+  subject text,
+  questions jsonb NOT NULL,
+  metadata jsonb,
+  user_id uuid REFERENCES auth.users,
+  is_public boolean DEFAULT false,
+  created_at timestamp DEFAULT now(),
+  updated_at timestamp DEFAULT now()
+);
+
+CREATE INDEX idx_question_sets_user_id ON question_sets(user_id);
+CREATE INDEX idx_question_sets_subject ON question_sets(subject);
+CREATE INDEX idx_question_sets_public ON question_sets(is_public);
+```
+
+**Code changes needed:**
+```typescript
+// lib/supabase.ts (new file)
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export async function saveQuestionSet(set: QuestionSet) {
+  const { data, error } = await supabase
+    .from('question_sets')
+    .insert([set])
+    .select();
+
+  if (error) throw error;
+  return data[0];
+}
+
+export async function getQuestionSets() {
+  const { data, error } = await supabase
+    .from('question_sets')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
+}
+```
+
+**Pros:**
+- Full PostgreSQL database
+- Built-in authentication
+- Real-time subscriptions
+- Row-level security
+- 500MB free storage
+- Unlimited API requests
+
+**Cons:**
+- More complex setup
+- Separate service to manage
+- Overkill if just need sync
+
+#### Option 3: Vercel KV (Redis)
+**When to implement:** Need fast caching and simple key-value storage
+
+**Best for:** Session data, rate limiting, temporary storage (not primary database)
+
+### Migration Decision Tree
+
+```
+Need cross-device sync?
+├─ No → Keep localStorage ✅ (current)
+└─ Yes → Need complex queries/search?
+    ├─ No → Use Vercel Blob (10 min setup)
+    └─ Yes → Need user accounts/auth?
+        ├─ No → Use Vercel Blob (simpler)
+        └─ Yes → Use Supabase (full featured)
+```
+
+### Deprecated: JSON File Storage (`lib/db.ts`)
+**Status:** ❌ Doesn't work on Vercel (read-only filesystem)
+
+The original implementation used local JSON files:
+- `data/db/question-sets.json`
+- `data/db/knowledge-areas.json`
+
+**Error:** `EROFS: read-only file system, open '/var/task/data/db/question-sets.json'`
+
+**Solution:** Migrated to localStorage (see above)
 
 ## Sharing & Privacy
 
