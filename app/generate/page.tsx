@@ -225,18 +225,8 @@ export default function GeneratePage() {
 
   const handleSaveQuestionSet = async (questionSet: QuestionSet, makePublic: boolean) => {
     try {
-      // Save to library via API
-      const response = await fetch('/api/library', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(questionSet),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save question set');
-      }
-
-      // Add to store
+      // Save directly to Zustand store (persists to localStorage)
+      // No server API needed - works on Vercel's read-only filesystem
       addQuestionSet(questionSet);
 
       // Navigate to library

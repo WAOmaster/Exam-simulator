@@ -10,7 +10,7 @@ import { QuestionSet } from '@/lib/types';
 
 export default function LibraryPage() {
   const router = useRouter();
-  const { loadQuestionSets, setCurrentQuestionSet, startExam, resetExam } = useExamStore();
+  const { loadQuestionSets, setCurrentQuestionSet, startExam, resetExam, availableQuestionSets } = useExamStore();
 
   const [questionSets, setQuestionSets] = useState<QuestionSet[]>([]);
   const [filteredSets, setFilteredSets] = useState<QuestionSet[]>([]);
@@ -19,10 +19,10 @@ export default function LibraryPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Load question sets on mount
+  // Load question sets from store on mount
   useEffect(() => {
     fetchQuestionSets();
-  }, []);
+  }, [availableQuestionSets]);
 
   // Filter question sets when search or filter changes
   useEffect(() => {
@@ -52,15 +52,9 @@ export default function LibraryPage() {
     setError('');
 
     try {
-      const response = await fetch('/api/library');
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch question sets');
-      }
-
-      const data = await response.json();
-      setQuestionSets(data);
-      loadQuestionSets(data);
+      // Load from Zustand store (localStorage) instead of server API
+      // This works on Vercel's read-only filesystem
+      setQuestionSets(availableQuestionSets);
     } catch (err: any) {
       setError(err.message || 'Failed to load question sets');
     } finally {
