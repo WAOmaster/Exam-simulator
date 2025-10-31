@@ -120,12 +120,14 @@ function estimateQuestionCount(content: string): number {
 function splitContentIntoQuestionBatches(content: string, questionsPerBatch: number): string[] {
   const batches: string[] = [];
 
-  // Try to find question boundaries (e.g., "1. ", "Question 1", "Q1:")
+  // Try to find question boundaries - use same patterns as frontend for consistency
   const questionBoundaries: number[] = [];
   const patterns = [
-    /^\s*\d+\.\s/gm,
-    /^\s*Question\s*\d+/gim,
-    /^\s*Q\d+[\.:]/gim,
+    /\d+\.\s*[A-Z]/gi,           // "1. What" - same as frontend
+    /Question\s*\d+/gi,           // "Question 1"
+    /Q\d+[\.:]/gi,                // "Q1:" or "Q1."
+    /^\s*\d+\.\s/gm,              // "1. " at line start
+    /^\s*\d+\)\s+[A-Z]/gm,        // "1) What"
   ];
 
   for (const pattern of patterns) {
@@ -140,12 +142,16 @@ function splitContentIntoQuestionBatches(content: string, questionsPerBatch: num
   // Sort and deduplicate boundaries
   const sortedBoundaries = [...new Set(questionBoundaries)].sort((a, b) => a - b);
 
+  console.log(`Found ${sortedBoundaries.length} question boundaries`);
+
   if (sortedBoundaries.length === 0) {
+    console.log('No boundaries found, splitting by character count');
     // If can't detect boundaries, split by character count
     const charsPerBatch = Math.ceil(content.length / Math.ceil(estimateQuestionCount(content) / questionsPerBatch));
     for (let i = 0; i < content.length; i += charsPerBatch) {
       batches.push(content.substring(i, i + charsPerBatch));
     }
+    console.log(`Created ${batches.length} batches by character count`);
     return batches;
   }
 
@@ -160,6 +166,7 @@ function splitContentIntoQuestionBatches(content: string, questionsPerBatch: num
     batches.push(content.substring(startIdx, nextBatchStart));
   }
 
+  console.log(`Created ${batches.length} batches from ${sortedBoundaries.length} boundaries`);
   return batches;
 }
 
