@@ -80,6 +80,30 @@ export default function GeneratePage() {
     const hasQuestions = patternMatches >= 3;
     const preview = content.substring(0, 200) + (content.length > 200 ? '...' : '');
 
+    // Try to extract subject from content if questions detected
+    let detectedSubject = '';
+    if (hasQuestions) {
+      // Look for common subject indicators
+      const subjectPatterns = [
+        /(?:Topic|Subject|Course|Exam)[\s:]+([A-Z][A-Za-z\s\d\-]+)(?:\n|Question|\d)/i,
+        /([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)*)\s+(?:Questions|Exam|Quiz|Test)/i,
+        /^([A-Z][A-Za-z\s\d\-]+?)(?:Exam|Questions|Quiz)/im,
+      ];
+
+      for (const pattern of subjectPatterns) {
+        const match = content.match(pattern);
+        if (match && match[1]) {
+          detectedSubject = match[1].trim();
+          break;
+        }
+      }
+
+      // Auto-fill subject if detected and current subject is empty
+      if (detectedSubject && !config.subject.trim()) {
+        setConfig(prev => ({ ...prev, subject: detectedSubject }));
+      }
+    }
+
     setContentAnalysis({
       hasQuestions,
       questionCount: hasQuestions ? estimatedQuestions : 0,
@@ -108,10 +132,17 @@ export default function GeneratePage() {
   };
 
   const handleGenerateQuestions = async () => {
-    // Validate inputs
-    if (!config.subject.trim()) {
+    // Validate inputs - subject required only for generation mode, not extraction
+    const isExtractionMode = contentAnalysis?.hasQuestions;
+
+    if (!isExtractionMode && !config.subject.trim()) {
       setError('Please enter a subject/topic');
       return;
+    }
+
+    // For extraction mode, use a generic subject if none detected
+    if (isExtractionMode && !config.subject.trim()) {
+      setConfig(prev => ({ ...prev, subject: 'General' }));
     }
 
     let source: ContentSource;
@@ -424,7 +455,11 @@ export default function GeneratePage() {
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 2. Configure Generation
               </h2>
-              <GenerationControls onConfigChange={setConfig} />
+              <GenerationControls
+                onConfigChange={setConfig}
+                isExtractionMode={contentAnalysis?.hasQuestions}
+                estimatedQuestions={contentAnalysis?.questionCount || 0}
+              />
             </div>
 
             {/* Generate Button */}

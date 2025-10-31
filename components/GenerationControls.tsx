@@ -6,6 +6,8 @@ import { GenerationConfig } from '@/lib/types';
 
 interface GenerationControlsProps {
   onConfigChange: (config: GenerationConfig) => void;
+  isExtractionMode?: boolean;
+  estimatedQuestions?: number;
 }
 
 const QUESTION_COUNTS = [10, 25, 50, 100];
@@ -16,7 +18,7 @@ const QUESTION_TYPES = [
   { id: 'scenario', label: 'Scenario-Based', description: 'Real-world situations' },
 ] as const;
 
-export default function GenerationControls({ onConfigChange }: GenerationControlsProps) {
+export default function GenerationControls({ onConfigChange, isExtractionMode = false, estimatedQuestions = 0 }: GenerationControlsProps) {
   const [config, setConfig] = useState<GenerationConfig>({
     numberOfQuestions: 25,
     difficulty: 'mixed',
@@ -59,22 +61,27 @@ export default function GenerationControls({ onConfigChange }: GenerationControl
       {/* Subject */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Subject / Topic <span className="text-red-500">*</span>
+          Subject / Topic {!isExtractionMode && <span className="text-red-500">*</span>}
+          {isExtractionMode && <span className="text-sm text-gray-500 dark:text-gray-400">(optional - auto-detected)</span>}
         </label>
         <input
           type="text"
           value={config.subject}
           onChange={(e) => updateConfig({ subject: e.target.value })}
-          placeholder="e.g., Oracle Cloud Infrastructure, AWS, Programming, etc."
+          placeholder={isExtractionMode ? "Auto-detected from content" : "e.g., Oracle Cloud Infrastructure, AWS, Programming, etc."}
           className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          required
+          required={!isExtractionMode}
         />
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          Specify the main subject area for the questions
+          {isExtractionMode
+            ? 'Subject will be extracted from your questions or you can override it here'
+            : 'Specify the main subject area for the questions'}
         </p>
       </div>
 
-      {/* Number of Questions */}
+      {/* Number of Questions - Hide in extraction mode */}
+      {!isExtractionMode && (
+      <div>
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           Number of Questions
@@ -173,7 +180,8 @@ export default function GenerationControls({ onConfigChange }: GenerationControl
         </div>
       </div>
 
-      {/* Topic Focus (Optional) */}
+      {/* Topic Focus (Optional) - Hide in extraction mode */}
+      {!isExtractionMode && (
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Topic Focus <span className="text-gray-400 text-xs">(Optional)</span>
@@ -189,20 +197,39 @@ export default function GenerationControls({ onConfigChange }: GenerationControl
           Specify particular topics or areas to emphasize in the questions
         </p>
       </div>
-
-      {/* Summary */}
-      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
-        <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
-          Generation Summary
-        </p>
-        <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-          <li>• {config.numberOfQuestions} questions</li>
-          <li>• Difficulty: {config.difficulty}</li>
-          <li>• Types: {config.questionTypes.join(', ')}</li>
-          {config.subject && <li>• Subject: {config.subject}</li>}
-          {config.topicFocus && <li>• Focus: {config.topicFocus.substring(0, 50)}{config.topicFocus.length > 50 ? '...' : ''}</li>}
-        </ul>
+      )}
       </div>
+      )}
+
+      {/* Extraction Mode Summary */}
+      {isExtractionMode ? (
+        <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
+          <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-2">
+            Extraction Summary
+          </p>
+          <ul className="text-sm text-green-800 dark:text-green-200 space-y-1">
+            <li>• ~{estimatedQuestions} questions detected</li>
+            <li>• AI will extract and enhance</li>
+            <li>• Missing options will be generated</li>
+            <li>• Explanations will be added/enhanced</li>
+            {config.subject && <li>• Subject: {config.subject}</li>}
+          </ul>
+        </div>
+      ) : (
+        /* Generation Summary */
+        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+          <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+            Generation Summary
+          </p>
+          <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+            <li>• {config.numberOfQuestions} questions</li>
+            <li>• Difficulty: {config.difficulty}</li>
+            <li>• Types: {config.questionTypes.join(', ')}</li>
+            {config.subject && <li>• Subject: {config.subject}</li>}
+            {config.topicFocus && <li>• Focus: {config.topicFocus.substring(0, 50)}{config.topicFocus.length > 50 ? '...' : ''}</li>}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
