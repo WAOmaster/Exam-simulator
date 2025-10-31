@@ -64,9 +64,104 @@ export async function intelligentQuestionProcessing(
 
 /**
  * Extract existing questions from content and fill in missing fields
+ * Now with intelligent batching to handle large question sets
  */
 async function extractAndCompleteQuestions(
   content: string,
+  config: GenerationConfig
+): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
+  // Estimate number of questions in content
+  const estimatedQuestions = estimateQuestionCount(content);
+  console.log(`Estimated ${estimatedQuestions} questions in content`);
+
+  // If content has many questions (>25), use batch extraction
+  if (estimatedQuestions > 25) {
+    console.log(`Using batch extraction for ${estimatedQuestions} questions`);
+    return batchExtractAndCompleteQuestions(content, estimatedQuestions, config);
+  }
+
+  // For smaller sets, process in single call
+  return extractBatch(content, Math.min(estimatedQuestions, 25), config);
+}
+
+/**
+ * Estimate the number of questions in content
+ */
+function estimateQuestionCount(content: string): number {
+  const patterns = [
+    /^\s*\d+\.\s/gm,           // "1. Question"
+    /^\s*Question\s*\d+/gim,   // "Question 1"
+    /^\s*Q\d+[\.:]/gim,        // "Q1:" or "Q1."
+  ];
+
+  let maxCount = 0;
+  for (const pattern of patterns) {
+    const matches = content.match(pattern);
+    if (matches) {
+      maxCount = Math.max(maxCount, matches.length);
+    }
+  }
+
+  return maxCount || 10; // Default to 10 if can't detect
+}
+
+/**
+ * Split content into batches based on question boundaries
+ */
+function splitContentIntoQuestionBatches(content: string, questionsPerBatch: number): string[] {
+  const batches: string[] = [];
+
+  // Try to find question boundaries (e.g., "1. ", "Question 1", "Q1:")
+  const questionBoundaries: number[] = [];
+  const patterns = [
+    /^\s*\d+\.\s/gm,
+    /^\s*Question\s*\d+/gim,
+    /^\s*Q\d+[\.:]/gim,
+  ];
+
+  for (const pattern of patterns) {
+    const matches = content.matchAll(pattern);
+    for (const match of matches) {
+      if (match.index !== undefined) {
+        questionBoundaries.push(match.index);
+      }
+    }
+  }
+
+  // Sort and deduplicate boundaries
+  const sortedBoundaries = [...new Set(questionBoundaries)].sort((a, b) => a - b);
+
+  if (sortedBoundaries.length === 0) {
+    // If can't detect boundaries, split by character count
+    const charsPerBatch = Math.ceil(content.length / Math.ceil(estimateQuestionCount(content) / questionsPerBatch));
+    for (let i = 0; i < content.length; i += charsPerBatch) {
+      batches.push(content.substring(i, i + charsPerBatch));
+    }
+    return batches;
+  }
+
+  // Group questions into batches
+  for (let i = 0; i < sortedBoundaries.length; i += questionsPerBatch) {
+    const startIdx = sortedBoundaries[i];
+    const endIdx = sortedBoundaries[Math.min(i + questionsPerBatch, sortedBoundaries.length - 1)] || content.length;
+    batches.push(content.substring(startIdx, endIdx));
+  }
+
+  // Add any remaining content
+  const lastBoundary = sortedBoundaries[sortedBoundaries.length - 1];
+  if (lastBoundary < content.length - 100) {
+    batches.push(content.substring(lastBoundary));
+  }
+
+  return batches;
+}
+
+/**
+ * Extract a single batch of questions
+ */
+async function extractBatch(
+  content: string,
+  expectedQuestions: number,
   config: GenerationConfig,
   retryCount = 0
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
@@ -80,14 +175,14 @@ async function extractAndCompleteQuestions(
     generationConfig: {
       temperature: 0.3, // Lower temperature for more accurate extraction
       topP: 0.95,
-      maxOutputTokens: 16384, // Increased for large question sets
+      maxOutputTokens: 16384,
     },
   });
 
   const prompt = `You are an expert at extracting and completing exam questions. The following content contains existing questions that may be incomplete.
 
 Your task:
-1. EXTRACT existing questions from the content (LIMIT: ${Math.min(config.numberOfQuestions, 50)} questions maximum to ensure quality)
+1. EXTRACT all existing questions from the content (approximately ${expectedQuestions} questions)
 2. For each question, FILL IN any missing information:
    - If options are missing: Generate 4 plausible options (A, B, C, D) based on the question
    - If correct answer is missing: Analyze the question and determine the most logical answer
@@ -97,9 +192,8 @@ Your task:
    - Assign appropriate difficulty: easy, medium, or hard
 
 Content to process:
-${content.substring(0, 20000)} ${content.length > 20000 ? '...(content truncated)' : ''}
+${content.substring(0, 25000)} ${content.length > 25000 ? '...(content truncated)' : ''}
 
-IMPORTANT: Extract up to ${Math.min(config.numberOfQuestions, 50)} questions ONLY. If there are more questions in the content, extract the first ${Math.min(config.numberOfQuestions, 50)}.
 Subject: ${config.subject || 'General'}
 
 Return questions in this JSON format:
@@ -131,8 +225,8 @@ IMPORTANT RULES:
 6. Make sure every question is complete and ready for exam use
 7. Return ONLY valid JSON, no additional text
 8. CRITICAL: Ensure all JSON strings are properly escaped (use \\" for quotes inside strings)
-9. Keep explanations concise (max 200 words) to avoid token limits
-10. If processing many questions, prioritize quality over quantity
+9. Keep explanations concise (max 150 words) to avoid token limits
+10. Extract ALL questions from this batch, don't skip any
 
 Return ONLY the JSON object with properly formatted, valid JSON. No markdown code blocks, no additional text.`;
 
@@ -152,11 +246,80 @@ Return ONLY the JSON object with properly formatted, valid JSON. No markdown cod
     if (isOverloadedError && retryCount === 0) {
       console.log('Model overloaded, retrying with gemini-1.5-pro...');
       await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
-      return extractAndCompleteQuestions(content, config, 1);
+      return extractBatch(content, expectedQuestions, config, 1);
     }
 
     throw new Error(`Failed to extract/complete questions: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
+}
+
+/**
+ * Batch extraction for large question sets (>25 questions)
+ */
+async function batchExtractAndCompleteQuestions(
+  content: string,
+  estimatedQuestions: number,
+  config: GenerationConfig
+): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
+  const QUESTIONS_PER_BATCH = 25; // Based on token limits, 25 questions = ~8000 tokens
+  const numBatches = Math.ceil(estimatedQuestions / QUESTIONS_PER_BATCH);
+
+  console.log(`Splitting into ${numBatches} batches of ~${QUESTIONS_PER_BATCH} questions each`);
+
+  // Split content into batches
+  const contentBatches = splitContentIntoQuestionBatches(content, QUESTIONS_PER_BATCH);
+
+  const allQuestions: Question[] = [];
+  const batchResults: Array<{ batchIndex: number; result: { questions: Question[]; metadata: QuestionSetMetadata } | null; error?: any }> = [];
+
+  // Process batches in parallel (but with controlled concurrency)
+  const CONCURRENT_BATCHES = 3; // Process 3 batches at a time to avoid rate limits
+
+  for (let i = 0; i < contentBatches.length; i += CONCURRENT_BATCHES) {
+    const batchPromises = [];
+
+    for (let j = 0; j < CONCURRENT_BATCHES && i + j < contentBatches.length; j++) {
+      const batchIndex = i + j;
+      const batchContent = contentBatches[batchIndex];
+
+      console.log(`Processing batch ${batchIndex + 1}/${contentBatches.length}...`);
+
+      batchPromises.push(
+        extractBatch(batchContent, QUESTIONS_PER_BATCH, config)
+          .then(result => ({ batchIndex, result, error: undefined }))
+          .catch(error => {
+            console.error(`Batch ${batchIndex + 1} failed:`, error);
+            return { batchIndex, result: null, error };
+          })
+      );
+    }
+
+    // Wait for this set of concurrent batches to complete
+    const results = await Promise.all(batchPromises);
+    batchResults.push(...results);
+
+    // Small delay between batch groups to avoid rate limiting
+    if (i + CONCURRENT_BATCHES < contentBatches.length) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+
+  // Collect all questions from successful batches
+  for (const batchResult of batchResults) {
+    if (batchResult.result && batchResult.result.questions) {
+      console.log(`Batch ${batchResult.batchIndex + 1} extracted ${batchResult.result.questions.length} questions`);
+      allQuestions.push(...batchResult.result.questions);
+    } else if (batchResult.error) {
+      console.warn(`Skipping batch ${batchResult.batchIndex + 1} due to error`);
+    }
+  }
+
+  console.log(`Total questions extracted: ${allQuestions.length}`);
+
+  // Calculate combined metadata
+  const metadata = calculateMetadata(allQuestions, config);
+
+  return { questions: allQuestions, metadata };
 }
 
 /**

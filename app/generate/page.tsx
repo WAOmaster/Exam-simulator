@@ -44,6 +44,7 @@ export default function GeneratePage() {
     questionCount: number;
     preview: string;
   } | null>(null);
+  const [progressMessage, setProgressMessage] = useState<string>('');
 
   const tabs = [
     { id: 'upload' as InputTab, label: 'Upload File', icon: Upload },
@@ -177,8 +178,22 @@ export default function GeneratePage() {
     setIsGenerating(true);
     setError('');
     setGeneratedQuestions([]);
+    setProgressMessage('');
 
     try {
+      // Show initial progress message
+      const isExtractionModeFinal = contentAnalysis?.hasQuestions;
+      const estimatedQuestions = contentAnalysis?.questionCount || config.numberOfQuestions;
+
+      if (isExtractionModeFinal && estimatedQuestions > 25) {
+        const numBatches = Math.ceil(estimatedQuestions / 25);
+        setProgressMessage(`Processing ${estimatedQuestions} questions in ${numBatches} batches...`);
+      } else if (isExtractionModeFinal) {
+        setProgressMessage(`Extracting ${estimatedQuestions} questions...`);
+      } else {
+        setProgressMessage(`Generating ${config.numberOfQuestions} questions...`);
+      }
+
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -193,8 +208,10 @@ export default function GeneratePage() {
 
       setGeneratedQuestions(data.questions);
       setProcessingMode(data.metadata?.processingMode || 'generated');
+      setProgressMessage(''); // Clear progress on success
     } catch (err: any) {
       setError(err.message || 'Failed to generate questions');
+      setProgressMessage(''); // Clear progress on error
     } finally {
       setIsGenerating(false);
     }
@@ -495,6 +512,21 @@ export default function GeneratePage() {
                 )}
               </button>
             </div>
+
+            {/* Progress Message */}
+            {progressMessage && (
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="w-5 h-5 animate-spin text-blue-600 dark:text-blue-400" />
+                  <p className="text-sm font-medium text-blue-800 dark:text-blue-200">{progressMessage}</p>
+                </div>
+                <p className="text-xs text-blue-600 dark:text-blue-300 mt-2">
+                  {contentAnalysis?.questionCount && contentAnalysis.questionCount > 25
+                    ? 'Large question sets are processed in batches to ensure quality. This may take 30-60 seconds.'
+                    : 'Processing your request...'}
+                </p>
+              </div>
+            )}
 
             {/* Error Message */}
             {error && (
