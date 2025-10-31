@@ -46,8 +46,15 @@ export async function intelligentQuestionProcessing(
 
   if (hasExistingQuestions) {
     console.log('Detected existing questions in content - using extraction mode');
-    const result = await extractAndCompleteQuestions(content, config);
-    return { ...result, mode: 'extracted' };
+    try {
+      const result = await extractAndCompleteQuestions(content, config);
+      return { ...result, mode: 'extracted' };
+    } catch (error) {
+      console.error('Extraction failed, falling back to generation mode:', error);
+      // If extraction fails (e.g., model overloaded), fall back to generation
+      const result = await generateQuestions(content, config);
+      return { ...result, mode: 'generated' };
+    }
   } else {
     console.log('No existing questions detected - using generation mode');
     const result = await generateQuestions(content, config);
@@ -60,11 +67,16 @@ export async function intelligentQuestionProcessing(
  */
 async function extractAndCompleteQuestions(
   content: string,
-  config: GenerationConfig
+  config: GenerationConfig,
+  retryCount = 0
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
   const genAI = getGeminiClient();
+
+  // Try gemini-2.5-flash first, fallback to gemini-1.5-flash if overloaded
+  const modelName = retryCount > 0 ? 'gemini-1.5-flash' : 'gemini-2.5-flash';
+
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: modelName,
     generationConfig: {
       temperature: 0.3, // Lower temperature for more accurate extraction
       topP: 0.95,
@@ -127,7 +139,19 @@ Return ONLY the JSON object, no markdown formatting.`;
     const text = response.text();
 
     return parseGeneratedQuestions(text, config);
-  } catch (error) {
+  } catch (error: any) {
+    // Check if it's a 503 (service overloaded) or rate limit error
+    const isOverloadedError = error.message?.includes('503') ||
+                              error.message?.includes('overloaded') ||
+                              error.message?.includes('quota');
+
+    // Retry once with different model if overloaded and haven't retried yet
+    if (isOverloadedError && retryCount === 0) {
+      console.log('Model overloaded, retrying with gemini-1.5-flash...');
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+      return extractAndCompleteQuestions(content, config, 1);
+    }
+
     throw new Error(`Failed to extract/complete questions: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
@@ -137,11 +161,16 @@ Return ONLY the JSON object, no markdown formatting.`;
  */
 export async function generateQuestions(
   content: string,
-  config: GenerationConfig
+  config: GenerationConfig,
+  retryCount = 0
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
   const genAI = getGeminiClient();
+
+  // Try gemini-2.5-flash first, fallback to gemini-1.5-flash if overloaded
+  const modelName = retryCount > 0 ? 'gemini-1.5-flash' : 'gemini-2.5-flash';
+
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: modelName,
     generationConfig: {
       temperature: 0.7,
       topP: 0.95,
@@ -161,7 +190,19 @@ export async function generateQuestions(
     const parsedResponse = parseGeneratedQuestions(text, config);
 
     return parsedResponse;
-  } catch (error) {
+  } catch (error: any) {
+    // Check if it's a 503 (service overloaded) or rate limit error
+    const isOverloadedError = error.message?.includes('503') ||
+                              error.message?.includes('overloaded') ||
+                              error.message?.includes('quota');
+
+    // Retry once with different model if overloaded and haven't retried yet
+    if (isOverloadedError && retryCount === 0) {
+      console.log('Model overloaded, retrying with gemini-1.5-flash...');
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+      return generateQuestions(content, config, 1);
+    }
+
     throw new Error(`Failed to generate questions: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
