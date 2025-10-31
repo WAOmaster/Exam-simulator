@@ -70,6 +70,7 @@ export interface GenerationConfig {
   questionTypes: ('multiple-choice' | 'true-false' | 'scenario')[];
   topicFocus?: string;
   subject: string;
+  estimatedQuestionCount?: number; // Frontend's detection, overrides backend
 }
 
 // Content source types

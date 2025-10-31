@@ -70,9 +70,14 @@ async function extractAndCompleteQuestions(
   content: string,
   config: GenerationConfig
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
-  // Estimate number of questions in content
-  const estimatedQuestions = estimateQuestionCount(content);
-  console.log(`Estimated ${estimatedQuestions} questions in content`);
+  // Use frontend's count if provided, otherwise estimate
+  let estimatedQuestions = config.estimatedQuestionCount || estimateQuestionCount(content);
+
+  if (config.estimatedQuestionCount) {
+    console.log(`Using frontend-provided count: ${estimatedQuestions} questions`);
+  } else {
+    console.log(`Estimated ${estimatedQuestions} questions in content (backend detection)`);
+  }
 
   // If content has many questions (>25), use batch extraction
   if (estimatedQuestions > 25) {

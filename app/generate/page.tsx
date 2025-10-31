@@ -194,10 +194,16 @@ export default function GeneratePage() {
         setProgressMessage(`Generating ${config.numberOfQuestions} questions...`);
       }
 
+      // Pass estimated count to backend to override its detection
+      const enhancedConfig = {
+        ...config,
+        estimatedQuestionCount: isExtractionModeFinal ? estimatedQuestions : undefined
+      };
+
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source, config }),
+        body: JSON.stringify({ source, config: enhancedConfig }),
       });
 
       const data = await response.json();
