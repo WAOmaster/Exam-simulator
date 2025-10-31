@@ -39,6 +39,11 @@ export default function GeneratePage() {
   const [manualText, setManualText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [processingMode, setProcessingMode] = useState<'extracted' | 'generated' | null>(null);
+  const [contentAnalysis, setContentAnalysis] = useState<{
+    hasQuestions: boolean;
+    questionCount: number;
+    preview: string;
+  } | null>(null);
 
   const tabs = [
     { id: 'upload' as InputTab, label: 'Upload File', icon: Upload },
@@ -47,12 +52,48 @@ export default function GeneratePage() {
     { id: 'text' as InputTab, label: 'Paste Text', icon: FileText },
   ];
 
+  // Analyze content to detect if it contains questions
+  const analyzeContent = (content: string) => {
+    const questionPatterns = [
+      /\d+\.\s*[A-Z]/gi,  // "1. What is..."
+      /Question\s*\d+/gi,  // "Question 1"
+      /Q\d+[\.:]/gi,       // "Q1:" or "Q1."
+      /^\s*[A-D]\.\s/gm,   // "A. option" (answer options)
+      /Answer:\s*[A-D]/gi, // "Answer: A"
+      /Correct\s*Answer/gi, // "Correct Answer"
+      /\?\s*$/gm,          // Lines ending with ?
+    ];
+
+    let patternMatches = 0;
+    let estimatedQuestions = 0;
+
+    for (const pattern of questionPatterns) {
+      const matches = content.match(pattern);
+      if (matches) {
+        patternMatches++;
+        if (pattern.source.includes('\\d+\\.\\s*') || pattern.source.includes('Question')) {
+          estimatedQuestions = Math.max(estimatedQuestions, matches.length);
+        }
+      }
+    }
+
+    const hasQuestions = patternMatches >= 3;
+    const preview = content.substring(0, 200) + (content.length > 200 ? '...' : '');
+
+    setContentAnalysis({
+      hasQuestions,
+      questionCount: hasQuestions ? estimatedQuestions : 0,
+      preview,
+    });
+  };
+
   const handleFileProcessed = (content: string, fileName: string) => {
     setContentSource({
       type: 'file',
       content,
       metadata: { fileName },
     });
+    analyzeContent(content);
     setError('');
   };
 
@@ -62,6 +103,7 @@ export default function GeneratePage() {
       content,
       metadata: { url: urls.join(', ') },
     });
+    analyzeContent(content);
     setError('');
   };
 
@@ -294,7 +336,17 @@ export default function GeneratePage() {
                       </label>
                       <textarea
                         value={manualText}
-                        onChange={(e) => setManualText(e.target.value)}
+                        onChange={(e) => {
+                          setManualText(e.target.value);
+                          if (e.target.value.trim().length > 100) {
+                            analyzeContent(e.target.value);
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value.trim().length > 0) {
+                            analyzeContent(e.target.value);
+                          }
+                        }}
                         placeholder="Paste your study material, documentation, or any text content here..."
                         rows={12}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm"
@@ -306,6 +358,65 @@ export default function GeneratePage() {
                   </div>
                 )}
               </div>
+
+              {/* Content Analysis Display */}
+              {contentAnalysis && (activeTab === 'upload' || activeTab === 'url' || activeTab === 'text') && (
+                <div className={`mt-6 p-4 rounded-lg border-2 ${
+                  contentAnalysis.hasQuestions
+                    ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700'
+                    : 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700'
+                }`}>
+                  <div className="flex items-start gap-3">
+                    {contentAnalysis.hasQuestions ? (
+                      <div className="p-2 bg-green-100 dark:bg-green-800 rounded-lg">
+                        <FileText className="w-5 h-5 text-green-700 dark:text-green-300" />
+                      </div>
+                    ) : (
+                      <div className="p-2 bg-blue-100 dark:bg-blue-800 rounded-lg">
+                        <Sparkles className="w-5 h-5 text-blue-700 dark:text-blue-300" />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <h3 className={`font-semibold mb-1 ${
+                        contentAnalysis.hasQuestions
+                          ? 'text-green-900 dark:text-green-100'
+                          : 'text-blue-900 dark:text-blue-100'
+                      }`}>
+                        {contentAnalysis.hasQuestions
+                          ? `✨ Existing Questions Detected (~${contentAnalysis.questionCount} questions)`
+                          : '🤖 No Questions Found - Will Generate New Ones'
+                        }
+                      </h3>
+                      <p className={`text-sm mb-2 ${
+                        contentAnalysis.hasQuestions
+                          ? 'text-green-800 dark:text-green-200'
+                          : 'text-blue-800 dark:text-blue-200'
+                      }`}>
+                        {contentAnalysis.hasQuestions
+                          ? 'Your content contains existing questions. AI will extract them and fill in any missing details (options, explanations, etc.)'
+                          : 'Your content will be analyzed and AI will create brand new questions based on the material.'
+                        }
+                      </p>
+                      <details className="text-sm">
+                        <summary className={`cursor-pointer font-medium ${
+                          contentAnalysis.hasQuestions
+                            ? 'text-green-700 dark:text-green-300'
+                            : 'text-blue-700 dark:text-blue-300'
+                        }`}>
+                          Content Preview
+                        </summary>
+                        <p className={`mt-2 p-3 rounded border font-mono text-xs ${
+                          contentAnalysis.hasQuestions
+                            ? 'bg-white dark:bg-green-950 border-green-200 dark:border-green-800 text-gray-700 dark:text-gray-300'
+                            : 'bg-white dark:bg-blue-950 border-blue-200 dark:border-blue-800 text-gray-700 dark:text-gray-300'
+                        }`}>
+                          {contentAnalysis.preview}
+                        </p>
+                      </details>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Generation Controls */}
@@ -321,17 +432,30 @@ export default function GeneratePage() {
               <button
                 onClick={handleGenerateQuestions}
                 disabled={isGenerating}
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-700 dark:to-purple-700 dark:hover:from-blue-600 dark:hover:to-purple-600 text-white text-lg font-bold rounded-lg shadow-xl transition-all disabled:opacity-50"
+                className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 text-white text-lg font-bold rounded-lg shadow-xl transition-all disabled:opacity-50 ${
+                  contentAnalysis?.hasQuestions
+                    ? 'bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 dark:from-green-700 dark:to-teal-700 dark:hover:from-green-600 dark:hover:to-teal-600'
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-700 dark:to-purple-700 dark:hover:from-blue-600 dark:hover:to-purple-600'
+                }`}
               >
                 {isGenerating ? (
                   <>
                     <Loader2 className="w-6 h-6 animate-spin" />
-                    Generating Questions...
+                    {contentAnalysis?.hasQuestions ? 'Extracting & Enhancing...' : 'Generating Questions...'}
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-6 h-6" />
-                    Generate Questions
+                    {contentAnalysis?.hasQuestions ? (
+                      <>
+                        <FileText className="w-6 h-6" />
+                        Extract & Enhance Questions
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-6 h-6" />
+                        Generate Questions
+                      </>
+                    )}
                   </>
                 )}
               </button>
