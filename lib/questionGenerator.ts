@@ -80,14 +80,14 @@ async function extractAndCompleteQuestions(
     generationConfig: {
       temperature: 0.3, // Lower temperature for more accurate extraction
       topP: 0.95,
-      maxOutputTokens: 8192,
+      maxOutputTokens: 16384, // Increased for large question sets
     },
   });
 
   const prompt = `You are an expert at extracting and completing exam questions. The following content contains existing questions that may be incomplete.
 
 Your task:
-1. EXTRACT all existing questions from the content
+1. EXTRACT existing questions from the content (LIMIT: ${Math.min(config.numberOfQuestions, 50)} questions maximum to ensure quality)
 2. For each question, FILL IN any missing information:
    - If options are missing: Generate 4 plausible options (A, B, C, D) based on the question
    - If correct answer is missing: Analyze the question and determine the most logical answer
@@ -97,10 +97,10 @@ Your task:
    - Assign appropriate difficulty: easy, medium, or hard
 
 Content to process:
-${content.substring(0, 15000)} ${content.length > 15000 ? '...(content truncated)' : ''}
+${content.substring(0, 20000)} ${content.length > 20000 ? '...(content truncated)' : ''}
 
-Target: Extract/complete up to ${config.numberOfQuestions} questions
-Subject: ${config.subject}
+IMPORTANT: Extract up to ${Math.min(config.numberOfQuestions, 50)} questions ONLY. If there are more questions in the content, extract the first ${Math.min(config.numberOfQuestions, 50)}.
+Subject: ${config.subject || 'General'}
 
 Return questions in this JSON format:
 {
@@ -130,8 +130,11 @@ IMPORTANT RULES:
 5. If answer is given but no explanation: CREATE detailed explanation
 6. Make sure every question is complete and ready for exam use
 7. Return ONLY valid JSON, no additional text
+8. CRITICAL: Ensure all JSON strings are properly escaped (use \\" for quotes inside strings)
+9. Keep explanations concise (max 200 words) to avoid token limits
+10. If processing many questions, prioritize quality over quantity
 
-Return ONLY the JSON object, no markdown formatting.`;
+Return ONLY the JSON object with properly formatted, valid JSON. No markdown code blocks, no additional text.`;
 
   try {
     const result = await model.generateContent(prompt);
@@ -353,21 +356,48 @@ function parseGeneratedQuestions(
       jsonText = jsonText.substring(firstBrace, lastBrace + 1);
     }
 
-    // Clean up common JSON issues
+    // Clean up common JSON issues before parsing
     jsonText = jsonText
       .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
-      .replace(/\n/g, ' ') // Remove newlines
-      .replace(/\s+/g, ' ') // Normalize whitespace
       .trim();
 
     let parsed;
     try {
       parsed = JSON.parse(jsonText);
     } catch (parseError) {
-      // Log the problematic JSON for debugging
+      // Try to fix truncated JSON
+      console.error('Initial parse failed, attempting to fix JSON...');
       console.error('Failed to parse JSON. First 500 chars:', jsonText.substring(0, 500));
       console.error('Last 500 chars:', jsonText.substring(Math.max(0, jsonText.length - 500)));
-      throw parseError;
+
+      // Check if JSON was truncated (missing closing brackets)
+      const openBraces = (jsonText.match(/{/g) || []).length;
+      const closeBraces = (jsonText.match(/}/g) || []).length;
+      const openBrackets = (jsonText.match(/\[/g) || []).length;
+      const closeBrackets = (jsonText.match(/\]/g) || []).length;
+
+      if (openBraces > closeBraces || openBrackets > closeBrackets) {
+        console.log('Detected truncated JSON, attempting to close...');
+
+        // Remove any incomplete question at the end
+        const lastCompleteQuestion = jsonText.lastIndexOf('},');
+        if (lastCompleteQuestion > 0) {
+          jsonText = jsonText.substring(0, lastCompleteQuestion + 1);
+        }
+
+        // Add missing closing brackets
+        for (let i = 0; i < (openBrackets - closeBrackets); i++) {
+          jsonText += ']';
+        }
+        for (let i = 0; i < (openBraces - closeBraces); i++) {
+          jsonText += '}';
+        }
+
+        console.log('Attempting to parse fixed JSON...');
+        parsed = JSON.parse(jsonText);
+      } else {
+        throw parseError;
+      }
     }
 
     // Validate the structure
