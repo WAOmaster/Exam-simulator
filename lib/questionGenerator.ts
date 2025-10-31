@@ -89,19 +89,23 @@ async function extractAndCompleteQuestions(
  */
 function estimateQuestionCount(content: string): number {
   const patterns = [
-    /^\s*\d+\.\s/gm,           // "1. Question"
-    /^\s*Question\s*\d+/gim,   // "Question 1"
-    /^\s*Q\d+[\.:]/gim,        // "Q1:" or "Q1."
+    /^\s*\d+\.\s+[A-Z]/gm,           // "1. Question" (must have letter after)
+    /^\s*Question\s*\d+/gim,         // "Question 1"
+    /^\s*Q\d+[\.:]\s*/gim,           // "Q1:" or "Q1."
+    /^\s*\d+\)\s+[A-Z]/gm,           // "1) Question"
   ];
 
   let maxCount = 0;
   for (const pattern of patterns) {
     const matches = content.match(pattern);
     if (matches) {
-      maxCount = Math.max(maxCount, matches.length);
+      const count = matches.length;
+      console.log(`Pattern ${pattern.source} found ${count} matches`);
+      maxCount = Math.max(maxCount, count);
     }
   }
 
+  console.log(`Estimated question count: ${maxCount}`);
   return maxCount || 10; // Default to 10 if can't detect
 }
 
@@ -173,28 +177,33 @@ async function extractBatch(
     generationConfig: {
       temperature: 0.3, // Lower temperature for more accurate extraction
       topP: 0.95,
-      maxOutputTokens: 16384,
+      maxOutputTokens: 8192, // Reduced from 16384
     },
   });
 
-  const prompt = `You are an expert at extracting and completing exam questions. The following content contains existing questions that may be incomplete.
+  const prompt = `You are an expert at extracting and completing exam questions. Extract EXACTLY ${expectedQuestions} questions from the content below.
+
+STRICT RULES - MUST FOLLOW:
+1. Extract ONLY ${expectedQuestions} questions - NO MORE, NO LESS
+2. Keep explanations BRIEF (max 50 words each)
+3. DO NOT add extra details, examples, or context
+4. Return ONLY valid JSON, nothing else
 
 Your task:
-1. EXTRACT all existing questions from the content (approximately ${expectedQuestions} questions)
-2. For each question, FILL IN any missing information:
-   - If options are missing: Generate 4 plausible options (A, B, C, D) based on the question
-   - If correct answer is missing: Analyze the question and determine the most logical answer
-   - If explanation is missing: Provide a detailed explanation of why the answer is correct
-   - If explanation exists: ENHANCE it with additional AI insights and context
-   - Determine question type: multiple-choice, true-false, or scenario
-   - Assign appropriate difficulty: easy, medium, or hard
+- EXTRACT existing questions from the content
+- If options missing: Generate 4 concise options (A, B, C, D)
+- If correct answer missing: Determine the answer
+- If explanation missing: Provide SHORT explanation (max 50 words)
+- If explanation exists: Keep it and make it concise (max 50 words)
+- Set question type: multiple-choice, true-false, or scenario
+- Set difficulty: easy, medium, or hard
 
 Content to process:
 ${content.substring(0, 25000)} ${content.length > 25000 ? '...(content truncated)' : ''}
 
 Subject: ${config.subject || 'General'}
 
-Return questions in this JSON format:
+Return questions in this EXACT JSON format (NO extra text):
 {
   "questions": [
     {
@@ -214,19 +223,14 @@ Return questions in this JSON format:
   ]
 }
 
-IMPORTANT RULES:
-1. PRESERVE the original question text exactly as written (just clean up formatting)
-2. If the content has answers marked, USE those answers
-3. If the content has explanations, KEEP them and ADD AI enhancement
-4. For MCQs with only questions and answers but no options: GENERATE plausible distractors
-5. If answer is given but no explanation: CREATE detailed explanation
-6. Make sure every question is complete and ready for exam use
-7. Return ONLY valid JSON, no additional text
-8. CRITICAL: Ensure all JSON strings are properly escaped (use \\" for quotes inside strings)
-9. Keep explanations VERY concise (max 100 words each) to avoid token limits
-10. Extract ALL questions from this batch, don't skip any
+CRITICAL RULES - STRICTLY ENFORCE:
+1. Extract EXACTLY ${expectedQuestions} questions - count them!
+2. Keep ALL explanations under 50 words (shorter = better)
+3. NO markdown, NO code blocks, NO extra text
+4. Escape quotes properly (use \\" inside strings)
+5. Return ONLY the JSON object
 
-Return ONLY the JSON object with properly formatted, valid JSON. No markdown code blocks, no additional text.`;
+Return ONLY the JSON object. No markdown formatting, no text before or after.`;
 
   try {
     const result = await model.generateContent(prompt);
