@@ -38,6 +38,7 @@ export interface QuestionSetMetadata {
     'scenario': number;
   };
   topics: string[];
+  processingMode?: 'extracted' | 'generated'; // How questions were created
   sourceInfo?: {
     fileName?: string;
     urls?: string[];

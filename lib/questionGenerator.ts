@@ -11,6 +11,128 @@ const getGeminiClient = () => {
 };
 
 /**
+ * Detect if content contains existing questions
+ */
+function detectExistingQuestions(content: string): boolean {
+  const questionPatterns = [
+    /\d+\.\s*[A-Z]/i,  // "1. What is..."
+    /Question\s*\d+/i,  // "Question 1"
+    /Q\d+[\.:]/i,       // "Q1:" or "Q1."
+    /^\s*[A-Z]\.\s/m,   // "A. option" (answer options)
+    /Answer:\s*[A-D]/i, // "Answer: A"
+    /Correct\s*Answer/i, // "Correct Answer"
+    /\?\s*$/m,          // Lines ending with ?
+  ];
+
+  let patternMatches = 0;
+  for (const pattern of questionPatterns) {
+    if (pattern.test(content)) {
+      patternMatches++;
+    }
+  }
+
+  // If 3 or more patterns match, likely contains questions
+  return patternMatches >= 3;
+}
+
+/**
+ * Intelligently process content - either extract existing questions or generate new ones
+ */
+export async function intelligentQuestionProcessing(
+  content: string,
+  config: GenerationConfig
+): Promise<{ questions: Question[]; metadata: QuestionSetMetadata; mode: 'extracted' | 'generated' }> {
+  const hasExistingQuestions = detectExistingQuestions(content);
+
+  if (hasExistingQuestions) {
+    console.log('Detected existing questions in content - using extraction mode');
+    const result = await extractAndCompleteQuestions(content, config);
+    return { ...result, mode: 'extracted' };
+  } else {
+    console.log('No existing questions detected - using generation mode');
+    const result = await generateQuestions(content, config);
+    return { ...result, mode: 'generated' };
+  }
+}
+
+/**
+ * Extract existing questions from content and fill in missing fields
+ */
+async function extractAndCompleteQuestions(
+  content: string,
+  config: GenerationConfig
+): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
+  const genAI = getGeminiClient();
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-2.5-flash',
+    generationConfig: {
+      temperature: 0.3, // Lower temperature for more accurate extraction
+      topP: 0.95,
+      maxOutputTokens: 8192,
+    },
+  });
+
+  const prompt = `You are an expert at extracting and completing exam questions. The following content contains existing questions that may be incomplete.
+
+Your task:
+1. EXTRACT all existing questions from the content
+2. For each question, FILL IN any missing information:
+   - If options are missing: Generate 4 plausible options (A, B, C, D) based on the question
+   - If correct answer is missing: Analyze the question and determine the most logical answer
+   - If explanation is missing: Provide a detailed explanation of why the answer is correct
+   - If explanation exists: ENHANCE it with additional AI insights and context
+   - Determine question type: multiple-choice, true-false, or scenario
+   - Assign appropriate difficulty: easy, medium, or hard
+
+Content to process:
+${content.substring(0, 15000)} ${content.length > 15000 ? '...(content truncated)' : ''}
+
+Target: Extract/complete up to ${config.numberOfQuestions} questions
+Subject: ${config.subject}
+
+Return questions in this JSON format:
+{
+  "questions": [
+    {
+      "question": "The extracted or cleaned question text",
+      "options": [
+        {"id": "A", "text": "Option A text"},
+        {"id": "B", "text": "Option B text"},
+        {"id": "C", "text": "Option C text"},
+        {"id": "D", "text": "Option D text"}
+      ],
+      "correctAnswer": "A",
+      "explanation": "Comprehensive explanation combining original explanation (if any) with AI analysis",
+      "difficulty": "easy|medium|hard",
+      "type": "multiple-choice|true-false|scenario",
+      "category": "${config.subject}"
+    }
+  ]
+}
+
+IMPORTANT RULES:
+1. PRESERVE the original question text exactly as written (just clean up formatting)
+2. If the content has answers marked, USE those answers
+3. If the content has explanations, KEEP them and ADD AI enhancement
+4. For MCQs with only questions and answers but no options: GENERATE plausible distractors
+5. If answer is given but no explanation: CREATE detailed explanation
+6. Make sure every question is complete and ready for exam use
+7. Return ONLY valid JSON, no additional text
+
+Return ONLY the JSON object, no markdown formatting.`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    return parseGeneratedQuestions(text, config);
+  } catch (error) {
+    throw new Error(`Failed to extract/complete questions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+/**
  * Generate questions from content using Gemini AI
  */
 export async function generateQuestions(

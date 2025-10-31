@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateQuestions, generateQuestionsFromSearch, batchGenerateQuestions } from '@/lib/questionGenerator';
+import {
+  intelligentQuestionProcessing,
+  generateQuestions,
+  generateQuestionsFromSearch,
+  batchGenerateQuestions
+} from '@/lib/questionGenerator';
 import { GenerationConfig, GenerateQuestionsResponse, ContentSource } from '@/lib/types';
 
 export async function POST(request: NextRequest) {
@@ -32,6 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     let result;
+    let processingMode: 'extracted' | 'generated' = 'generated';
 
     // Generate questions based on source type
     if (source.type === 'search') {
@@ -39,7 +45,7 @@ export async function POST(request: NextRequest) {
       const searchQuery = source.metadata?.searchQuery || source.content;
       result = await generateQuestionsFromSearch(searchQuery, config);
     } else {
-      // Generate from provided content (file, url, or text)
+      // Process content intelligently (extract or generate)
       if (!source.content || source.content.trim().length === 0) {
         return NextResponse.json(
           {
@@ -57,18 +63,38 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Use batch generation for large question sets
-      if (config.numberOfQuestions > 25) {
-        result = await batchGenerateQuestions(source.content, config.numberOfQuestions, config);
+      // Use intelligent processing for small to medium sets
+      // Use batch generation only for very large sets from scratch content
+      if (config.numberOfQuestions > 50) {
+        // For large sets, try intelligent processing first
+        const intelligentResult = await intelligentQuestionProcessing(source.content, {
+          ...config,
+          numberOfQuestions: Math.min(50, config.numberOfQuestions), // Process first batch
+        });
+        processingMode = intelligentResult.mode;
+
+        // If extracted mode and we need more, continue with batch generation
+        if (intelligentResult.mode === 'extracted' || config.numberOfQuestions <= 50) {
+          result = intelligentResult;
+        } else {
+          // For pure generation of large sets, use batch mode
+          result = await batchGenerateQuestions(source.content, config.numberOfQuestions, config);
+        }
       } else {
-        result = await generateQuestions(source.content, config);
+        // Use intelligent processing (auto-detects extraction vs generation)
+        const intelligentResult = await intelligentQuestionProcessing(source.content, config);
+        processingMode = intelligentResult.mode;
+        result = intelligentResult;
       }
     }
 
     return NextResponse.json({
       success: true,
       questions: result.questions,
-      metadata: result.metadata,
+      metadata: {
+        ...result.metadata,
+        processingMode, // Include mode so UI can show "Extracted & Enhanced" vs "Generated"
+      },
     } as GenerateQuestionsResponse);
   } catch (error: any) {
     console.error('Question generation error:', error);

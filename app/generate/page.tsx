@@ -38,6 +38,7 @@ export default function GeneratePage() {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [manualText, setManualText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [processingMode, setProcessingMode] = useState<'extracted' | 'generated' | null>(null);
 
   const tabs = [
     { id: 'upload' as InputTab, label: 'Upload File', icon: Upload },
@@ -118,6 +119,7 @@ export default function GeneratePage() {
       }
 
       setGeneratedQuestions(data.questions);
+      setProcessingMode(data.metadata?.processingMode || 'generated');
     } catch (err: any) {
       setError(err.message || 'Failed to generate questions');
     } finally {
@@ -352,6 +354,21 @@ export default function GeneratePage() {
 
               {generatedQuestions.length > 0 ? (
                 <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+                  {/* Processing Mode Indicator */}
+                  {processingMode && (
+                    <div className={`px-3 py-2 rounded-lg text-sm font-medium ${
+                      processingMode === 'extracted'
+                        ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700'
+                        : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700'
+                    }`}>
+                      {processingMode === 'extracted' ? (
+                        <>✨ Questions Extracted & AI Enhanced</>
+                      ) : (
+                        <>🤖 Questions AI Generated</>
+                      )}
+                    </div>
+                  )}
+
                   <QuestionPreview questions={generatedQuestions} />
 
                   <div className="flex flex-col gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
