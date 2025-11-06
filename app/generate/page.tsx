@@ -19,6 +19,61 @@ const getSourceType = (tab: InputTab): 'upload' | 'url' | 'search' | 'manual' | 
   return tab === 'text' ? 'manual' : tab;
 };
 
+// Helper function to generate smart title based on configuration
+const generateTitle = (config: GenerationConfig, activeTab: InputTab, searchQuery?: string): string => {
+  const subject = config.subject || 'General';
+
+  if (activeTab === 'search' && searchQuery) {
+    // For search, use the search query as the basis
+    return `${searchQuery} - Practice Questions`;
+  }
+
+  if (config.topicFocus) {
+    // If there's a topic focus, use it
+    return `${config.topicFocus} - ${subject} Questions`;
+  }
+
+  // Default: subject-based title
+  return `${subject} Practice Questions`;
+};
+
+// Helper function to generate smart description
+const generateDescription = (config: GenerationConfig, activeTab: InputTab, questionCount: number, searchQuery?: string): string => {
+  const parts: string[] = [];
+
+  // Add question count
+  parts.push(`${questionCount} ${config.difficulty === 'mixed' ? 'mixed difficulty' : config.difficulty} questions`);
+
+  // Add subject
+  if (config.subject) {
+    parts.push(`covering ${config.subject}`);
+  }
+
+  // Add source-specific details
+  if (activeTab === 'search' && searchQuery) {
+    parts.push(`generated from search: "${searchQuery}"`);
+  } else if (activeTab === 'upload') {
+    parts.push('extracted from uploaded file');
+  } else if (activeTab === 'url') {
+    parts.push('generated from web content');
+  } else if (activeTab === 'text') {
+    parts.push('generated from provided text');
+  }
+
+  // Add topic focus if present
+  if (config.topicFocus) {
+    parts.push(`with focus on ${config.topicFocus}`);
+  }
+
+  // Add question types
+  if (config.questionTypes.length > 0) {
+    const types = config.questionTypes.join(', ').replace('multiple-choice', 'multiple choice').replace('true-false', 'true/false');
+    parts.push(`(${types})`);
+  }
+
+  return parts.join(' ');
+};
+
 export default function GeneratePage() {
   const router = useRouter();
   const { addQuestionSet, resetExam, setCurrentQuestionSet, startExam } = useExamStore();
@@ -600,8 +655,8 @@ export default function GeneratePage() {
           onClose={() => setShowSaveDialog(false)}
           questionSet={{
             id: '',
-            title: '',
-            description: '',
+            title: generateTitle(config, activeTab, searchQuery),
+            description: generateDescription(config, activeTab, generatedQuestions.length, searchQuery),
             subject: config.subject,
             questions: generatedQuestions,
             metadata: {
