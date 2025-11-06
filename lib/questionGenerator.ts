@@ -388,7 +388,8 @@ export async function generateQuestions(
 }
 
 /**
- * Generate questions using Google Search grounding
+ * Generate questions using Google Search grounding with STEM-focused sources
+ * Enhanced to prioritize academic, textbook, and curated educational materials
  */
 export async function generateQuestionsFromSearch(
   searchQuery: string,
@@ -404,14 +405,29 @@ export async function generateQuestionsFromSearch(
     },
   });
 
-  const prompt = `You are an expert exam question generator. Use Google Search to find information about "${searchQuery}" and generate ${config.numberOfQuestions} exam questions.
+  // Enhance search query with STEM-focused source preferences
+  const stemSources = getSTEMSourceGuidance(config.subject);
+
+  const prompt = `You are an expert exam question generator with access to Google Search. Research "${searchQuery}" and generate ${config.numberOfQuestions} exam questions.
+
+SEARCH GUIDANCE:
+${stemSources}
 
 Subject: ${config.subject}
 Difficulty: ${config.difficulty}
 Question Types: ${config.questionTypes.join(', ')}
 ${config.topicFocus ? `Focus on: ${config.topicFocus}` : ''}
 
-Generate questions in JSON format with the following structure:
+RESEARCH PRIORITIES:
+1. Academic textbooks and university course materials
+2. Peer-reviewed papers and research publications (arXiv, IEEE, ACM, Nature, Science)
+3. Educational resources from MIT OpenCourseWare, Khan Academy, Coursera
+4. Technical documentation and official standards
+5. Respected educational publishers (Pearson, Springer, O'Reilly)
+
+Generate questions based on accurate, authoritative information from these sources.
+
+JSON Output Format:
 {
   "questions": [
     {
@@ -423,20 +439,24 @@ Generate questions in JSON format with the following structure:
         {"id": "D", "text": "Option D text"}
       ],
       "correctAnswer": "A",
-      "explanation": "Detailed explanation of why this is correct",
+      "explanation": "Detailed explanation with reference to authoritative sources when possible",
       "difficulty": "easy|medium|hard",
-      "type": "multiple-choice|true-false|scenario"
+      "type": "multiple-choice|true-false|scenario",
+      "category": "Specific topic or subtopic"
     }
   ]
 }
 
-Requirements:
-- Each question must be clear, specific, and based on accurate information
-- Provide 4 options for multiple-choice questions (A, B, C, D)
+QUALITY REQUIREMENTS:
+- Base questions on academically accurate, peer-reviewed information
+- Each question must be clear, specific, and unambiguous
+- Provide 4 options for multiple-choice (A, B, C, D)
 - For true-false, provide 2 options (A=True, B=False)
-- Include detailed explanations
+- Include detailed explanations referencing key concepts
 - Distribute difficulty levels appropriately
 - Make distractors (incorrect options) plausible but clearly incorrect
+- Avoid trivial or overly easy questions
+- Ensure technical accuracy
 
 Return ONLY the JSON object, no additional text.`;
 
@@ -449,6 +469,105 @@ Return ONLY the JSON object, no additional text.`;
   } catch (error) {
     throw new Error(`Failed to generate questions from search: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
+}
+
+/**
+ * Get STEM-focused source guidance based on subject area
+ * Inspired by lunch-stem's curated source approach
+ */
+function getSTEMSourceGuidance(subject: string): string {
+  const subjectLower = subject.toLowerCase();
+
+  // Computer Science & Technology
+  if (subjectLower.includes('computer') || subjectLower.includes('programming') ||
+      subjectLower.includes('software') || subjectLower.includes('algorithm')) {
+    return `Prioritize sources like:
+- ACM Digital Library, IEEE Xplore for research papers
+- Computer Science textbooks (Cormen, Knuth, Tanenbaum, Sipser)
+- MIT OpenCourseWare Computer Science courses
+- Official documentation (Python, Java, C++, etc.)
+- arXiv.org Computer Science section
+- Stanford, MIT, Berkeley CS course materials`;
+  }
+
+  // Mathematics
+  if (subjectLower.includes('math') || subjectLower.includes('calculus') ||
+      subjectLower.includes('algebra') || subjectLower.includes('geometry')) {
+    return `Prioritize sources like:
+- Mathematics textbooks (Stewart Calculus, Linear Algebra by Strang, Abstract Algebra by Dummit)
+- arXiv.org Mathematics section
+- MIT OpenCourseWare Mathematics courses
+- Khan Academy Math sections
+- Wolfram MathWorld
+- Mathematical proofs and theorem repositories`;
+  }
+
+  // Physics
+  if (subjectLower.includes('physics') || subjectLower.includes('mechanics') ||
+      subjectLower.includes('quantum') || subjectLower.includes('thermodynamics')) {
+    return `Prioritize sources like:
+- Physics textbooks (Halliday & Resnick, Feynman Lectures, Griffiths)
+- arXiv.org Physics section
+- Physical Review journals
+- MIT OpenCourseWare Physics courses
+- CERN, NASA educational resources
+- Nature Physics, Physics Today`;
+  }
+
+  // Chemistry
+  if (subjectLower.includes('chem')) {
+    return `Prioritize sources like:
+- Chemistry textbooks (Atkins, Brown & LeMay, Organic Chemistry by Clayden)
+- ACS (American Chemical Society) publications
+- Journal of the American Chemical Society
+- MIT OpenCourseWare Chemistry courses
+- IUPAC nomenclature and standards
+- ChemLibreTexts educational resources`;
+  }
+
+  // Biology & Life Sciences
+  if (subjectLower.includes('bio') || subjectLower.includes('life') ||
+      subjectLower.includes('genetics') || subjectLower.includes('molecular')) {
+    return `Prioritize sources like:
+- Biology textbooks (Campbell Biology, Molecular Biology of the Cell)
+- NCBI, PubMed research papers
+- Nature, Science, Cell journals
+- MIT OpenCourseWare Biology courses
+- Khan Academy Biology sections
+- University biology course materials`;
+  }
+
+  // Engineering
+  if (subjectLower.includes('engineer')) {
+    return `Prioritize sources like:
+- Engineering textbooks (Engineering Mechanics, Circuit Analysis, Thermodynamics)
+- IEEE, ASME, ASCE publications
+- Engineering standards (ISO, ANSI, ASTM)
+- MIT OpenCourseWare Engineering courses
+- University engineering course materials
+- Professional engineering handbooks`;
+  }
+
+  // Arts & Humanities
+  if (subjectLower.includes('art') || subjectLower.includes('humanities') ||
+      subjectLower.includes('history') || subjectLower.includes('literature')) {
+    return `Prioritize sources like:
+- Academic humanities textbooks and anthologies
+- JSTOR, Project MUSE for scholarly articles
+- Stanford Encyclopedia of Philosophy
+- Museum and cultural institution resources
+- University humanities course materials
+- Respected literary and historical analyses`;
+  }
+
+  // Default: General STEM
+  return `Prioritize sources like:
+- Academic textbooks from respected publishers
+- Peer-reviewed research papers and journals
+- University course materials and lecture notes
+- arXiv.org, Google Scholar indexed papers
+- Educational resources (MIT OCW, Khan Academy, Coursera)
+- Official technical documentation and standards`;
 }
 
 /**

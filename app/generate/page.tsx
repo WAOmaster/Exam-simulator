@@ -356,17 +356,23 @@ export default function GeneratePage() {
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="e.g., AWS Lambda functions and best practices"
+                        placeholder="e.g., Machine Learning algorithms for classification"
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                        The AI will search for information and generate questions based on the latest knowledge
+                        AI searches academic sources, textbooks, and research papers to generate accurate questions
                       </p>
                     </div>
 
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                    <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                      <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                        🎓 STEM-Enhanced Search
+                      </p>
                       <p className="text-sm text-blue-800 dark:text-blue-200">
-                        <strong>Tip:</strong> Be specific in your search query. Include key topics, concepts, or areas you want the questions to focus on.
+                        Questions are generated from curated academic sources including MIT OpenCourseWare, arXiv, IEEE, ACM, textbooks, and peer-reviewed journals. For best results, include specific topics or concepts in your search.
+                      </p>
+                      <p className="text-xs text-blue-700 dark:text-blue-300 mt-2">
+                        <strong>Examples:</strong> "Quantum entanglement in physics" • "Binary search tree algorithms" • "Organic chemistry reaction mechanisms"
                       </p>
                     </div>
                   </div>
