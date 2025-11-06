@@ -1,0 +1,62 @@
+[
+  {
+    "id": "science",
+    "name": "General Science",
+    "description": "Biology, Chemistry, Physics fundamentals",
+    "icon": "Atom",
+    "color": "from-green-600 to-emerald-600",
+    "questionCount": 25,
+    "difficulty": "mixed",
+    "file": "science.json"
+  },
+  {
+    "id": "technology",
+    "name": "Computer Science",
+    "description": "Programming, algorithms, data structures",
+    "icon": "Code",
+    "color": "from-blue-600 to-cyan-600",
+    "questionCount": 25,
+    "difficulty": "mixed",
+    "file": "technology.json"
+  },
+  {
+    "id": "engineering",
+    "name": "Engineering Basics",
+    "description": "Mechanical, electrical, civil engineering",
+    "icon": "Cog",
+    "color": "from-orange-600 to-amber-600",
+    "questionCount": 25,
+    "difficulty": "mixed",
+    "file": "engineering.json"
+  },
+  {
+    "id": "arts",
+    "name": "Arts & Humanities",
+    "description": "History, literature, philosophy",
+    "icon": "Palette",
+    "color": "from-purple-600 to-pink-600",
+    "questionCount": 25,
+    "difficulty": "mixed",
+    "file": "arts.json"
+  },
+  {
+    "id": "mathematics",
+    "name": "Mathematics",
+    "description": "Algebra, geometry, calculus concepts",
+    "icon": "Calculator",
+    "color": "from-red-600 to-rose-600",
+    "questionCount": 25,
+    "difficulty": "mixed",
+    "file": "mathematics.json"
+  },
+  {
+    "id": "oci",
+    "name": "OCI Certification",
+    "description": "Oracle Cloud Infrastructure practice",
+    "icon": "Cloud",
+    "color": "from-indigo-600 to-blue-600",
+    "questionCount": 49,
+    "difficulty": "medium",
+    "file": "oci.json"
+  }
+]

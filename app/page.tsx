@@ -14,8 +14,26 @@ import {
   BarChart3,
   Library,
   Plus,
+  Atom,
+  Code,
+  Cog,
+  Palette,
+  Calculator,
+  Cloud,
+  CheckCircle,
+  ChevronRight,
 } from 'lucide-react';
-import questions from '@/data/questions.json';
+import subjects from '@/data/default-questions/subjects.json';
+
+// Icon mapping
+const iconMap: Record<string, any> = {
+  Atom,
+  Code,
+  Cog,
+  Palette,
+  Calculator,
+  Cloud,
+};
 
 export default function Home() {
   const router = useRouter();
@@ -23,12 +41,33 @@ export default function Home() {
   const [examDuration, setExamDuration] = useState(90);
   const [mode, setMode] = useState<'practice' | 'exam'>('exam');
   const [useTimer, setUseTimer] = useState(true);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [loadedQuestions, setLoadedQuestions] = useState<any[]>([]);
+
+  // Load questions when subject is selected
+  useEffect(() => {
+    if (selectedSubject) {
+      const subject = subjects.find((s) => s.id === selectedSubject);
+      if (subject) {
+        import(`@/data/default-questions/${subject.file}`)
+          .then((module) => {
+            setLoadedQuestions(module.default);
+          })
+          .catch((err) => console.error('Failed to load questions:', err));
+      }
+    }
+  }, [selectedSubject]);
 
   const handleStart = () => {
+    if (!selectedSubject || loadedQuestions.length === 0) {
+      alert('Please select a subject first!');
+      return;
+    }
+
     resetExam();
 
-    // Load the default OCI questions into the store
-    setQuestions(questions as any);
+    // Load the selected subject's questions into the store
+    setQuestions(loadedQuestions);
 
     startExam(examDuration, mode, useTimer);
     router.push(mode === 'practice' ? '/practice' : '/exam');
@@ -39,11 +78,12 @@ export default function Home() {
   };
 
   const score = isExamCompleted ? getScore() : null;
+  const selectedSubjectData = subjects.find((s) => s.id === selectedSubject);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 dark:from-blue-900 dark:via-purple-900 dark:to-pink-900">
       <div className="min-h-screen bg-black bg-opacity-30 dark:bg-opacity-50 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-4 py-12">
+        <div className="max-w-7xl mx-auto px-4 py-12">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -60,7 +100,7 @@ export default function Home() {
               Create Custom Practice Exams with AI
             </p>
             <p className="text-lg text-blue-200 dark:text-blue-300 mt-2">
-              Generate questions from any subject using AI-powered technology
+              Explore sample questions or generate your own from any subject
             </p>
           </motion.div>
 
@@ -102,245 +142,317 @@ export default function Home() {
             </button>
           </motion.div>
 
-          {/* Main Card */}
+          {/* Subject Selection Section */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden transition-colors"
+            className="mb-8"
           >
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
-              <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
-                <FileText className="w-10 h-10 text-blue-600 dark:text-blue-400" />
-                <div>
-                  <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">
-                    {questions.length}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Total Questions</p>
-                </div>
-              </div>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 transition-colors">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+                <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                Explore Sample Questions
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                Try out the app with pre-built question sets before creating your own
+              </p>
 
-              <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
-                <Clock className="w-10 h-10 text-purple-600 dark:text-purple-400" />
-                <div>
-                  <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">{examDuration}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Minutes</p>
-                </div>
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {subjects.map((subject) => {
+                  const Icon = iconMap[subject.icon] || FileText;
+                  const isSelected = selectedSubject === subject.id;
 
-              <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
-                <Brain className="w-10 h-10 text-pink-600 dark:text-pink-400" />
-                <div>
-                  <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">AI</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Powered Explanations</p>
-                </div>
+                  return (
+                    <button
+                      key={subject.id}
+                      onClick={() => setSelectedSubject(subject.id)}
+                      className={`relative p-5 rounded-xl border-2 transition-all text-left group ${
+                        isSelected
+                          ? 'border-blue-600 dark:border-blue-400 bg-gradient-to-br ' + subject.color + ' shadow-lg scale-105'
+                          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:scale-102'
+                      }`}
+                    >
+                      {isSelected && (
+                        <div className="absolute top-3 right-3">
+                          <CheckCircle className="w-6 h-6 text-white" />
+                        </div>
+                      )}
+
+                      <div className={`flex items-start gap-3 ${isSelected ? 'text-white' : 'text-gray-800 dark:text-gray-100'}`}>
+                        <div className={`p-2 rounded-lg ${isSelected ? 'bg-white bg-opacity-20' : 'bg-gray-100 dark:bg-gray-600'}`}>
+                          <Icon className={`w-6 h-6 ${isSelected ? 'text-white' : 'text-gray-700 dark:text-gray-300'}`} />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-bold text-lg mb-1">{subject.name}</h3>
+                          <p className={`text-sm mb-2 ${isSelected ? 'text-white text-opacity-90' : 'text-gray-600 dark:text-gray-300'}`}>
+                            {subject.description}
+                          </p>
+                          <div className="flex items-center gap-3 text-xs">
+                            <span className={`font-medium ${isSelected ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`}>
+                              {subject.questionCount} questions
+                            </span>
+                            <span className={`px-2 py-1 rounded ${isSelected ? 'bg-white bg-opacity-20 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'}`}>
+                              {subject.difficulty}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
+          </motion.div>
 
-            {/* Content */}
-            <div className="p-8">
-              {/* Previous Score */}
-              {isExamCompleted && score && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mb-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/30 dark:to-blue-900/30 rounded-lg border-2 border-green-200 dark:border-green-700"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <BarChart3 className="w-8 h-8 text-green-600 dark:text-green-400" />
+          {/* Configuration Card (Only show if subject is selected) */}
+          {selectedSubject && selectedSubjectData && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden transition-colors"
+            >
+              {/* Stats Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
+                <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
+                  <FileText className="w-10 h-10 text-blue-600 dark:text-blue-400" />
+                  <div>
+                    <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">
+                      {loadedQuestions.length}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">Questions</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
+                  <div className={`p-2 rounded-lg bg-gradient-to-br ${selectedSubjectData.color}`}>
+                    {(() => {
+                      const Icon = iconMap[selectedSubjectData.icon] || FileText;
+                      return <Icon className="w-6 h-6 text-white" />;
+                    })()}
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                      {selectedSubjectData.name}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">Selected</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
+                  <Brain className="w-10 h-10 text-pink-600 dark:text-pink-400" />
+                  <div>
+                    <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">AI</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">Explanations</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-8">
+                {/* Previous Score */}
+                {isExamCompleted && score && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/30 dark:to-blue-900/30 rounded-lg border-2 border-green-200 dark:border-green-700"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <BarChart3 className="w-8 h-8 text-green-600 dark:text-green-400" />
+                        <div>
+                          <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">
+                            Your Last Score
+                          </p>
+                          <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">
+                            {score.correct} / {score.total}
+                            <span className="text-xl ml-2 text-green-600 dark:text-green-400">
+                              ({score.percentage}%)
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleViewResults}
+                        className="px-6 py-3 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white font-medium rounded-lg transition-colors"
+                      >
+                        View Results
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Features */}
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+                    Features
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
+                      <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400 mt-1" />
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">
-                          Your Last Score
+                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
+                          AI Explanations
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                          Get detailed explanations powered by Google Gemini AI
                         </p>
-                        <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">
-                          {score.correct} / {score.total}
-                          <span className="text-xl ml-2 text-green-600 dark:text-green-400">
-                            ({score.percentage}%)
-                          </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
+                      <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400 mt-1" />
+                      <div>
+                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">Timed Mode</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                          Practice under real exam conditions with a timer
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
+                      <Trophy className="w-6 h-6 text-yellow-600 dark:text-yellow-400 mt-1" />
+                      <div>
+                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
+                          Track Progress
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                          Monitor your performance and identify weak areas
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
+                      <FileText className="w-6 h-6 text-green-600 dark:text-green-400 mt-1" />
+                      <div>
+                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
+                          Practice Questions
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                          Test your knowledge with {selectedSubjectData.name} questions
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mode Selector */}
+                <div className="mb-8">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Select Mode
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button
+                      onClick={() => setMode('practice')}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        mode === 'practice'
+                          ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30'
+                          : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Brain className={`w-6 h-6 ${mode === 'practice' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`} />
+                        <div className="text-left">
+                          <h3 className={`font-semibold ${mode === 'practice' ? 'text-blue-900 dark:text-blue-100' : 'text-gray-800 dark:text-gray-100'}`}>
+                            Practice Mode
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                            Instant AI feedback for each answer
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => setMode('exam')}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        mode === 'exam'
+                          ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30'
+                          : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Trophy className={`w-6 h-6 ${mode === 'exam' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`} />
+                        <div className="text-left">
+                          <h3 className={`font-semibold ${mode === 'exam' ? 'text-blue-900 dark:text-blue-100' : 'text-gray-800 dark:text-gray-100'}`}>
+                            Exam Mode
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                            Simulate real exam conditions
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Timer Toggle */}
+                <div className="mb-8">
+                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                      <div>
+                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
+                          Use Timer
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                          {useTimer ? `${examDuration} minutes countdown` : 'No time limit'}
                         </p>
                       </div>
                     </div>
                     <button
-                      onClick={handleViewResults}
-                      className="px-6 py-3 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white font-medium rounded-lg transition-colors"
+                      onClick={() => setUseTimer(!useTimer)}
+                      className={`relative w-14 h-8 rounded-full transition-colors ${
+                        useTimer ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                      }`}
                     >
-                      View Results
+                      <div
+                        className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                          useTimer ? 'translate-x-6' : 'translate-x-0'
+                        }`}
+                      />
                     </button>
                   </div>
-                </motion.div>
-              )}
-
-              {/* Features */}
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-                  Features
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
-                    <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400 mt-1" />
-                    <div>
-                      <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                        AI Explanations
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
-                        Get detailed explanations powered by Google Gemini AI
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
-                    <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400 mt-1" />
-                    <div>
-                      <h3 className="font-semibold text-gray-800 dark:text-gray-100">Timed Mode</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
-                        Practice under real exam conditions with a timer
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
-                    <Trophy className="w-6 h-6 text-yellow-600 dark:text-yellow-400 mt-1" />
-                    <div>
-                      <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                        Track Progress
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
-                        Monitor your performance and identify weak areas
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
-                    <FileText className="w-6 h-6 text-green-600 dark:text-green-400 mt-1" />
-                    <div>
-                      <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                        Real Questions
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
-                        Practice with actual OCI certification questions
-                      </p>
-                    </div>
-                  </div>
                 </div>
+
+                {/* Exam Duration Selector (only if timer is enabled) */}
+                {useTimer && (
+                  <div className="mb-8">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      Exam Duration
+                    </label>
+                    <div className="flex gap-3 flex-wrap">
+                      {[30, 60, 90, 120].map((duration) => (
+                        <button
+                          key={duration}
+                          onClick={() => setExamDuration(duration)}
+                          className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                            examDuration === duration
+                              ? 'bg-blue-600 dark:bg-blue-700 text-white shadow-lg scale-105'
+                              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          {duration} min
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Start Button */}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleStart}
+                  className={`w-full py-4 bg-gradient-to-r ${selectedSubjectData.color} text-white text-xl font-bold rounded-lg shadow-xl transition-all flex items-center justify-center gap-3`}
+                >
+                  <Play className="w-6 h-6" />
+                  {mode === 'practice' ? 'Start Practice' : 'Start Exam'}
+                  <ChevronRight className="w-6 h-6" />
+                </motion.button>
               </div>
-
-              {/* Mode Selector */}
-              <div className="mb-8">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                  Select Mode
-                </label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <button
-                    onClick={() => setMode('practice')}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      mode === 'practice'
-                        ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30'
-                        : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Brain className={`w-6 h-6 ${mode === 'practice' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`} />
-                      <div className="text-left">
-                        <h3 className={`font-semibold ${mode === 'practice' ? 'text-blue-900 dark:text-blue-100' : 'text-gray-800 dark:text-gray-100'}`}>
-                          Practice Mode
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          Instant AI feedback for each answer
-                        </p>
-                      </div>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => setMode('exam')}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      mode === 'exam'
-                        ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30'
-                        : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Trophy className={`w-6 h-6 ${mode === 'exam' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`} />
-                      <div className="text-left">
-                        <h3 className={`font-semibold ${mode === 'exam' ? 'text-blue-900 dark:text-blue-100' : 'text-gray-800 dark:text-gray-100'}`}>
-                          Exam Mode
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          Simulate real exam conditions
-                        </p>
-                      </div>
-                    </div>
-                  </button>
-                </div>
-              </div>
-
-              {/* Timer Toggle */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                    <div>
-                      <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                        Use Timer
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
-                        {useTimer ? `${examDuration} minutes countdown` : 'No time limit'}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setUseTimer(!useTimer)}
-                    className={`relative w-14 h-8 rounded-full transition-colors ${
-                      useTimer ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
-                    }`}
-                  >
-                    <div
-                      className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
-                        useTimer ? 'translate-x-6' : 'translate-x-0'
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
-
-              {/* Exam Duration Selector (only if timer is enabled) */}
-              {useTimer && (
-                <div className="mb-8">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    Exam Duration
-                  </label>
-                  <div className="flex gap-3 flex-wrap">
-                    {[30, 60, 90, 120].map((duration) => (
-                      <button
-                        key={duration}
-                        onClick={() => setExamDuration(duration)}
-                        className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                          examDuration === duration
-                            ? 'bg-blue-600 dark:bg-blue-700 text-white shadow-lg scale-105'
-                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                        }`}
-                      >
-                        {duration} min
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Start Button */}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleStart}
-                className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-700 dark:to-purple-700 dark:hover:from-blue-600 dark:hover:to-purple-600 text-white text-xl font-bold rounded-lg shadow-xl transition-all flex items-center justify-center gap-3"
-              >
-                <Play className="w-6 h-6" />
-                {mode === 'practice' ? 'Start Practice' : 'Start Exam'}
-              </motion.button>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
 
           {/* Footer */}
           <motion.p

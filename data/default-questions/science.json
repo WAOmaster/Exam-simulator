@@ -1,0 +1,352 @@
+[
+  {
+    "id": 1,
+    "question": "What is the primary function of mitochondria in a cell?",
+    "options": [
+      { "id": "A", "text": "Protein synthesis" },
+      { "id": "B", "text": "Energy production through ATP synthesis" },
+      { "id": "C", "text": "DNA replication" },
+      { "id": "D", "text": "Waste removal" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Mitochondria are known as the powerhouse of the cell because they produce ATP (adenosine triphosphate) through cellular respiration, which is the cell's main energy currency.",
+    "category": "Biology",
+    "difficulty": "easy"
+  },
+  {
+    "id": 2,
+    "question": "What is the pH value of a neutral solution at 25°C?",
+    "options": [
+      { "id": "A", "text": "0" },
+      { "id": "B", "text": "7" },
+      { "id": "C", "text": "10" },
+      { "id": "D", "text": "14" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "A pH of 7 indicates a neutral solution. Values below 7 are acidic, and values above 7 are basic (alkaline). Pure water at 25°C has a pH of 7.",
+    "category": "Chemistry",
+    "difficulty": "easy"
+  },
+  {
+    "id": 3,
+    "question": "Which law states that for every action, there is an equal and opposite reaction?",
+    "options": [
+      { "id": "A", "text": "Newton's First Law" },
+      { "id": "B", "text": "Newton's Second Law" },
+      { "id": "C", "text": "Newton's Third Law" },
+      { "id": "D", "text": "Law of Conservation of Energy" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "Newton's Third Law of Motion states that when one object exerts a force on another object, the second object exerts an equal force in the opposite direction on the first object.",
+    "category": "Physics",
+    "difficulty": "easy"
+  },
+  {
+    "id": 4,
+    "question": "What process do plants use to convert light energy into chemical energy?",
+    "options": [
+      { "id": "A", "text": "Cellular respiration" },
+      { "id": "B", "text": "Fermentation" },
+      { "id": "C", "text": "Photosynthesis" },
+      { "id": "D", "text": "Glycolysis" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "Photosynthesis is the process by which plants use sunlight, water, and carbon dioxide to create oxygen and energy in the form of glucose.",
+    "category": "Biology",
+    "difficulty": "easy"
+  },
+  {
+    "id": 5,
+    "question": "What is the atomic number of carbon?",
+    "options": [
+      { "id": "A", "text": "4" },
+      { "id": "B", "text": "6" },
+      { "id": "C", "text": "8" },
+      { "id": "D", "text": "12" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Carbon has an atomic number of 6, which means it has 6 protons in its nucleus. The atomic number defines the element's identity on the periodic table.",
+    "category": "Chemistry",
+    "difficulty": "easy"
+  },
+  {
+    "id": 6,
+    "question": "What is the speed of light in a vacuum?",
+    "options": [
+      { "id": "A", "text": "3 × 10⁸ m/s" },
+      { "id": "B", "text": "3 × 10⁶ m/s" },
+      { "id": "C", "text": "3 × 10¹⁰ m/s" },
+      { "id": "D", "text": "3 × 10⁴ m/s" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The speed of light in a vacuum is approximately 299,792,458 meters per second, commonly approximated as 3 × 10⁸ m/s or about 186,000 miles per second.",
+    "category": "Physics",
+    "difficulty": "medium"
+  },
+  {
+    "id": 7,
+    "question": "Which organelle is responsible for packaging and modifying proteins?",
+    "options": [
+      { "id": "A", "text": "Ribosome" },
+      { "id": "B", "text": "Golgi apparatus" },
+      { "id": "C", "text": "Endoplasmic reticulum" },
+      { "id": "D", "text": "Lysosome" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "The Golgi apparatus modifies, sorts, and packages proteins and lipids for transport to their final destinations, either inside or outside the cell.",
+    "category": "Biology",
+    "difficulty": "medium"
+  },
+  {
+    "id": 8,
+    "question": "What type of chemical bond involves the sharing of electron pairs between atoms?",
+    "options": [
+      { "id": "A", "text": "Ionic bond" },
+      { "id": "B", "text": "Covalent bond" },
+      { "id": "C", "text": "Hydrogen bond" },
+      { "id": "D", "text": "Metallic bond" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "A covalent bond is formed when two atoms share one or more pairs of electrons. This type of bond is common in organic molecules.",
+    "category": "Chemistry",
+    "difficulty": "medium"
+  },
+  {
+    "id": 9,
+    "question": "What is the formula for kinetic energy?",
+    "options": [
+      { "id": "A", "text": "KE = mv" },
+      { "id": "B", "text": "KE = ½mv²" },
+      { "id": "C", "text": "KE = mgh" },
+      { "id": "D", "text": "KE = F × d" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Kinetic energy (KE) is calculated using KE = ½mv², where m is mass and v is velocity. The energy increases with the square of velocity.",
+    "category": "Physics",
+    "difficulty": "medium"
+  },
+  {
+    "id": 10,
+    "question": "What is the primary difference between DNA and RNA?",
+    "options": [
+      { "id": "A", "text": "DNA is single-stranded, RNA is double-stranded" },
+      { "id": "B", "text": "DNA contains thymine, RNA contains uracil" },
+      { "id": "C", "text": "DNA is found in cytoplasm, RNA in nucleus" },
+      { "id": "D", "text": "DNA is smaller than RNA" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "DNA contains the nucleotide base thymine, while RNA contains uracil instead. Additionally, DNA is typically double-stranded while RNA is usually single-stranded.",
+    "category": "Biology",
+    "difficulty": "medium"
+  },
+  {
+    "id": 11,
+    "question": "What is Avogadro's number?",
+    "options": [
+      { "id": "A", "text": "6.022 × 10²³" },
+      { "id": "B", "text": "3.14 × 10⁸" },
+      { "id": "C", "text": "9.81 × 10²" },
+      { "id": "D", "text": "1.60 × 10⁻¹⁹" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Avogadro's number (6.022 × 10²³) represents the number of particles (atoms, molecules, ions) in one mole of a substance. It's fundamental to chemistry calculations.",
+    "category": "Chemistry",
+    "difficulty": "medium"
+  },
+  {
+    "id": 12,
+    "question": "What phenomenon causes the bending of light as it passes from one medium to another?",
+    "options": [
+      { "id": "A", "text": "Reflection" },
+      { "id": "B", "text": "Diffraction" },
+      { "id": "C", "text": "Refraction" },
+      { "id": "D", "text": "Interference" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "Refraction is the bending of light as it passes from one medium to another with a different density. This occurs because light travels at different speeds in different materials.",
+    "category": "Physics",
+    "difficulty": "medium"
+  },
+  {
+    "id": 13,
+    "question": "What is the role of ribosomes in protein synthesis?",
+    "options": [
+      { "id": "A", "text": "They translate mRNA into proteins" },
+      { "id": "B", "text": "They transcribe DNA into mRNA" },
+      { "id": "C", "text": "They store genetic information" },
+      { "id": "D", "text": "They break down proteins" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Ribosomes are the cellular machinery that reads mRNA sequences and assembles amino acids into proteins through a process called translation.",
+    "category": "Biology",
+    "difficulty": "hard"
+  },
+  {
+    "id": 14,
+    "question": "In a redox reaction, what happens to the oxidizing agent?",
+    "options": [
+      { "id": "A", "text": "It gains electrons and is reduced" },
+      { "id": "B", "text": "It loses electrons and is oxidized" },
+      { "id": "C", "text": "It remains unchanged" },
+      { "id": "D", "text": "It becomes neutral" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The oxidizing agent gains electrons (is reduced) while causing another substance to lose electrons (be oxidized). Remember: OIL RIG - Oxidation Is Loss, Reduction Is Gain.",
+    "category": "Chemistry",
+    "difficulty": "hard"
+  },
+  {
+    "id": 15,
+    "question": "According to the Second Law of Thermodynamics, what happens to entropy in an isolated system?",
+    "options": [
+      { "id": "A", "text": "It always decreases" },
+      { "id": "B", "text": "It remains constant" },
+      { "id": "C", "text": "It always increases or remains constant" },
+      { "id": "D", "text": "It fluctuates randomly" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "The Second Law of Thermodynamics states that the total entropy of an isolated system can never decrease over time. It either increases or remains constant in ideal cases.",
+    "category": "Physics",
+    "difficulty": "hard"
+  },
+  {
+    "id": 16,
+    "question": "What is the function of the enzyme DNA helicase?",
+    "options": [
+      { "id": "A", "text": "It joins DNA fragments together" },
+      { "id": "B", "text": "It unwinds the DNA double helix" },
+      { "id": "C", "text": "It proofreads DNA sequences" },
+      { "id": "D", "text": "It adds nucleotides to DNA strands" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "DNA helicase is an enzyme that unwinds and separates the two strands of the DNA double helix during DNA replication, creating a replication fork.",
+    "category": "Biology",
+    "difficulty": "hard"
+  },
+  {
+    "id": 17,
+    "question": "What is the electron configuration of oxygen?",
+    "options": [
+      { "id": "A", "text": "1s² 2s² 2p⁴" },
+      { "id": "B", "text": "1s² 2s² 2p⁶" },
+      { "id": "C", "text": "1s² 2s² 2p³" },
+      { "id": "D", "text": "1s² 2s² 2p²" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Oxygen has 8 electrons. The electron configuration is 1s² 2s² 2p⁴, with 2 electrons in the 1s orbital, 2 in the 2s orbital, and 4 in the 2p orbitals.",
+    "category": "Chemistry",
+    "difficulty": "hard"
+  },
+  {
+    "id": 18,
+    "question": "What is the relationship between wavelength and frequency of electromagnetic waves?",
+    "options": [
+      { "id": "A", "text": "They are directly proportional" },
+      { "id": "B", "text": "They are inversely proportional" },
+      { "id": "C", "text": "They are unrelated" },
+      { "id": "D", "text": "They are equal" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Wavelength and frequency are inversely proportional, related by the equation c = λν, where c is the speed of light, λ is wavelength, and ν is frequency.",
+    "category": "Physics",
+    "difficulty": "hard"
+  },
+  {
+    "id": 19,
+    "question": "Which blood vessels carry oxygenated blood away from the heart?",
+    "options": [
+      { "id": "A", "text": "Veins" },
+      { "id": "B", "text": "Arteries" },
+      { "id": "C", "text": "Capillaries" },
+      { "id": "D", "text": "Venules" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Arteries carry oxygenated blood away from the heart to the body tissues (except for pulmonary arteries which carry deoxygenated blood to the lungs).",
+    "category": "Biology",
+    "difficulty": "easy"
+  },
+  {
+    "id": 20,
+    "question": "What is the most abundant gas in Earth's atmosphere?",
+    "options": [
+      { "id": "A", "text": "Oxygen" },
+      { "id": "B", "text": "Carbon dioxide" },
+      { "id": "C", "text": "Nitrogen" },
+      { "id": "D", "text": "Argon" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "Nitrogen makes up approximately 78% of Earth's atmosphere, while oxygen accounts for about 21%. The remaining 1% consists of various other gases.",
+    "category": "Chemistry",
+    "difficulty": "easy"
+  },
+  {
+    "id": 21,
+    "question": "What unit is used to measure electric current?",
+    "options": [
+      { "id": "A", "text": "Volt" },
+      { "id": "B", "text": "Ampere" },
+      { "id": "C", "text": "Ohm" },
+      { "id": "D", "text": "Watt" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Electric current is measured in amperes (A), named after André-Marie Ampère. One ampere represents one coulomb of charge passing through a point per second.",
+    "category": "Physics",
+    "difficulty": "easy"
+  },
+  {
+    "id": 22,
+    "question": "What is the powerhouse of the cell?",
+    "options": [
+      { "id": "A", "text": "Nucleus" },
+      { "id": "B", "text": "Mitochondria" },
+      { "id": "C", "text": "Chloroplast" },
+      { "id": "D", "text": "Ribosome" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Mitochondria are often called the powerhouse of the cell because they generate most of the cell's supply of ATP through cellular respiration.",
+    "category": "Biology",
+    "difficulty": "easy"
+  },
+  {
+    "id": 23,
+    "question": "What is the chemical formula for water?",
+    "options": [
+      { "id": "A", "text": "H₂O" },
+      { "id": "B", "text": "CO₂" },
+      { "id": "C", "text": "O₂" },
+      { "id": "D", "text": "H₂O₂" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Water has the chemical formula H₂O, meaning each molecule consists of two hydrogen atoms bonded to one oxygen atom.",
+    "category": "Chemistry",
+    "difficulty": "easy"
+  },
+  {
+    "id": 24,
+    "question": "What force keeps planets in orbit around the sun?",
+    "options": [
+      { "id": "A", "text": "Electromagnetic force" },
+      { "id": "B", "text": "Nuclear force" },
+      { "id": "C", "text": "Gravitational force" },
+      { "id": "D", "text": "Friction" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "Gravitational force, as described by Newton's law of universal gravitation, keeps planets in orbit around the sun and governs the motion of celestial bodies.",
+    "category": "Physics",
+    "difficulty": "easy"
+  },
+  {
+    "id": 25,
+    "question": "What is the process by which cells divide to produce identical daughter cells?",
+    "options": [
+      { "id": "A", "text": "Meiosis" },
+      { "id": "B", "text": "Mitosis" },
+      { "id": "C", "text": "Binary fission" },
+      { "id": "D", "text": "Budding" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Mitosis is the process of cell division that produces two genetically identical daughter cells from a single parent cell. It's essential for growth and repair in multicellular organisms.",
+    "category": "Biology",
+    "difficulty": "medium"
+  }
+]

@@ -1,0 +1,352 @@
+[
+  {
+    "id": 1,
+    "question": "What does 'HTML' stand for?",
+    "options": [
+      { "id": "A", "text": "Hyper Text Markup Language" },
+      { "id": "B", "text": "High Tech Modern Language" },
+      { "id": "C", "text": "Home Tool Markup Language" },
+      { "id": "D", "text": "Hyperlinks and Text Markup Language" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "HTML stands for Hyper Text Markup Language. It's the standard markup language used to create and structure content on the web.",
+    "category": "Web Development",
+    "difficulty": "easy"
+  },
+  {
+    "id": 2,
+    "question": "Which data structure uses LIFO (Last In, First Out) principle?",
+    "options": [
+      { "id": "A", "text": "Queue" },
+      { "id": "B", "text": "Stack" },
+      { "id": "C", "text": "Array" },
+      { "id": "D", "text": "Linked List" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "A Stack follows the LIFO principle where the last element added is the first one to be removed, like a stack of plates.",
+    "category": "Data Structures",
+    "difficulty": "easy"
+  },
+  {
+    "id": 3,
+    "question": "What is the time complexity of binary search in a sorted array?",
+    "options": [
+      { "id": "A", "text": "O(n)" },
+      { "id": "B", "text": "O(log n)" },
+      { "id": "C", "text": "O(n²)" },
+      { "id": "D", "text": "O(1)" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Binary search has O(log n) time complexity because it divides the search space in half with each comparison, making it very efficient for sorted arrays.",
+    "category": "Algorithms",
+    "difficulty": "medium"
+  },
+  {
+    "id": 4,
+    "question": "Which programming paradigm does Python primarily support?",
+    "options": [
+      { "id": "A", "text": "Only object-oriented" },
+      { "id": "B", "text": "Only functional" },
+      { "id": "C", "text": "Multi-paradigm (OOP, functional, procedural)" },
+      { "id": "D", "text": "Only procedural" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "Python is a multi-paradigm language that supports object-oriented, functional, and procedural programming styles, giving developers flexibility in how they write code.",
+    "category": "Programming Languages",
+    "difficulty": "easy"
+  },
+  {
+    "id": 5,
+    "question": "What does SQL stand for?",
+    "options": [
+      { "id": "A", "text": "Structured Query Language" },
+      { "id": "B", "text": "Simple Question Language" },
+      { "id": "C", "text": "Server Query Language" },
+      { "id": "D", "text": "System Query Logic" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "SQL stands for Structured Query Language. It's used to communicate with and manipulate databases, allowing users to query, insert, update, and delete data.",
+    "category": "Databases",
+    "difficulty": "easy"
+  },
+  {
+    "id": 6,
+    "question": "What is the purpose of a compiler?",
+    "options": [
+      { "id": "A", "text": "To execute code line by line" },
+      { "id": "B", "text": "To translate source code into machine code" },
+      { "id": "C", "text": "To debug programs" },
+      { "id": "D", "text": "To format code" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "A compiler translates high-level source code (like C++ or Java) into machine code (binary) that can be executed by the computer's processor.",
+    "category": "Computer Systems",
+    "difficulty": "easy"
+  },
+  {
+    "id": 7,
+    "question": "Which sorting algorithm has the best average-case time complexity?",
+    "options": [
+      { "id": "A", "text": "Bubble Sort - O(n²)" },
+      { "id": "B", "text": "Merge Sort - O(n log n)" },
+      { "id": "C", "text": "Selection Sort - O(n²)" },
+      { "id": "D", "text": "Insertion Sort - O(n²)" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Merge Sort has O(n log n) time complexity for average and worst cases, making it more efficient than quadratic algorithms like Bubble Sort for large datasets.",
+    "category": "Algorithms",
+    "difficulty": "medium"
+  },
+  {
+    "id": 8,
+    "question": "What is encapsulation in object-oriented programming?",
+    "options": [
+      { "id": "A", "text": "Creating multiple instances of a class" },
+      { "id": "B", "text": "Bundling data and methods that operate on that data within a single unit" },
+      { "id": "C", "text": "Inheriting properties from parent classes" },
+      { "id": "D", "text": "Converting code to machine language" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Encapsulation is the bundling of data (attributes) and methods that operate on that data into a single unit (class), hiding internal details and exposing only necessary interfaces.",
+    "category": "Object-Oriented Programming",
+    "difficulty": "medium"
+  },
+  {
+    "id": 9,
+    "question": "What does API stand for?",
+    "options": [
+      { "id": "A", "text": "Application Programming Interface" },
+      { "id": "B", "text": "Advanced Program Integration" },
+      { "id": "C", "text": "Automated Programming Instruction" },
+      { "id": "D", "text": "Application Process Integration" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "API stands for Application Programming Interface. It defines how software components should interact, allowing different applications to communicate with each other.",
+    "category": "Software Engineering",
+    "difficulty": "easy"
+  },
+  {
+    "id": 10,
+    "question": "Which of the following is NOT a relational database?",
+    "options": [
+      { "id": "A", "text": "MySQL" },
+      { "id": "B", "text": "PostgreSQL" },
+      { "id": "C", "text": "MongoDB" },
+      { "id": "D", "text": "Oracle Database" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "MongoDB is a NoSQL document database that stores data in flexible, JSON-like documents. MySQL, PostgreSQL, and Oracle are relational databases using tables and SQL.",
+    "category": "Databases",
+    "difficulty": "medium"
+  },
+  {
+    "id": 11,
+    "question": "What is the main purpose of version control systems like Git?",
+    "options": [
+      { "id": "A", "text": "To compile code" },
+      { "id": "B", "text": "To track changes in code and collaborate with others" },
+      { "id": "C", "text": "To deploy applications" },
+      { "id": "D", "text": "To test software" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Version control systems like Git track changes in source code over time, enable collaboration among developers, and allow reverting to previous versions when needed.",
+    "category": "Software Development",
+    "difficulty": "easy"
+  },
+  {
+    "id": 12,
+    "question": "What does CSS stand for?",
+    "options": [
+      { "id": "A", "text": "Computer Style Sheets" },
+      { "id": "B", "text": "Cascading Style Sheets" },
+      { "id": "C", "text": "Creative Style System" },
+      { "id": "D", "text": "Colorful Style Sheets" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "CSS stands for Cascading Style Sheets. It's used to style and layout web pages, controlling colors, fonts, spacing, and responsive design.",
+    "category": "Web Development",
+    "difficulty": "easy"
+  },
+  {
+    "id": 13,
+    "question": "What is the difference between '==' and '===' in JavaScript?",
+    "options": [
+      { "id": "A", "text": "They are exactly the same" },
+      { "id": "B", "text": "'==' checks value only, '===' checks value and type" },
+      { "id": "C", "text": "'==' is for strings, '===' is for numbers" },
+      { "id": "D", "text": "'==' is deprecated" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "'==' performs type coercion before comparison (loose equality), while '===' compares both value and type without coercion (strict equality). For example, 5 == '5' is true, but 5 === '5' is false.",
+    "category": "Programming Languages",
+    "difficulty": "medium"
+  },
+  {
+    "id": 14,
+    "question": "Which HTTP method is used to retrieve data from a server?",
+    "options": [
+      { "id": "A", "text": "POST" },
+      { "id": "B", "text": "PUT" },
+      { "id": "C", "text": "GET" },
+      { "id": "D", "text": "DELETE" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "GET is the HTTP method used to request and retrieve data from a server. It should not modify server data and is considered a safe method.",
+    "category": "Web Development",
+    "difficulty": "easy"
+  },
+  {
+    "id": 15,
+    "question": "What is Big O notation used for?",
+    "options": [
+      { "id": "A", "text": "Measuring code readability" },
+      { "id": "B", "text": "Describing algorithm efficiency in terms of time and space complexity" },
+      { "id": "C", "text": "Counting lines of code" },
+      { "id": "D", "text": "Measuring code execution speed in seconds" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Big O notation describes the upper bound of algorithm complexity, showing how runtime or space requirements grow as input size increases. It helps compare algorithm efficiency.",
+    "category": "Algorithms",
+    "difficulty": "medium"
+  },
+  {
+    "id": 16,
+    "question": "What is recursion in programming?",
+    "options": [
+      { "id": "A", "text": "A loop that never ends" },
+      { "id": "B", "text": "A function that calls itself" },
+      { "id": "C", "text": "A type of data structure" },
+      { "id": "D", "text": "An error handling technique" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Recursion is when a function calls itself to solve a problem by breaking it into smaller, similar subproblems. It requires a base case to prevent infinite recursion.",
+    "category": "Programming Concepts",
+    "difficulty": "medium"
+  },
+  {
+    "id": 17,
+    "question": "What is the purpose of the 'async/await' keywords in JavaScript?",
+    "options": [
+      { "id": "A", "text": "To create classes" },
+      { "id": "B", "text": "To handle asynchronous operations more elegantly" },
+      { "id": "C", "text": "To declare variables" },
+      { "id": "D", "text": "To define functions" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "async/await provides a cleaner syntax for handling promises and asynchronous operations, making asynchronous code look and behave more like synchronous code.",
+    "category": "Programming Languages",
+    "difficulty": "hard"
+  },
+  {
+    "id": 18,
+    "question": "What is a binary tree?",
+    "options": [
+      { "id": "A", "text": "A tree where each node has exactly two children" },
+      { "id": "B", "text": "A tree where each node has at most two children" },
+      { "id": "C", "text": "A tree with only two nodes" },
+      { "id": "D", "text": "A tree that stores binary numbers" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "A binary tree is a hierarchical data structure where each node has at most two children, referred to as left child and right child.",
+    "category": "Data Structures",
+    "difficulty": "medium"
+  },
+  {
+    "id": 19,
+    "question": "What is the difference between an interpreter and a compiler?",
+    "options": [
+      { "id": "A", "text": "There is no difference" },
+      { "id": "B", "text": "Interpreter executes code line-by-line; compiler translates entire program first" },
+      { "id": "C", "text": "Interpreter is faster than compiler" },
+      { "id": "D", "text": "Compiler only works with machine code" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "An interpreter executes code line by line without creating an executable file, while a compiler translates the entire program to machine code before execution, creating an executable.",
+    "category": "Computer Systems",
+    "difficulty": "medium"
+  },
+  {
+    "id": 20,
+    "question": "What does REST stand for in web services?",
+    "options": [
+      { "id": "A", "text": "Representational State Transfer" },
+      { "id": "B", "text": "Remote Execution Service Technology" },
+      { "id": "C", "text": "Rapid Enterprise Service Tool" },
+      { "id": "D", "text": "Real-time State Transmission" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "REST stands for Representational State Transfer. It's an architectural style for building web services that use HTTP methods and are stateless.",
+    "category": "Web Development",
+    "difficulty": "medium"
+  },
+  {
+    "id": 21,
+    "question": "What is polymorphism in OOP?",
+    "options": [
+      { "id": "A", "text": "Having multiple classes" },
+      { "id": "B", "text": "The ability of objects to take multiple forms" },
+      { "id": "C", "text": "Creating multiple instances" },
+      { "id": "D", "text": "Using multiple programming languages" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Polymorphism allows objects of different classes to be treated as objects of a common parent class. Methods can have different implementations in different classes.",
+    "category": "Object-Oriented Programming",
+    "difficulty": "hard"
+  },
+  {
+    "id": 22,
+    "question": "What is the purpose of a hash function?",
+    "options": [
+      { "id": "A", "text": "To sort data" },
+      { "id": "B", "text": "To map data to fixed-size values" },
+      { "id": "C", "text": "To encrypt data permanently" },
+      { "id": "D", "text": "To compress files" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "A hash function maps input data of arbitrary size to fixed-size output values (hash codes). It's used in hash tables, data integrity verification, and cryptography.",
+    "category": "Data Structures",
+    "difficulty": "hard"
+  },
+  {
+    "id": 23,
+    "question": "What is a deadlock in concurrent programming?",
+    "options": [
+      { "id": "A", "text": "When a program stops responding" },
+      { "id": "B", "text": "When two or more processes wait for each other indefinitely" },
+      { "id": "C", "text": "When a process terminates unexpectedly" },
+      { "id": "D", "text": "When memory is exhausted" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "A deadlock occurs when two or more processes are unable to proceed because each is waiting for the other to release a resource, creating a circular dependency.",
+    "category": "Operating Systems",
+    "difficulty": "hard"
+  },
+  {
+    "id": 24,
+    "question": "What is the purpose of unit testing?",
+    "options": [
+      { "id": "A", "text": "To test the entire application" },
+      { "id": "B", "text": "To test individual components or functions in isolation" },
+      { "id": "C", "text": "To test user interface" },
+      { "id": "D", "text": "To test deployment" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Unit testing involves testing individual components, functions, or methods in isolation to ensure they work correctly. It's the foundation of test-driven development.",
+    "category": "Software Testing",
+    "difficulty": "medium"
+  },
+  {
+    "id": 25,
+    "question": "What is the CAP theorem in distributed systems?",
+    "options": [
+      { "id": "A", "text": "A database can have Consistency, Availability, and Partition tolerance simultaneously" },
+      { "id": "B", "text": "A distributed system can achieve only two of: Consistency, Availability, Partition tolerance" },
+      { "id": "C", "text": "All distributed systems must be consistent" },
+      { "id": "D", "text": "Availability is more important than consistency" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "The CAP theorem states that a distributed system can provide only two of three guarantees: Consistency, Availability, and Partition tolerance. Trade-offs must be made based on requirements.",
+    "category": "Distributed Systems",
+    "difficulty": "hard"
+  }
+]

@@ -1,0 +1,352 @@
+[
+  {
+    "id": 1,
+    "question": "What is Ohm's Law?",
+    "options": [
+      { "id": "A", "text": "V = IR" },
+      { "id": "B", "text": "P = IV" },
+      { "id": "C", "text": "E = mc²" },
+      { "id": "D", "text": "F = ma" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Ohm's Law states that voltage (V) equals current (I) multiplied by resistance (R): V = IR. It's fundamental to electrical circuit analysis.",
+    "category": "Electrical Engineering",
+    "difficulty": "easy"
+  },
+  {
+    "id": 2,
+    "question": "What is the unit of force in the SI system?",
+    "options": [
+      { "id": "A", "text": "Joule" },
+      { "id": "B", "text": "Newton" },
+      { "id": "C", "text": "Watt" },
+      { "id": "D", "text": "Pascal" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "The Newton (N) is the SI unit of force. One Newton is the force required to accelerate one kilogram of mass at one meter per second squared.",
+    "category": "Mechanical Engineering",
+    "difficulty": "easy"
+  },
+  {
+    "id": 3,
+    "question": "What does CAD stand for in engineering?",
+    "options": [
+      { "id": "A", "text": "Computer Aided Design" },
+      { "id": "B", "text": "Central Analysis Device" },
+      { "id": "C", "text": "Computed Angle Diagram" },
+      { "id": "D", "text": "Complex Algorithm Design" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "CAD stands for Computer Aided Design. It's software used to create, modify, analyze, and optimize designs in engineering and architecture.",
+    "category": "General Engineering",
+    "difficulty": "easy"
+  },
+  {
+    "id": 4,
+    "question": "What is the efficiency formula for a machine?",
+    "options": [
+      { "id": "A", "text": "Input/Output" },
+      { "id": "B", "text": "Output/Input × 100%" },
+      { "id": "C", "text": "Power × Time" },
+      { "id": "D", "text": "Work/Force" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Efficiency = (Useful Output Energy / Input Energy) × 100%. It measures how well a machine converts input energy to useful output.",
+    "category": "Mechanical Engineering",
+    "difficulty": "easy"
+  },
+  {
+    "id": 5,
+    "question": "What is the first law of thermodynamics?",
+    "options": [
+      { "id": "A", "text": "Energy cannot be created or destroyed" },
+      { "id": "B", "text": "Entropy always increases" },
+      { "id": "C", "text": "Heat flows from hot to cold" },
+      { "id": "D", "text": "Work equals force times distance" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The First Law of Thermodynamics states energy cannot be created or destroyed, only converted from one form to another. It's also known as the law of conservation of energy.",
+    "category": "Mechanical Engineering",
+    "difficulty": "easy"
+  },
+  {
+    "id": 6,
+    "question": "What is the purpose of a transistor?",
+    "options": [
+      { "id": "A", "text": "To amplify or switch electrical signals" },
+      { "id": "B", "text": "To store electrical energy" },
+      { "id": "C", "text": "To measure voltage" },
+      { "id": "D", "text": "To generate electricity" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Transistors amplify or switch electronic signals and electrical power. They're fundamental building blocks of modern electronics and computing.",
+    "category": "Electrical Engineering",
+    "difficulty": "easy"
+  },
+  {
+    "id": 7,
+    "question": "What is the compressive strength of concrete typically measured in?",
+    "options": [
+      { "id": "A", "text": "MPa (Megapascals)" },
+      { "id": "B", "text": "Newtons" },
+      { "id": "C", "text": "Joules" },
+      { "id": "D", "text": "Watts" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Concrete compressive strength is measured in MPa (Megapascals) or psi (pounds per square inch). It indicates the maximum compressive stress concrete can withstand.",
+    "category": "Civil Engineering",
+    "difficulty": "medium"
+  },
+  {
+    "id": 8,
+    "question": "What is the moment of inertia?",
+    "options": [
+      { "id": "A", "text": "A measure of an object's resistance to rotational acceleration" },
+      { "id": "B", "text": "The force applied to an object" },
+      { "id": "C", "text": "The velocity of rotation" },
+      { "id": "D", "text": "The weight of an object" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Moment of inertia measures an object's resistance to changes in rotational motion. It depends on mass distribution relative to the axis of rotation.",
+    "category": "Mechanical Engineering",
+    "difficulty": "medium"
+  },
+  {
+    "id": 9,
+    "question": "What is Kirchhoff's Current Law (KCL)?",
+    "options": [
+      { "id": "A", "text": "The sum of currents entering a node equals the sum leaving" },
+      { "id": "B", "text": "Voltage equals current times resistance" },
+      { "id": "C", "text": "Power equals voltage times current" },
+      { "id": "D", "text": "Current flows from high to low potential" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "KCL states that the algebraic sum of currents at any node in a circuit equals zero. Current flowing into a node must equal current flowing out.",
+    "category": "Electrical Engineering",
+    "difficulty": "medium"
+  },
+  {
+    "id": 10,
+    "question": "What is the primary function of a bearing in mechanical systems?",
+    "options": [
+      { "id": "A", "text": "To reduce friction between moving parts" },
+      { "id": "B", "text": "To increase speed" },
+      { "id": "C", "text": "To generate power" },
+      { "id": "D", "text": "To store energy" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Bearings reduce friction between moving parts, allowing smooth rotation or linear movement while supporting loads.",
+    "category": "Mechanical Engineering",
+    "difficulty": "easy"
+  },
+  {
+    "id": 11,
+    "question": "What is the purpose of reinforcement bars (rebar) in concrete?",
+    "options": [
+      { "id": "A", "text": "To increase tensile strength" },
+      { "id": "B", "text": "To make concrete lighter" },
+      { "id": "C", "text": "To speed up curing" },
+      { "id": "D", "text": "To improve color" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Rebar increases concrete's tensile strength. While concrete is strong in compression, it's weak in tension. Steel reinforcement compensates for this weakness.",
+    "category": "Civil Engineering",
+    "difficulty": "medium"
+  },
+  {
+    "id": 12,
+    "question": "What does AC stand for in electrical systems?",
+    "options": [
+      { "id": "A", "text": "Alternating Current" },
+      { "id": "B", "text": "Active Current" },
+      { "id": "C", "text": "Amplified Circuit" },
+      { "id": "D", "text": "Automated Connection" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "AC stands for Alternating Current, where the direction of electric charge periodically reverses. It's the standard for power distribution in most countries.",
+    "category": "Electrical Engineering",
+    "difficulty": "easy"
+  },
+  {
+    "id": 13,
+    "question": "What is stress in material mechanics?",
+    "options": [
+      { "id": "A", "text": "Force per unit area" },
+      { "id": "B", "text": "Change in length per unit length" },
+      { "id": "C", "text": "Total force applied" },
+      { "id": "D", "text": "Material hardness" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Stress is force per unit area (σ = F/A), measured in Pascals or psi. It describes the internal resistance of a material to deformation.",
+    "category": "Mechanical Engineering",
+    "difficulty": "medium"
+  },
+  {
+    "id": 14,
+    "question": "What is the function of a diode?",
+    "options": [
+      { "id": "A", "text": "To allow current flow in one direction only" },
+      { "id": "B", "text": "To amplify signals" },
+      { "id": "C", "text": "To store charge" },
+      { "id": "D", "text": "To resist current flow" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "A diode is a semiconductor device that allows current to flow in one direction while blocking it in the reverse direction. It's used in rectification and signal processing.",
+    "category": "Electrical Engineering",
+    "difficulty": "easy"
+  },
+  {
+    "id": 15,
+    "question": "What is the Bernoulli equation used for?",
+    "options": [
+      { "id": "A", "text": "Analyzing fluid flow and pressure" },
+      { "id": "B", "text": "Calculating electrical resistance" },
+      { "id": "C", "text": "Measuring structural loads" },
+      { "id": "D", "text": "Computing heat transfer" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Bernoulli's equation relates pressure, velocity, and elevation in flowing fluids. It's fundamental in fluid dynamics and has applications in aerodynamics and hydraulics.",
+    "category": "Mechanical Engineering",
+    "difficulty": "hard"
+  },
+  {
+    "id": 16,
+    "question": "What is Young's Modulus?",
+    "options": [
+      { "id": "A", "text": "A measure of material stiffness" },
+      { "id": "B", "text": "A measure of material hardness" },
+      { "id": "C", "text": "A measure of electrical conductivity" },
+      { "id": "D", "text": "A measure of thermal expansion" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Young's Modulus (E) measures a material's stiffness or resistance to elastic deformation. It's the ratio of stress to strain in the elastic region.",
+    "category": "Mechanical Engineering",
+    "difficulty": "hard"
+  },
+  {
+    "id": 17,
+    "question": "What is the load factor in structural engineering?",
+    "options": [
+      { "id": "A", "text": "A safety multiplier for design loads" },
+      { "id": "B", "text": "The weight of the structure" },
+      { "id": "C", "text": "The maximum load capacity" },
+      { "id": "D", "text": "The deflection under load" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Load factors are safety multipliers applied to expected loads in structural design to account for uncertainties and ensure adequate safety margins.",
+    "category": "Civil Engineering",
+    "difficulty": "hard"
+  },
+  {
+    "id": 18,
+    "question": "What is the purpose of a capacitor?",
+    "options": [
+      { "id": "A", "text": "To store electrical energy in an electric field" },
+      { "id": "B", "text": "To resist current flow" },
+      { "id": "C", "text": "To amplify signals" },
+      { "id": "D", "text": "To convert AC to DC" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Capacitors store electrical energy in an electric field between conductive plates. They're used in filtering, timing, and energy storage applications.",
+    "category": "Electrical Engineering",
+    "difficulty": "easy"
+  },
+  {
+    "id": 19,
+    "question": "What is torque?",
+    "options": [
+      { "id": "A", "text": "A rotational force" },
+      { "id": "B", "text": "Linear velocity" },
+      { "id": "C", "text": "Angular velocity" },
+      { "id": "D", "text": "Kinetic energy" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Torque is a rotational or twisting force, calculated as force multiplied by perpendicular distance from the axis of rotation (τ = r × F).",
+    "category": "Mechanical Engineering",
+    "difficulty": "easy"
+  },
+  {
+    "id": 20,
+    "question": "What is the water-cement ratio in concrete?",
+    "options": [
+      { "id": "A", "text": "The ratio of water weight to cement weight in a mix" },
+      { "id": "B", "text": "The ratio of cement to aggregate" },
+      { "id": "C", "text": "The curing time requirement" },
+      { "id": "D", "text": "The strength after 28 days" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The water-cement ratio (w/c) is the weight of water divided by weight of cement in a concrete mix. It significantly affects concrete strength and durability.",
+    "category": "Civil Engineering",
+    "difficulty": "medium"
+  },
+  {
+    "id": 21,
+    "question": "What is the frequency of standard AC power in North America?",
+    "options": [
+      { "id": "A", "text": "50 Hz" },
+      { "id": "B", "text": "60 Hz" },
+      { "id": "C", "text": "100 Hz" },
+      { "id": "D", "text": "120 Hz" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "North American AC power operates at 60 Hz (cycles per second), while most other countries use 50 Hz. This affects electrical equipment design.",
+    "category": "Electrical Engineering",
+    "difficulty": "medium"
+  },
+  {
+    "id": 22,
+    "question": "What is a cantilever beam?",
+    "options": [
+      { "id": "A", "text": "A beam fixed at one end and free at the other" },
+      { "id": "B", "text": "A beam supported at both ends" },
+      { "id": "C", "text": "A beam with no supports" },
+      { "id": "D", "text": "A curved beam" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "A cantilever beam is fixed at one end and free at the other. Examples include balconies and overhanging structures. They experience bending moments and shear forces.",
+    "category": "Civil Engineering",
+    "difficulty": "medium"
+  },
+  {
+    "id": 23,
+    "question": "What is Reynolds number used for?",
+    "options": [
+      { "id": "A", "text": "Predicting flow patterns in fluid dynamics" },
+      { "id": "B", "text": "Calculating electrical resistance" },
+      { "id": "C", "text": "Measuring material strength" },
+      { "id": "D", "text": "Determining heat transfer rates" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Reynolds number is a dimensionless quantity that predicts flow patterns in fluid dynamics. It distinguishes between laminar and turbulent flow.",
+    "category": "Mechanical Engineering",
+    "difficulty": "hard"
+  },
+  {
+    "id": 24,
+    "question": "What is a three-phase electrical system?",
+    "options": [
+      { "id": "A", "text": "A system with three AC voltages 120° apart" },
+      { "id": "B", "text": "A system with three different voltages" },
+      { "id": "C", "text": "A system with three transformers" },
+      { "id": "D", "text": "A backup power system" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Three-phase power uses three AC voltages of equal frequency and amplitude but phase-shifted by 120°. It's more efficient for power distribution and industrial motors.",
+    "category": "Electrical Engineering",
+    "difficulty": "hard"
+  },
+  {
+    "id": 25,
+    "question": "What is the factor of safety in engineering design?",
+    "options": [
+      { "id": "A", "text": "The ratio of maximum strength to expected load" },
+      { "id": "B", "text": "The minimum load a structure can bear" },
+      { "id": "C", "text": "The cost of safety features" },
+      { "id": "D", "text": "The number of safety inspections required" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Factor of Safety (FoS) is the ratio of a structure's ultimate strength to the expected working load. A FoS > 1 indicates the design can safely handle loads with margin.",
+    "category": "General Engineering",
+    "difficulty": "medium"
+  }
+]
