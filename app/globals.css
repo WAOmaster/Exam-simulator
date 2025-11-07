@@ -13,8 +13,8 @@
   --muted: #f3f4f6;
   --muted-foreground: #6b7280;
 
-  /* Light mode specific overlays */
-  --overlay-bg: rgba(255, 255, 255, 0.4);
+  /* Light mode specific overlays - reduced opacity for better visibility */
+  --overlay-bg: rgba(255, 255, 255, 0.15);
   --overlay-strong: rgba(255, 255, 255, 0.6);
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(255, 255, 255, 0.3);
@@ -221,12 +221,20 @@ body {
   --tw-gradient-to: color-mix(in srgb, var(--secondary) 90%, black 10%) var(--tw-gradient-to-position);
 }
 
-/* Light text colors for gradients */
+/* Adaptive text colors - dark in light mode, light in dark mode */
 .text-theme-light {
+  color: rgba(23, 23, 23, 0.9);
+}
+
+.dark .text-theme-light {
   color: rgba(255, 255, 255, 0.9);
 }
 
 .text-theme-light-muted {
+  color: rgba(23, 23, 23, 0.7);
+}
+
+.dark .text-theme-light-muted {
   color: rgba(255, 255, 255, 0.7);
 }
 

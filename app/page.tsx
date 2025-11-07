@@ -94,8 +94,8 @@ export default function Home() {
             className="text-center mb-12"
           >
             <div className="flex items-center justify-center gap-3 mb-4">
-              <Trophy className="w-12 h-12 text-yellow-300 dark:text-yellow-400" />
-              <h1 className="text-5xl font-bold text-white">
+              <Trophy className="w-12 h-12 text-yellow-500 dark:text-yellow-400" />
+              <h1 className="text-5xl font-bold text-gray-900 dark:text-white">
                 AI Exam Generator
               </h1>
             </div>
@@ -488,7 +488,7 @@ export default function Home() {
                     <Zap className="w-5 h-5 text-yellow-300 fill-yellow-300" />
                   </div>
                 </div>
-                <span className="text-white font-semibold">Powered by</span>
+                <span className="text-gray-900 dark:text-white font-semibold">Powered by</span>
               </div>
               <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500">
                 <Sparkles className="w-4 h-4 text-white" />
