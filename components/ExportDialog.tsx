@@ -1,9 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { X, FileJson, FileSpreadsheet, FileText, Download, CheckCircle } from 'lucide-react';
+import { X, FileJson, FileSpreadsheet, FileText, Download, CheckCircle, File } from 'lucide-react';
 import { QuestionSet } from '@/lib/types';
-import { exportToJSON, exportToCSV, exportToPDF, exportQuestionsOnlyToPDF } from '@/lib/exportUtils';
+import {
+  exportToJSON,
+  exportToCSV,
+  exportToPDF,
+  exportQuestionsOnlyToPDF,
+  exportToMarkdown,
+  ExportOptions
+} from '@/lib/exportUtils';
 
 interface ExportDialogProps {
   isOpen: boolean;
@@ -11,12 +18,17 @@ interface ExportDialogProps {
   questionSet: QuestionSet;
 }
 
-type ExportFormat = 'json' | 'csv' | 'pdf-full' | 'pdf-questions';
+type ExportFormat = 'json' | 'csv' | 'markdown' | 'pdf-full' | 'pdf-questions';
 
 export default function ExportDialog({ isOpen, onClose, questionSet }: ExportDialogProps) {
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('pdf-full');
   const [isExporting, setIsExporting] = useState(false);
   const [exportComplete, setExportComplete] = useState(false);
+  const [options, setOptions] = useState<ExportOptions>({
+    includeAnswers: true,
+    includeExplanations: true,
+    includeMetadata: true,
+  });
 
   if (!isOpen) return null;
 
@@ -36,6 +48,13 @@ export default function ExportDialog({ isOpen, onClose, questionSet }: ExportDia
       color: 'green',
     },
     {
+      id: 'markdown' as ExportFormat,
+      label: 'Markdown',
+      description: 'Readable text format with formatting - Perfect for documentation',
+      icon: File,
+      color: 'purple',
+    },
+    {
       id: 'pdf-full' as ExportFormat,
       label: 'PDF (Full)',
       description: 'Complete PDF with questions, answers, and explanations',
@@ -47,7 +66,7 @@ export default function ExportDialog({ isOpen, onClose, questionSet }: ExportDia
       label: 'PDF (Questions Only)',
       description: 'PDF with questions only - Perfect for printing actual exams',
       icon: FileText,
-      color: 'purple',
+      color: 'orange',
     },
   ];
 
@@ -61,10 +80,13 @@ export default function ExportDialog({ isOpen, onClose, questionSet }: ExportDia
 
       switch (selectedFormat) {
         case 'json':
-          exportToJSON(questionSet);
+          exportToJSON(questionSet, options);
           break;
         case 'csv':
-          exportToCSV(questionSet);
+          exportToCSV(questionSet, options);
+          break;
+        case 'markdown':
+          exportToMarkdown(questionSet, options);
           break;
         case 'pdf-full':
           exportToPDF(questionSet);
@@ -138,9 +160,11 @@ export default function ExportDialog({ isOpen, onClose, questionSet }: ExportDia
                             ? 'bg-blue-100 dark:bg-blue-900/30'
                             : format.color === 'green'
                             ? 'bg-green-100 dark:bg-green-900/30'
+                            : format.color === 'purple'
+                            ? 'bg-purple-100 dark:bg-purple-900/30'
                             : format.color === 'red'
                             ? 'bg-red-100 dark:bg-red-900/30'
-                            : 'bg-purple-100 dark:bg-purple-900/30'
+                            : 'bg-orange-100 dark:bg-orange-900/30'
                         }`}
                       >
                         <Icon
@@ -149,9 +173,11 @@ export default function ExportDialog({ isOpen, onClose, questionSet }: ExportDia
                               ? 'text-blue-600 dark:text-blue-400'
                               : format.color === 'green'
                               ? 'text-green-600 dark:text-green-400'
+                              : format.color === 'purple'
+                              ? 'text-purple-600 dark:text-purple-400'
                               : format.color === 'red'
                               ? 'text-red-600 dark:text-red-400'
-                              : 'text-purple-600 dark:text-purple-400'
+                              : 'text-orange-600 dark:text-orange-400'
                           }`}
                         />
                       </div>
@@ -174,6 +200,73 @@ export default function ExportDialog({ isOpen, onClose, questionSet }: ExportDia
               })}
             </div>
           </div>
+
+          {/* Export Options - Only show for formats that support options */}
+          {['json', 'csv', 'markdown'].includes(selectedFormat) && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Export Options
+              </h3>
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={options.includeAnswers}
+                    onChange={(e) =>
+                      setOptions({ ...options, includeAnswers: e.target.checked })
+                    }
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <div>
+                    <div className="font-medium text-gray-800 dark:text-white">
+                      Include Answers
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      Show correct answers for each question
+                    </div>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={options.includeExplanations}
+                    onChange={(e) =>
+                      setOptions({ ...options, includeExplanations: e.target.checked })
+                    }
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <div>
+                    <div className="font-medium text-gray-800 dark:text-white">
+                      Include Explanations
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      Include detailed explanations for answers
+                    </div>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={options.includeMetadata}
+                    onChange={(e) =>
+                      setOptions({ ...options, includeMetadata: e.target.checked })
+                    }
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <div>
+                    <div className="font-medium text-gray-800 dark:text-white">
+                      Include Metadata
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      Include title, description, and statistics
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          )}
 
           {/* Info Box */}
           <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">

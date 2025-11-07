@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { QuestionSet } from '@/lib/types';
-import { Calendar, FileText, TrendingUp, Play, Trash2, Globe, Lock } from 'lucide-react';
+import { Calendar, FileText, TrendingUp, Play, Trash2, Globe, Lock, Download } from 'lucide-react';
+import ExportDialog from './ExportDialog';
 
 interface QuestionSetCardProps {
   questionSet: QuestionSet;
@@ -10,6 +12,7 @@ interface QuestionSetCardProps {
 }
 
 export default function QuestionSetCard({ questionSet, onStart, onDelete }: QuestionSetCardProps) {
+  const [showExportDialog, setShowExportDialog] = useState(false);
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -149,6 +152,14 @@ export default function QuestionSetCard({ questionSet, onStart, onDelete }: Ques
           Start Exam
         </button>
 
+        <button
+          onClick={() => setShowExportDialog(true)}
+          className="px-4 py-2 border border-green-300 dark:border-green-700 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+          title="Export"
+        >
+          <Download className="w-4 h-4" />
+        </button>
+
         {onDelete && (
           <button
             onClick={() => onDelete(questionSet)}
@@ -159,6 +170,13 @@ export default function QuestionSetCard({ questionSet, onStart, onDelete }: Ques
           </button>
         )}
       </div>
+
+      {/* Export Dialog */}
+      <ExportDialog
+        isOpen={showExportDialog}
+        onClose={() => setShowExportDialog(false)}
+        questionSet={questionSet}
+      />
     </div>
   );
 }

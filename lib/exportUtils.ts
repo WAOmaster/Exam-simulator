@@ -1,27 +1,54 @@
 import jsPDF from 'jspdf';
+import { saveAs } from 'file-saver';
 import { Question, QuestionSet } from './types';
+
+export interface ExportOptions {
+  includeAnswers?: boolean;
+  includeExplanations?: boolean;
+  includeMetadata?: boolean;
+}
 
 /**
  * Export question set to JSON format
  */
-export function exportToJSON(questionSet: QuestionSet): void {
-  const jsonString = JSON.stringify(questionSet, null, 2);
-  const blob = new Blob([jsonString], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
+export function exportToJSON(questionSet: QuestionSet, options: ExportOptions = {}): void {
+  const data = {
+    title: questionSet.title,
+    description: questionSet.description,
+    subject: questionSet.subject,
+    ...(options.includeMetadata !== false && {
+      metadata: questionSet.metadata,
+      createdAt: questionSet.createdAt,
+      updatedAt: questionSet.updatedAt,
+      sourceType: questionSet.sourceType,
+      isPublic: questionSet.isPublic,
+    }),
+    questions: questionSet.questions.map((q) => ({
+      id: q.id,
+      question: q.question,
+      options: q.options,
+      ...(options.includeAnswers !== false && { correctAnswer: q.correctAnswer }),
+      ...(options.includeExplanations !== false && { explanation: q.explanation }),
+      category: q.category,
+      difficulty: q.difficulty,
+      ...(q.type && { type: q.type }),
+    })),
+  };
 
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${sanitizeFilename(questionSet.title)}.json`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  const jsonString = JSON.stringify(data, null, 2);
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const filename = `${sanitizeFilename(questionSet.title)}.json`;
+  saveAs(blob, filename);
 }
 
 /**
  * Export questions to CSV format
  */
-export function exportToCSV(questionSet: QuestionSet): void {
+export function exportToCSV(questionSet: QuestionSet, options: ExportOptions = {}): void {
+  const includeAnswers = options.includeAnswers !== false;
+  const includeExplanations = options.includeExplanations !== false;
+  const includeMetadata = options.includeMetadata !== false;
+
   // CSV Headers
   const headers = [
     'Question Number',
@@ -30,8 +57,8 @@ export function exportToCSV(questionSet: QuestionSet): void {
     'Option B',
     'Option C',
     'Option D',
-    'Correct Answer',
-    'Explanation',
+    ...(includeAnswers ? ['Correct Answer'] : []),
+    ...(includeExplanations ? ['Explanation'] : []),
     'Difficulty',
     'Type',
     'Category'
@@ -51,31 +78,35 @@ export function exportToCSV(questionSet: QuestionSet): void {
       escapeCSV(optionB),
       escapeCSV(optionC),
       escapeCSV(optionD),
-      q.correctAnswer,
-      escapeCSV(q.explanation),
+      ...(includeAnswers ? [q.correctAnswer] : []),
+      ...(includeExplanations ? [escapeCSV(q.explanation)] : []),
       q.difficulty,
       q.type || 'multiple-choice',
       q.category
     ];
   });
 
-  // Combine headers and rows
+  // Combine metadata, headers and rows
   const csvContent = [
+    // Add metadata if included
+    ...(includeMetadata
+      ? [
+          ['Title', escapeCSV(questionSet.title)],
+          ['Description', escapeCSV(questionSet.description)],
+          ['Subject', questionSet.subject],
+          ['Total Questions', questionSet.questions.length.toString()],
+          ['Created', new Date(questionSet.createdAt).toLocaleDateString()],
+          [''], // Empty row
+        ].map(row => row.join(','))
+      : []),
     headers.join(','),
     ...rows.map(row => row.join(','))
   ].join('\n');
 
   // Create and download file
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${sanitizeFilename(questionSet.title)}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  const filename = `${sanitizeFilename(questionSet.title)}.csv`;
+  saveAs(blob, filename);
 }
 
 /**
@@ -370,6 +401,78 @@ export function exportResultsToPDF(
   });
 
   pdf.save(`${sanitizeFilename(questionSet.title)}_results.pdf`);
+}
+
+/**
+ * Export question set as Markdown
+ */
+export function exportToMarkdown(questionSet: QuestionSet, options: ExportOptions = {}): void {
+  const includeAnswers = options.includeAnswers !== false;
+  const includeExplanations = options.includeExplanations !== false;
+  const includeMetadata = options.includeMetadata !== false;
+
+  let markdown = '';
+
+  // Title and metadata
+  markdown += `# ${questionSet.title}\n\n`;
+  markdown += `${questionSet.description}\n\n`;
+
+  if (includeMetadata) {
+    markdown += `## Metadata\n\n`;
+    markdown += `- **Subject:** ${questionSet.subject}\n`;
+    markdown += `- **Total Questions:** ${questionSet.questions.length}\n`;
+    markdown += `- **Created:** ${new Date(questionSet.createdAt).toLocaleDateString()}\n`;
+    markdown += `- **Source:** ${questionSet.sourceType}\n\n`;
+
+    if (questionSet.metadata) {
+      const dist = questionSet.metadata.difficultyDistribution;
+      markdown += `### Difficulty Distribution\n\n`;
+      markdown += `- Easy: ${dist.easy} (${Math.round((dist.easy / questionSet.questions.length) * 100)}%)\n`;
+      markdown += `- Medium: ${dist.medium} (${Math.round((dist.medium / questionSet.questions.length) * 100)}%)\n`;
+      markdown += `- Hard: ${dist.hard} (${Math.round((dist.hard / questionSet.questions.length) * 100)}%)\n\n`;
+    }
+  }
+
+  markdown += `---\n\n`;
+  markdown += `## Questions\n\n`;
+
+  // Questions
+  questionSet.questions.forEach((q, index) => {
+    markdown += `### Question ${index + 1}\n\n`;
+    markdown += `**${q.question}**\n\n`;
+
+    // Options
+    q.options.forEach((opt) => {
+      const isCorrect = includeAnswers && opt.id === q.correctAnswer;
+      const marker = isCorrect ? '✅' : '○';
+      markdown += `${marker} **${opt.id}.** ${opt.text}\n`;
+    });
+
+    markdown += `\n`;
+
+    // Metadata
+    markdown += `*Category: ${q.category} | Difficulty: ${q.difficulty}*\n\n`;
+
+    // Answer
+    if (includeAnswers) {
+      markdown += `**Correct Answer:** ${q.correctAnswer}\n\n`;
+    }
+
+    // Explanation
+    if (includeExplanations) {
+      markdown += `**Explanation:**\n${q.explanation}\n\n`;
+    }
+
+    markdown += `---\n\n`;
+  });
+
+  // Footer
+  markdown += `\n*Generated from AI Exam Generator*\n`;
+
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8;' });
+  const filename = `${sanitizeFilename(questionSet.title)}.md`;
+
+  saveAs(blob, filename);
 }
 
 /**
