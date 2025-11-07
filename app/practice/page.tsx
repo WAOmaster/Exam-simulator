@@ -6,6 +6,7 @@ import { useExamStore } from '@/lib/store';
 import Timer from '@/components/Timer';
 import ProgressBar from '@/components/ProgressBar';
 import EvaluationPane from '@/components/EvaluationPane';
+import LearnWithAI from '@/components/LearnWithAI';
 import { ChevronLeft, ChevronRight, Home, AlertCircle } from 'lucide-react';
 
 export default function PracticePage() {
@@ -18,6 +19,7 @@ export default function PracticePage() {
     examStartTime,
     examDuration,
     useTimer,
+    learnWithAI,
     submitAnswer,
     nextQuestion,
     previousQuestion,
@@ -219,6 +221,15 @@ export default function PracticePage() {
                   );
                 })}
               </div>
+
+              {/* Learn with AI (only if enabled and answer is selected) */}
+              {learnWithAI && selectedAnswer && (
+                <LearnWithAI
+                  question={currentQuestion.question}
+                  options={currentQuestion.options}
+                  correctAnswer={currentQuestion.correctAnswer}
+                />
+              )}
             </div>
 
             {/* Navigation */}

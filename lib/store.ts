@@ -19,6 +19,7 @@ interface ExamState {
   examDuration: number; // in minutes
   mode: 'practice' | 'exam';
   useTimer: boolean;
+  learnWithAI: boolean; // AI-guided learning (practice mode only)
 
   // Question set management
   currentQuestionSetId: string | null;
@@ -28,7 +29,7 @@ interface ExamState {
   setQuestions: (questions: Question[]) => void;
   setCurrentQuestionIndex: (index: number) => void;
   submitAnswer: (questionId: number, selectedAnswer: string, isCorrect: boolean) => void;
-  startExam: (duration: number, mode?: 'practice' | 'exam', useTimer?: boolean) => void;
+  startExam: (duration: number, mode?: 'practice' | 'exam', useTimer?: boolean, learnWithAI?: boolean) => void;
   completeExam: () => void;
   resetExam: () => void;
   nextQuestion: () => void;
@@ -56,6 +57,7 @@ export const useExamStore = create<ExamState>()(
       examDuration: 90, // default 90 minutes
       mode: 'exam',
       useTimer: true,
+      learnWithAI: false,
 
       // Question set management
       currentQuestionSetId: null,
@@ -77,7 +79,7 @@ export const useExamStore = create<ExamState>()(
           return { userAnswers: newAnswers };
         }),
 
-      startExam: (duration, mode = 'exam', useTimer = true) =>
+      startExam: (duration, mode = 'exam', useTimer = true, learnWithAI = false) =>
         set({
           isExamStarted: true,
           isExamCompleted: false,
@@ -85,6 +87,7 @@ export const useExamStore = create<ExamState>()(
           examDuration: duration,
           mode,
           useTimer,
+          learnWithAI: mode === 'practice' ? learnWithAI : false, // Only enable in practice mode
           currentQuestionIndex: 0,
           userAnswers: new Map(),
         }),

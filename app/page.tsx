@@ -44,6 +44,7 @@ export default function Home() {
   const [examDuration, setExamDuration] = useState(90);
   const [mode, setMode] = useState<'practice' | 'exam'>('exam');
   const [useTimer, setUseTimer] = useState(true);
+  const [learnWithAI, setLearnWithAI] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [loadedQuestions, setLoadedQuestions] = useState<any[]>([]);
 
@@ -72,7 +73,7 @@ export default function Home() {
     // Load the selected subject's questions into the store
     setQuestions(loadedQuestions);
 
-    startExam(examDuration, mode, useTimer);
+    startExam(examDuration, mode, useTimer, learnWithAI);
     router.push(mode === 'practice' ? '/practice' : '/exam');
   };
 
@@ -433,6 +434,37 @@ export default function Home() {
                     </button>
                   </div>
                 </div>
+
+                {/* Learn with AI Toggle (Practice Mode Only) */}
+                {mode === 'practice' && (
+                  <div className="mb-8">
+                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-700 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                        <div>
+                          <h3 className="font-semibold text-gray-800 dark:text-gray-100">
+                            Learn with AI
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                            Get AI-guided learning for each question
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setLearnWithAI(!learnWithAI)}
+                        className={`relative w-14 h-8 rounded-full transition-colors ${
+                          learnWithAI ? 'bg-purple-600 dark:bg-purple-500' : 'bg-gray-300 dark:bg-gray-600'
+                        }`}
+                      >
+                        <div
+                          className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                            learnWithAI ? 'translate-x-6' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Exam Duration Selector (only if timer is enabled) */}
                 {useTimer && (

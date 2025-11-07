@@ -1067,6 +1067,168 @@ Implemented visual progress tracking that shows detailed stages of the generatio
 - Clear focus indicators
 - High contrast color schemes in both themes
 
+### Learn with AI Feature (Current Session)
+
+**Feature Implemented:**
+AI-guided learning system that helps students deeply understand the concepts behind each question, available exclusively in Practice Mode.
+
+---
+
+#### Problem:
+Students often want to understand not just whether their answer is correct, but the underlying concepts, related topics, and how to learn more about the subject matter. Traditional exam systems only provide explanations, not comprehensive learning guidance.
+
+#### Solution:
+Implemented an AI-powered learning companion that analyzes each question and provides structured, educational content including topic identification, key concepts, guided learning, and further study resources.
+
+#### Implementation:
+
+1. **Store Updates** (`lib/store.ts`)
+   - Added `learnWithAI: boolean` to exam state (practice mode only)
+   - Updated `startExam()` function signature to accept `learnWithAI` parameter
+   - Automatically disabled in exam mode (only available in practice mode)
+
+2. **Home Page** (`app/page.tsx`)
+   - Added Learn with AI toggle in exam setup (only visible when Practice Mode is selected)
+   - Beautiful purple/pink gradient styling to distinguish from other toggles
+   - State management with `learnWithAI` boolean
+   - Passed to `startExam()` when initiating practice session
+
+3. **API Endpoint** (`app/api/ai/learn/route.ts` - NEW)
+   - POST endpoint that accepts question, options, and correct answer
+   - Calls Gemini 2.0 Flash API with educational prompt
+   - Returns structured learning content:
+     * **Topic**: Specific topic/concept being tested
+     * **Subject Area**: Broader field (e.g., "Computer Science", "Physics")
+     * **Key Concepts**: 3-5 essential concepts (bulleted list)
+     * **Learning Guide**: Comprehensive explanation (max 300 words)
+       - Fundamental concepts in simple terms
+       - Why correct answer is correct
+       - Common misconceptions
+       - Connection to broader understanding
+     * **Further Learning**: 3-4 search queries/topics for deeper study
+   - Word limit enforcement (truncates at 300 words if exceeded)
+   - JSON parsing with fallback handling
+   - Error handling with friendly error messages
+
+4. **LearnWithAI Component** (`components/LearnWithAI.tsx` - NEW)
+   - Expandable panel with "Learn with AI" button
+   - Lazy loading: fetches content only when button clicked
+   - Animated expand/collapse with Framer Motion
+   - Beautiful gradient purple/pink styling consistent with theme
+   - Structured display sections:
+     * Header with Sparkles icon
+     * Topic and Subject Area in grid layout
+     * Key Concepts with bullet points and Lightbulb icon
+     * Guided Learning with BookOpen icon
+     * Further Learning with clickable Google search links
+   - Loading state with spinner
+   - Error handling with red error message
+   - Close button for collapsing panel
+
+5. **Practice Page Integration** (`app/practice/page.tsx`)
+   - Import LearnWithAI component
+   - Get `learnWithAI` from store
+   - Conditionally render LearnWithAI after question options
+   - Only shows when:
+     * `learnWithAI` is enabled
+     * User has selected an answer
+   - Positioned within question card for seamless UX
+
+#### Key Features:
+- ✅ **Practice Mode Only**: Exclusively available in practice mode to focus on learning
+- ✅ **On-Demand Loading**: Content fetched only when user clicks button
+- ✅ **Structured Learning**: Organized into clear sections (topic, concepts, guide, resources)
+- ✅ **Word Limit**: Learning guide capped at 300 words for focused, digestible content
+- ✅ **External Resources**: Clickable links to Google searches for each further learning topic
+- ✅ **Beautiful UI**: Gradient purple/pink styling with smooth animations
+- ✅ **Smart Caching**: Once loaded, content persists when toggling open/close
+- ✅ **Error Handling**: Graceful fallbacks and error messages
+- ✅ **Full Dark Mode**: Consistent theming in light and dark modes
+- ✅ **Accessible**: Keyboard navigable, semantic HTML, clear focus indicators
+
+#### User Flow:
+1. User selects Practice Mode on home page
+2. Toggle "Learn with AI" switch (shows purple/pink gradient toggle)
+3. Start practice session
+4. Answer a question (select any option)
+5. Click "Learn with AI" button (appears below options)
+6. AI analyzes question and generates learning content
+7. Expandable panel shows:
+   - Topic and subject area
+   - Key concepts to understand
+   - Guided learning explanation (max 300 words)
+   - Links to further learning resources
+8. User can close/reopen panel without reloading
+9. Navigate to next question and repeat
+
+#### Technical Highlights:
+
+**AI Prompt Engineering:**
+- Educational tone optimized for learning
+- Structured JSON output for consistent parsing
+- Temperature 0.7 for balanced creativity and accuracy
+- Max 2048 tokens for comprehensive responses
+- Explicit word limit enforcement in prompt
+
+**API Call:**
+```typescript
+POST /api/ai/learn
+Body: {
+  question: string,
+  options: Array<{id: string, text: string}>,
+  correctAnswer: string
+}
+Response: {
+  success: boolean,
+  learning: {
+    topic: string,
+    subjectArea: string,
+    keyConcepts: string[],
+    learningGuide: string,
+    furtherLearning: string[]
+  }
+}
+```
+
+**Performance:**
+- Lazy loading: API called only when button clicked
+- Content cached after first load
+- ~2-3 second response time with Gemini 2.0 Flash
+- No performance impact when feature disabled
+
+**Styling:**
+- Purple (#9333ea) to Pink (#db2777) gradients
+- Consistent with app's theme system
+- Smooth transitions and animations
+- Responsive design with proper spacing
+
+#### Files Created:
+- `app/api/ai/learn/route.ts` - 127 lines, AI learning API endpoint
+- `components/LearnWithAI.tsx` - 184 lines, learning content display component
+
+#### Files Modified:
+- `lib/store.ts` - Added learnWithAI state and parameter
+- `app/page.tsx` - Added Learn with AI toggle
+- `app/practice/page.tsx` - Integrated LearnWithAI component
+
+#### Benefits:
+- **Deeper Understanding**: Students learn concepts, not just memorize answers
+- **Self-Paced Learning**: Access learning content when ready
+- **Guided Discovery**: AI breaks down complex topics into digestible parts
+- **Extended Learning**: Links to external resources for deep dives
+- **Engaging UX**: Beautiful, interactive interface encourages exploration
+- **Practice-Focused**: Only available in practice mode to avoid exam mode distractions
+
+#### Future Enhancements (for Learn with AI):
+- [ ] Save learning content to review later
+- [ ] Personal learning history and progress tracking
+- [ ] Adaptive difficulty based on learning patterns
+- [ ] Video/image resources in further learning
+- [ ] Multi-language support
+- [ ] Voice narration of learning content
+
+---
+
 ## Future Enhancements
 
 - [x] Intelligent question extraction and completion
@@ -1076,8 +1238,9 @@ Implemented visual progress tracking that shows detailed stages of the generatio
 - [x] Theme system with dark/light mode
 - [x] Light mode improvements
 - [x] Light mode text visibility fixes
-- [x] Question editing after generation ✨ **NEW**
-- [x] Real-time progress tracking with visual feedback ✨ **NEW**
+- [x] Question editing after generation
+- [x] Real-time progress tracking with visual feedback
+- [x] Learn with AI - AI-guided learning for practice mode ✨ **NEW**
 - [ ] Color theme variants (currently disabled, future feature)
 - [ ] Incremental temp JSON storage for batch results
 - [ ] Knowledge Areas browser with pre-built sets
