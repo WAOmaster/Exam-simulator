@@ -125,3 +125,95 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* Theme-aware utility classes */
+.bg-theme-primary {
+  background-color: var(--primary);
+}
+
+.bg-theme-primary-hover:hover {
+  background-color: var(--primary-hover);
+}
+
+.bg-theme-primary-light {
+  background-color: var(--primary-light);
+}
+
+.bg-theme-secondary {
+  background-color: var(--secondary);
+}
+
+.text-theme-primary {
+  color: var(--primary);
+}
+
+.text-theme-primary-hover:hover {
+  color: var(--primary-hover);
+}
+
+.text-theme-secondary {
+  color: var(--secondary);
+}
+
+.text-theme-accent {
+  color: var(--accent);
+}
+
+.border-theme-primary {
+  border-color: var(--primary);
+}
+
+.border-theme-primary-hover:hover {
+  border-color: var(--primary-hover);
+}
+
+/* Gradient utilities with theme colors */
+.from-theme-primary {
+  --tw-gradient-from: var(--primary) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.from-theme-secondary {
+  --tw-gradient-from: var(--secondary) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.via-theme-secondary {
+  --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--secondary) var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+
+.via-theme-accent {
+  --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--accent) var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+
+.to-theme-secondary {
+  --tw-gradient-to: var(--secondary) var(--tw-gradient-to-position);
+}
+
+.to-theme-accent {
+  --tw-gradient-to: var(--accent) var(--tw-gradient-to-position);
+}
+
+/* Darker variants for hover states */
+.hover\:from-theme-primary-dark:hover {
+  --tw-gradient-from: var(--primary-hover) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.hover\:to-theme-secondary-dark:hover {
+  --tw-gradient-to: color-mix(in srgb, var(--secondary) 90%, black 10%) var(--tw-gradient-to-position);
+}
+
+/* Light text colors for gradients */
+.text-theme-light {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.text-theme-light-muted {
+  color: rgba(255, 255, 255, 0.7);
+}

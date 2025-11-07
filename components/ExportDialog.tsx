@@ -149,7 +149,7 @@ export default function ExportDialog({ isOpen, onClose, questionSet }: ExportDia
                     onClick={() => setSelectedFormat(format.id)}
                     className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
                       isSelected
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                        ? 'border-theme-primary bg-theme-primary-light'
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
@@ -187,7 +187,7 @@ export default function ExportDialog({ isOpen, onClose, questionSet }: ExportDia
                             {format.label}
                           </h4>
                           {isSelected && (
-                            <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                            <CheckCircle className="w-5 h-5 text-theme-primary" />
                           )}
                         </div>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -215,7 +215,8 @@ export default function ExportDialog({ isOpen, onClose, questionSet }: ExportDia
                     onChange={(e) =>
                       setOptions({ ...options, includeAnswers: e.target.checked })
                     }
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    className="w-4 h-4 bg-gray-100 border-gray-300 rounded focus:ring-2"
+                    style={{ accentColor: 'var(--primary)' }}
                   />
                   <div>
                     <div className="font-medium text-gray-800 dark:text-white">
@@ -234,7 +235,8 @@ export default function ExportDialog({ isOpen, onClose, questionSet }: ExportDia
                     onChange={(e) =>
                       setOptions({ ...options, includeExplanations: e.target.checked })
                     }
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    className="w-4 h-4 bg-gray-100 border-gray-300 rounded focus:ring-2"
+                    style={{ accentColor: 'var(--primary)' }}
                   />
                   <div>
                     <div className="font-medium text-gray-800 dark:text-white">
@@ -253,7 +255,8 @@ export default function ExportDialog({ isOpen, onClose, questionSet }: ExportDia
                     onChange={(e) =>
                       setOptions({ ...options, includeMetadata: e.target.checked })
                     }
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    className="w-4 h-4 bg-gray-100 border-gray-300 rounded focus:ring-2"
+                    style={{ accentColor: 'var(--primary)' }}
                   />
                   <div>
                     <div className="font-medium text-gray-800 dark:text-white">
@@ -269,8 +272,8 @@ export default function ExportDialog({ isOpen, onClose, questionSet }: ExportDia
           )}
 
           {/* Info Box */}
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
-            <p className="text-sm text-blue-900 dark:text-blue-100">
+          <div className="p-4 bg-theme-primary-light border border-theme-primary rounded-lg">
+            <p className="text-sm text-gray-900 dark:text-white">
               <strong>Note:</strong> The export will include {questionSet.questions.length} questions.
               {selectedFormat === 'pdf-questions' &&
                 ' The PDF will only contain questions (no answers or explanations).'}
@@ -290,7 +293,7 @@ export default function ExportDialog({ isOpen, onClose, questionSet }: ExportDia
           <button
             onClick={handleExport}
             disabled={isExporting || exportComplete}
-            className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 px-6 py-3 bg-theme-primary hover:bg-theme-primary-hover text-white font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {exportComplete ? (
               <>
