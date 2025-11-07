@@ -299,12 +299,12 @@ export default function GeneratePage() {
 
     try {
       // Initialize progress tracking
-      const isExtractionModeFinal = contentAnalysis?.hasQuestions;
+      const isExtractionModeFinal = contentAnalysis?.hasQuestions ?? false;
       const estimatedQuestions = contentAnalysis?.questionCount || config.numberOfQuestions;
       const isBatchMode = isExtractionModeFinal && estimatedQuestions > 25;
 
       // Create progress stages
-      const stages = initializeProgressStages(isExtractionModeFinal || false, estimatedQuestions, isBatchMode);
+      const stages = initializeProgressStages(isExtractionModeFinal, estimatedQuestions, isBatchMode);
       setProgressStages(stages);
       setCurrentStageIndex(0);
 

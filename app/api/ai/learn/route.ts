@@ -78,7 +78,7 @@ IMPORTANT:
       const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/) || text.match(/```\s*([\s\S]*?)\s*```/);
       const jsonText = jsonMatch ? jsonMatch[1] : text;
       learningData = JSON.parse(jsonText);
-    } catch (parseError) {
+    } catch {
       console.error('Failed to parse AI response:', text);
       // Return a fallback structure
       learningData = {
