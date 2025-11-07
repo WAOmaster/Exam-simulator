@@ -22,6 +22,9 @@ import {
   Cloud,
   CheckCircle,
   ChevronRight,
+  Wand2,
+  BookMarked,
+  Zap,
 } from 'lucide-react';
 import subjects from '@/data/default-questions/subjects.json';
 
@@ -113,11 +116,14 @@ export default function Home() {
           >
             <button
               onClick={() => router.push('/generate')}
-              className="group p-6 bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl shadow-xl transition-all hover:scale-105"
+              className="group p-6 bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl shadow-xl transition-all hover:scale-105 relative overflow-hidden"
             >
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-white bg-opacity-20 rounded-lg">
-                  <Plus className="w-8 h-8 text-white" />
+              <div className="absolute top-2 right-2 opacity-10">
+                <Sparkles className="w-16 h-16 text-white" />
+              </div>
+              <div className="flex items-center gap-4 relative z-10">
+                <div className="p-3 bg-white bg-opacity-20 rounded-lg backdrop-blur-sm">
+                  <Wand2 className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-left">
                   <h3 className="text-xl font-bold text-white mb-1">Generate Questions</h3>
@@ -128,11 +134,14 @@ export default function Home() {
 
             <button
               onClick={() => router.push('/library')}
-              className="group p-6 bg-gradient-to-br from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 rounded-xl shadow-xl transition-all hover:scale-105"
+              className="group p-6 bg-gradient-to-br from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 rounded-xl shadow-xl transition-all hover:scale-105 relative overflow-hidden"
             >
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-white bg-opacity-20 rounded-lg">
-                  <Library className="w-8 h-8 text-white" />
+              <div className="absolute top-2 right-2 opacity-10">
+                <BookMarked className="w-16 h-16 text-white" />
+              </div>
+              <div className="flex items-center gap-4 relative z-10">
+                <div className="p-3 bg-white bg-opacity-20 rounded-lg backdrop-blur-sm">
+                  <BookMarked className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-left">
                   <h3 className="text-xl font-bold text-white mb-1">My Library</h3>
@@ -167,32 +176,39 @@ export default function Home() {
                     <button
                       key={subject.id}
                       onClick={() => setSelectedSubject(subject.id)}
-                      className={`relative p-5 rounded-xl border-2 transition-all text-left group ${
+                      className={`relative p-5 rounded-xl border-2 transition-all text-left group overflow-hidden ${
                         isSelected
-                          ? 'border-blue-600 dark:border-blue-400 bg-gradient-to-br ' + subject.color + ' shadow-lg scale-105'
-                          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:scale-102'
+                          ? 'border-white dark:border-white bg-gradient-to-br ' + subject.color + ' shadow-2xl scale-105 ring-4 ring-white ring-opacity-30'
+                          : 'border-gray-300 dark:border-gray-600 bg-gradient-to-br ' + subject.color + ' bg-opacity-10 dark:bg-opacity-20 hover:border-opacity-50 hover:scale-102 hover:shadow-lg'
                       }`}
                     >
+                      {/* Background gradient overlay */}
+                      {!isSelected && (
+                        <div className="absolute inset-0 bg-white dark:bg-gray-900 opacity-90 dark:opacity-85" />
+                      )}
+
                       {isSelected && (
-                        <div className="absolute top-3 right-3">
-                          <CheckCircle className="w-6 h-6 text-white" />
+                        <div className="absolute top-3 right-3 z-10">
+                          <div className="bg-white bg-opacity-30 backdrop-blur-sm rounded-full p-1">
+                            <CheckCircle className="w-5 h-5 text-white" />
+                          </div>
                         </div>
                       )}
 
-                      <div className={`flex items-start gap-3 ${isSelected ? 'text-white' : 'text-gray-800 dark:text-gray-100'}`}>
-                        <div className={`p-2 rounded-lg ${isSelected ? 'bg-white bg-opacity-20' : 'bg-gray-100 dark:bg-gray-600'}`}>
-                          <Icon className={`w-6 h-6 ${isSelected ? 'text-white' : 'text-gray-700 dark:text-gray-300'}`} />
+                      <div className={`flex items-start gap-3 relative z-10 ${isSelected ? 'text-white' : 'text-gray-800 dark:text-gray-100'}`}>
+                        <div className={`p-2 rounded-lg ${isSelected ? 'bg-white bg-opacity-25 backdrop-blur-sm' : `bg-gradient-to-br ${subject.color} bg-opacity-20`}`}>
+                          <Icon className={`w-6 h-6 ${isSelected ? 'text-white' : ''}`} style={!isSelected ? {color: 'inherit'} : {}} />
                         </div>
                         <div className="flex-1">
                           <h3 className="font-bold text-lg mb-1">{subject.name}</h3>
-                          <p className={`text-sm mb-2 ${isSelected ? 'text-white text-opacity-90' : 'text-gray-600 dark:text-gray-300'}`}>
+                          <p className={`text-sm mb-2 ${isSelected ? 'text-white text-opacity-95' : 'text-gray-600 dark:text-gray-300'}`}>
                             {subject.description}
                           </p>
                           <div className="flex items-center gap-3 text-xs">
-                            <span className={`font-medium ${isSelected ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`}>
+                            <span className={`font-medium ${isSelected ? 'text-white text-opacity-90' : 'text-gray-600 dark:text-gray-400'}`}>
                               {subject.questionCount} questions
                             </span>
-                            <span className={`px-2 py-1 rounded ${isSelected ? 'bg-white bg-opacity-20 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'}`}>
+                            <span className={`px-2 py-1 rounded font-medium ${isSelected ? 'bg-white bg-opacity-25 backdrop-blur-sm text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}>
                               {subject.difficulty}
                             </span>
                           </div>
@@ -454,15 +470,31 @@ export default function Home() {
             </motion.div>
           )}
 
-          {/* Footer */}
-          <motion.p
+          {/* Footer with Gemini Branding */}
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-center text-blue-100 dark:text-blue-200 mt-8"
+            className="mt-8"
           >
-            Powered by Google Gemini AI • Generate questions from any subject
-          </motion.p>
+            <div className="flex items-center justify-center gap-3 p-4 bg-white bg-opacity-10 dark:bg-black dark:bg-opacity-20 backdrop-blur-md rounded-xl border border-white border-opacity-20">
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <Zap className="w-5 h-5 text-yellow-300 fill-yellow-300 animate-pulse" />
+                  <div className="absolute inset-0 blur-sm">
+                    <Zap className="w-5 h-5 text-yellow-300 fill-yellow-300" />
+                  </div>
+                </div>
+                <span className="text-white font-semibold">Powered by</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
+                <Sparkles className="w-4 h-4 text-white" />
+                <span className="text-white font-bold">Google Gemini AI</span>
+              </div>
+              <span className="text-blue-100 dark:text-blue-200 hidden sm:inline">•</span>
+              <span className="text-blue-100 dark:text-blue-200 hidden sm:inline">Generate questions from any subject</span>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>
