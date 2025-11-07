@@ -64,8 +64,9 @@ export default function ThemeSwitcher() {
         )}
       </motion.button>
 
-      {/* Color Theme Picker */}
-      <div className="relative">
+      {/* Color Theme Picker - DISABLED FOR NOW (Future Feature)
+      TODO: Re-enable color themes in future release */}
+      {false && <div className="relative">
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -132,7 +133,7 @@ export default function ThemeSwitcher() {
             </>
           )}
         </AnimatePresence>
-      </div>
+      </div>}
     </div>
   );
 }

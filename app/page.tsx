@@ -84,9 +84,7 @@ export default function Home() {
   const selectedSubjectData = subjects.find((s) => s.id === selectedSubject);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-theme-primary via-theme-secondary to-theme-accent dark:from-theme-primary dark:via-theme-secondary dark:to-theme-accent" style={{
-      backgroundImage: 'linear-gradient(to bottom right, var(--primary), var(--secondary), var(--accent))'
-    }}>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950 dark:via-purple-950 dark:to-pink-950">
       <div className="min-h-screen overlay-bg backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 py-12">
           {/* Header */}
@@ -118,10 +116,7 @@ export default function Home() {
           >
             <button
               onClick={() => router.push('/generate')}
-              className="group p-6 rounded-xl shadow-xl transition-all hover:scale-105 relative overflow-hidden"
-              style={{
-                backgroundImage: 'linear-gradient(to bottom right, var(--primary), var(--secondary))'
-              }}
+              className="group p-6 rounded-xl shadow-xl transition-all hover:scale-105 relative overflow-hidden bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
               <div className="absolute top-2 right-2 opacity-10">
                 <Sparkles className="w-16 h-16 text-white" />
@@ -234,11 +229,9 @@ export default function Home() {
               className="bg-card dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden transition-colors"
             >
               {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8 dark:from-gray-900 dark:to-gray-800" style={{
-                backgroundImage: 'linear-gradient(to right, color-mix(in srgb, var(--primary) 15%, white), color-mix(in srgb, var(--secondary) 15%, white))'
-              }}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
                 <div className="flex items-center gap-4 p-4 bg-card dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
-                  <FileText className="w-10 h-10 text-theme-primary" />
+                  <FileText className="w-10 h-10 text-blue-600 dark:text-blue-400" />
                   <div>
                     <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">
                       {loadedQuestions.length}
@@ -327,7 +320,7 @@ export default function Home() {
                     </div>
 
                     <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
-                      <Clock className="w-6 h-6 text-theme-primary mt-1" />
+                      <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400 mt-1" />
                       <div>
                         <h3 className="font-semibold text-gray-800 dark:text-gray-100">Timed Mode</h3>
                         <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -372,12 +365,12 @@ export default function Home() {
                       onClick={() => setMode('practice')}
                       className={`p-4 rounded-lg border-2 transition-all ${
                         mode === 'practice'
-                          ? 'border-theme-primary bg-theme-primary-light'
-                          : 'border-gray-300 dark:border-gray-600 bg-card dark:bg-gray-700 hover:border-theme-primary'
+                          ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30'
+                          : 'border-gray-300 dark:border-gray-600 bg-card dark:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Brain className={`w-6 h-6 ${mode === 'practice' ? 'text-theme-primary' : 'text-gray-500 dark:text-gray-400'}`} />
+                        <Brain className={`w-6 h-6 ${mode === 'practice' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`} />
                         <div className="text-left">
                           <h3 className={`font-semibold ${mode === 'practice' ? 'text-gray-900 dark:text-white' : 'text-gray-800 dark:text-gray-100'}`}>
                             Practice Mode
@@ -393,12 +386,12 @@ export default function Home() {
                       onClick={() => setMode('exam')}
                       className={`p-4 rounded-lg border-2 transition-all ${
                         mode === 'exam'
-                          ? 'border-theme-primary bg-theme-primary-light'
-                          : 'border-gray-300 dark:border-gray-600 bg-card dark:bg-gray-700 hover:border-theme-primary'
+                          ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30'
+                          : 'border-gray-300 dark:border-gray-600 bg-card dark:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Trophy className={`w-6 h-6 ${mode === 'exam' ? 'text-theme-primary' : 'text-gray-500 dark:text-gray-400'}`} />
+                        <Trophy className={`w-6 h-6 ${mode === 'exam' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`} />
                         <div className="text-left">
                           <h3 className={`font-semibold ${mode === 'exam' ? 'text-gray-900 dark:text-white' : 'text-gray-800 dark:text-gray-100'}`}>
                             Exam Mode
@@ -416,7 +409,7 @@ export default function Home() {
                 <div className="mb-8">
                   <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <div className="flex items-center gap-3">
-                      <Clock className="w-6 h-6 text-theme-primary" />
+                      <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                       <div>
                         <h3 className="font-semibold text-gray-800 dark:text-gray-100">
                           Use Timer
@@ -429,7 +422,7 @@ export default function Home() {
                     <button
                       onClick={() => setUseTimer(!useTimer)}
                       className={`relative w-14 h-8 rounded-full transition-colors ${
-                        useTimer ? 'bg-theme-primary' : 'bg-gray-300 dark:bg-gray-600'
+                        useTimer ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
                       }`}
                     >
                       <div
@@ -454,7 +447,7 @@ export default function Home() {
                           onClick={() => setExamDuration(duration)}
                           className={`px-6 py-3 rounded-lg font-medium transition-all ${
                             examDuration === duration
-                              ? 'bg-theme-primary text-white shadow-lg scale-105'
+                              ? 'bg-blue-600 dark:bg-blue-700 text-white shadow-lg scale-105'
                               : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                           }`}
                         >
@@ -497,9 +490,7 @@ export default function Home() {
                 </div>
                 <span className="text-white font-semibold">Powered by</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1 rounded-lg" style={{
-                backgroundImage: 'linear-gradient(to right, var(--primary), var(--secondary))'
-              }}>
+              <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500">
                 <Sparkles className="w-4 h-4 text-white" />
                 <span className="text-white font-bold">Google Gemini AI</span>
               </div>

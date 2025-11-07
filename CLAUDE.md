@@ -680,16 +680,150 @@ Look for:
 3. **503 overload** → Retry logic will switch models
 4. **Save failed** → Check question set structure and db.ts
 
+## Recent Development Work
+
+### Export Functionality (Commits: b0af4ff, ca5e925)
+
+**Feature:** Comprehensive export system for question sets
+
+**Implementations:**
+- Created `lib/exportUtils.ts` with export functions for multiple formats
+- Supported formats: JSON, CSV, Markdown, PDF (full), PDF (questions only)
+- Added `components/ExportDialog.tsx` with format selection and options
+- Integrated export button into `components/QuestionSetCard.tsx`
+- Configurable options: Include answers, explanations, and metadata
+
+**Dependencies Added:**
+- `file-saver` (^2.0.5) - For client-side file downloads
+- `@types/file-saver` (^2.0.7) - TypeScript definitions
+- `jspdf` - For PDF generation
+
+**Files Modified:**
+- `lib/exportUtils.ts` - Core export functionality
+- `components/ExportDialog.tsx` - Export UI modal
+- `components/QuestionSetCard.tsx` - Added export button
+- `package.json` - Added dependencies
+
+### Visual Enhancements (Commit: 6ca1f69)
+
+**Feature:** Enhanced home page visual appeal
+
+**Changes:**
+- Added native gradient colors to all subject cards in "Explore Sample Questions"
+- Updated quick action buttons with visual icons:
+  * Generate Questions: Wand2 icon
+  * My Library: BookMarked icon
+- Enhanced Gemini AI branding with animated Zap icon
+- Added gradient backgrounds and glassmorphism effects
+
+**Files Modified:**
+- `app/page.tsx` - Visual enhancements throughout
+- `data/default-questions/subjects.json` - Added gradient color definitions
+
+### Theme System Implementation (Commits: 7419223, e0e8571, 6b288a5)
+
+**Phase 1 - Theme Selector Fix (Commit: 7419223)**
+
+Problem: Theme color selector showed the currently active theme's color on all options instead of each option's native color.
+
+Solution:
+- Added `ringColor` and `dotColor` properties to theme definitions in `ThemeSwitcher.tsx`
+- Replaced dynamic `ring-primary` class with static theme-specific colors
+- Updated indicator dot from `var(--primary)` to static colors
+
+Result: Each theme option now correctly displays its own color (blue, purple, green, orange, pink)
+
+**Phase 2 - Theme-Aware Colors (Commit: e0e8571)**
+
+Problem: UI elements with hardcoded blue colors didn't change when switching themes.
+
+Solution:
+- Created theme-aware utility classes in `globals.css`:
+  * `.bg-theme-primary`, `.text-theme-primary`, `.border-theme-primary`
+  * Gradient utilities: `.from-theme-primary`, `.via-theme-secondary`, `.to-theme-accent`
+  * Light text utilities: `.text-theme-light`, `.text-theme-light-muted`
+- Replaced 40+ instances of hardcoded colors in `app/page.tsx`
+- Updated `QuestionSetCard.tsx` and `ExportDialog.tsx` components
+
+Files Modified:
+- `app/globals.css` - Added 20+ theme-aware utility classes
+- `app/page.tsx` - Replaced hardcoded colors (backgrounds, buttons, icons, text)
+- `components/QuestionSetCard.tsx` - "Start Exam" button
+- `components/ExportDialog.tsx` - Format selection, checkboxes, info box, export button
+
+Result: All 5 color themes (blue, purple, green, orange, pink) work correctly throughout the application.
+
+**Phase 3 - Light Mode Improvements (Commit: 6b288a5)**
+
+Problem: Light mode had poor contrast and didn't look as polished as dark mode.
+
+Solution:
+- Added light mode-specific CSS variables in `globals.css`:
+  * `--overlay-bg`: Adaptive overlays (white 40% light, black 30% dark)
+  * `--overlay-strong`: Stronger overlays (white 60% light, black 50% dark)
+  * `--glass-bg`: Glassmorphism backgrounds (white 70% light, black 20% dark)
+  * `--glass-border`: Border colors (white 30% light, white 20% dark)
+- Created new utility classes: `.overlay-bg`, `.glass-bg`, `.bg-card`, `.border-card`
+- Replaced 15+ hardcoded `bg-white` and `bg-black` instances in `app/page.tsx`
+
+Files Modified:
+- `app/globals.css` - Added adaptive overlay variables and utilities
+- `app/page.tsx` - Replaced hardcoded backgrounds with theme-aware classes
+
+Result: Light mode now features bright, clean overlays with proper contrast and professional glassmorphism effects.
+
+### Theme System Simplification (Current - Not Yet Committed)
+
+**Problem:**
+- Theme colors made UI too vivid and overpowering
+- Backgrounds didn't properly sync with dark/light mode
+- Overall visual experience was too colorful
+
+**Solution:**
+- Disabled color theme selector (kept code for future use)
+- Fixed backgrounds to respect light/dark mode properly
+- Set fixed blue color scheme as default
+- Removed dynamic theme color variables from backgrounds
+
+**Changes:**
+- `components/ThemeSwitcher.tsx`: Commented out color theme picker, kept only dark/light toggle
+- `app/page.tsx`: Replaced theme-color gradients with fixed subtle gradients:
+  * Main background: `from-blue-50 via-purple-50 to-pink-50` (light) / `from-blue-950 via-purple-950 to-pink-950` (dark)
+  * Generate Questions button: Fixed `from-blue-600 to-purple-600` gradient
+  * Stats section: Fixed `from-blue-50 to-purple-50` gradient (light)
+  * Gemini badge: Fixed `from-blue-500 to-purple-500` gradient
+  * Mode selectors: Fixed blue borders and backgrounds
+  * Timer toggle: Fixed blue background
+  * Duration buttons: Fixed blue active state
+- `components/QuestionSetCard.tsx`: Fixed blue "Start Exam" button
+- `components/ExportDialog.tsx`: Fixed blue selected format, checkmark, info box, and export button
+
+**Future Requirement:**
+The color theme system (blue, purple, green, orange, pink) remains in the codebase as a future feature. To re-enable:
+1. Uncomment color theme picker in `ThemeSwitcher.tsx`
+2. Restore theme-aware utility classes usage in components
+3. Update backgrounds to use CSS variables instead of fixed colors
+
+**Files Modified (Not Yet Committed):**
+- `components/ThemeSwitcher.tsx` - Commented out color picker
+- `app/page.tsx` - Fixed gradients and colors
+- `components/QuestionSetCard.tsx` - Fixed button color
+- `components/ExportDialog.tsx` - Fixed dialog colors
+
 ## Future Enhancements
 
 - [x] Intelligent question extraction and completion
 - [x] Batch processing for large question sets
+- [x] Comprehensive export functionality (JSON, CSV, Markdown, PDF)
+- [x] Visual home page enhancements
+- [x] Theme system with dark/light mode
+- [x] Light mode improvements
+- [ ] Color theme variants (currently disabled, future feature)
 - [ ] Real-time progress tracking with visual feedback
 - [ ] Incremental temp JSON storage for batch results
 - [ ] Question editing after generation
 - [ ] Knowledge Areas browser with pre-built sets
 - [ ] Community question sets with ratings
-- [ ] Export questions to various formats
 - [ ] Real-time collaboration on question sets
 - [ ] Advanced analytics and insights
 - [ ] Mobile app version
