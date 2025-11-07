@@ -1229,6 +1229,118 @@ Response: {
 
 ---
 
+### Exam Setup Modal for Library (Current Session)
+
+**Feature Implemented:**
+Added comprehensive exam configuration modal to library page, allowing users to fully customize their exam/practice session settings before starting from saved question sets.
+
+---
+
+#### Problem:
+When starting an exam from the library, users were forced into a hardcoded configuration (90 minutes, exam mode, timer on). They had no control over:
+- Mode selection (practice vs exam)
+- Timer preferences (on/off and duration)
+- Learn with AI feature (practice mode only)
+
+This inconsistency with the home page experience limited flexibility and user control.
+
+#### Solution:
+Implemented a modal dialog that appears when starting any exam from the library, providing the same configuration options available on the home page.
+
+#### Implementation:
+
+1. **ExamSetupModal Component** (`components/ExamSetupModal.tsx` - NEW)
+   - Full-screen modal with backdrop blur
+   - Displays question set title and question count
+   - Mode selection: Practice Mode vs Exam Mode (radio buttons with icons)
+   - Timer toggle: Enable/disable countdown timer
+   - Learn with AI toggle: Only visible in practice mode (purple/pink gradient)
+   - Duration selector: 30, 60, 90, 120 minutes (only when timer enabled)
+   - Action buttons: Cancel and Start (dynamic text based on mode)
+   - Framer Motion animations for smooth transitions
+   - Full dark mode support
+
+2. **Library Page Updates** (`app/library/page.tsx`)
+   - Added state: `showSetupModal`, `selectedQuestionSet`
+   - Updated `handleStartExam()`: Opens modal instead of directly starting
+   - Created `handleStartWithConfig()`: Starts exam with user-selected configuration
+   - Integrated modal component with conditional rendering
+   - Passes configuration to `startExam()` with all 4 parameters
+
+#### Key Features:
+- ✅ **Consistent UX**: Same configuration options as home page
+- ✅ **Mode Selection**: Choose between practice and exam mode
+- ✅ **Flexible Timer**: Toggle on/off and select duration
+- ✅ **Learn with AI**: Available in practice mode with purple/pink styling
+- ✅ **Smart Defaults**: Pre-selected sensible defaults (exam mode, timer on, 90 min)
+- ✅ **Beautiful Modal**: Professional design with backdrop blur and animations
+- ✅ **Dark Mode**: Full dark mode support throughout
+- ✅ **Accessible**: Keyboard navigable, clear focus indicators
+
+#### User Flow:
+1. Navigate to My Library page
+2. Browse saved question sets
+3. Click "Start Exam" on any question set
+4. **Modal appears** with configuration options:
+   - Select mode (Practice or Exam)
+   - Toggle timer on/off
+   - If practice mode: Toggle Learn with AI
+   - If timer on: Select duration (30/60/90/120 min)
+5. Click "Start Practice" or "Start Exam"
+6. Navigate to appropriate page with configured settings
+
+#### Technical Highlights:
+
+**Modal Props:**
+```typescript
+interface ExamSetupModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onStart: (config: {
+    mode: 'practice' | 'exam';
+    useTimer: boolean;
+    learnWithAI: boolean;
+    examDuration: number;
+  }) => void;
+  questionSetTitle: string;
+  questionCount: number;
+}
+```
+
+**Configuration Flow:**
+```typescript
+// Library page handler
+const handleStartWithConfig = (config) => {
+  resetExam();
+  loadQuestionSets(questionSets);
+  setCurrentQuestionSet(selectedQuestionSet.id);
+  startExam(config.examDuration, config.mode, config.useTimer, config.learnWithAI);
+  router.push(config.mode === 'practice' ? '/practice' : '/exam');
+};
+```
+
+**Styling:**
+- Backdrop: `bg-black/50 backdrop-blur-sm`
+- Modal: Max width 2xl, max height 90vh with scroll
+- Sticky header and footer for long content
+- Grid layouts for mode and duration selection
+- Consistent blue theme with purple/pink accents for Learn with AI
+
+#### Files Created:
+- `components/ExamSetupModal.tsx` - 267 lines, full modal implementation
+
+#### Files Modified:
+- `app/library/page.tsx` - Added modal integration and configuration handlers
+
+#### Benefits:
+- **User Control**: Full control over exam/practice settings from library
+- **Consistency**: Same experience as starting from home page
+- **Flexibility**: Can practice or take exams from the same question set with different settings
+- **Learn with AI Access**: Can enable AI-guided learning for any saved question set
+- **Better UX**: Clear, intuitive modal interface with smart defaults
+
+---
+
 ## Future Enhancements
 
 - [x] Intelligent question extraction and completion
