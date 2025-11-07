@@ -1341,6 +1341,149 @@ const handleStartWithConfig = (config) => {
 
 ---
 
+### Review Answers Feature (Current Session)
+
+**Feature Implemented:**
+Optional review capability for exam mode that allows students to review their submitted answers and see explanations during the exam, providing flexibility for different exam styles.
+
+---
+
+#### Problem:
+Traditional exam mode locked students into their answers with no ability to review explanations until the exam was complete. Some learning scenarios benefit from allowing students to:
+- Review their submitted answers during the exam
+- See explanations for questions they've already answered
+- Reflect on their understanding while still in exam mode
+
+However, this should be optional to support both strict exam conditions and more flexible learning assessments.
+
+#### Solution:
+Implemented an optional "Review Answers" toggle that can be enabled in exam mode, giving users control over whether they can review explanations during their exam session.
+
+#### Implementation:
+
+1. **Store Updates** (`lib/store.ts`)
+   - Added `reviewAnswers: boolean` to exam state (exam mode only)
+   - Updated `startExam()` function signature to accept `reviewAnswers` parameter
+   - Automatically disabled in practice mode (only available in exam mode)
+   - State set to `false` by default (strict exam mode)
+
+2. **Home Page** (`app/page.tsx`)
+   - Added Review Answers toggle in exam setup (only visible when Exam Mode is selected)
+   - Green/teal gradient styling to distinguish from other toggles
+   - State management with `reviewAnswers` boolean
+   - Passed to `startExam()` when initiating exam session
+
+3. **ExamSetupModal Component** (`components/ExamSetupModal.tsx`)
+   - Added Review Answers toggle to modal (exam mode only)
+   - Same green/teal gradient styling for consistency
+   - Included in configuration passed to library page
+   - Hidden when practice mode is selected
+
+4. **Library Page Updates** (`app/library/page.tsx`)
+   - Updated `handleStartWithConfig()` to accept `reviewAnswers` parameter
+   - Passes review configuration to `startExam()` function
+
+5. **Exam Page Integration** (`app/exam/page.tsx`)
+   - Import `reviewAnswers` from store
+   - Conditionally render "Review Answer" button based on `reviewAnswers` setting
+   - Button only appears when:
+     * Question has been answered
+     * Explanation is not currently shown
+     * Review mode is enabled by user
+   - Opens evaluation pane with explanation when clicked
+
+#### Key Features:
+- ✅ **Exam Mode Only**: Exclusively available in exam mode (practice mode has instant feedback)
+- ✅ **Optional Setting**: Disabled by default, users must explicitly enable
+- ✅ **Consistent UI**: Green/teal gradient styling distinguishes from other toggles
+- ✅ **Full Integration**: Works seamlessly with both home page and library setup
+- ✅ **Smart Conditional**: Review button only shows when appropriate
+- ✅ **Evaluation Pane**: Uses existing EvaluationPane component for consistency
+- ✅ **Full Dark Mode**: Consistent theming in light and dark modes
+- ✅ **Accessible**: Keyboard navigable, clear focus indicators
+
+#### User Flow:
+1. User selects Exam Mode on home page or in library modal
+2. Toggle "Review Answers" switch (shows green/teal gradient toggle)
+3. Start exam session
+4. Answer a question (select option and submit)
+5. "Review Answer" button appears (purple button between Previous and Next)
+6. Click "Review Answer" to open evaluation pane
+7. Evaluation pane shows:
+   - User's selected answer
+   - Correct answer
+   - Explanation
+   - Whether answer was correct/incorrect
+8. Close pane and continue with exam
+9. Navigate to next question
+
+#### Technical Highlights:
+
+**Store Function Signature:**
+```typescript
+startExam: (
+  duration: number,
+  mode?: 'practice' | 'exam',
+  useTimer?: boolean,
+  learnWithAI?: boolean,
+  reviewAnswers?: boolean
+) => void
+```
+
+**Conditional Rendering Logic:**
+```typescript
+// Exam page - app/exam/page.tsx
+{isAnswered && !showExplanation && reviewAnswers && (
+  <button onClick={handleReviewAnswer}>
+    Review Answer
+  </button>
+)}
+```
+
+**Configuration Flow:**
+```typescript
+// Home page or Library modal
+const handleStart = () => {
+  startExam(
+    examDuration,
+    'exam',
+    useTimer,
+    false, // learnWithAI (exam mode only)
+    reviewAnswers // NEW parameter
+  );
+};
+```
+
+**Styling:**
+- Toggle: `bg-gradient-to-r from-green-50 to-teal-50` (light mode)
+- Toggle: `from-green-900/20 to-teal-900/20` (dark mode)
+- Border: `border-green-200 dark:border-green-700`
+- Icon: `text-green-600 dark:text-green-400` (FileText icon)
+- Button: Purple gradient for "Review Answer" button
+
+#### Files Modified:
+- `lib/store.ts` - Added reviewAnswers state and parameter
+- `app/page.tsx` - Added Review Answers toggle
+- `components/ExamSetupModal.tsx` - Added Review Answers toggle to modal
+- `app/library/page.tsx` - Pass reviewAnswers config to startExam()
+- `app/exam/page.tsx` - Conditionally show review button
+
+#### Benefits:
+- **Flexible Assessment**: Supports both strict exams and flexible learning assessments
+- **User Control**: Students choose their exam style
+- **Better Learning**: Can review and learn during exam if enabled
+- **Maintains Integrity**: Disabled by default preserves traditional exam behavior
+- **Consistent UX**: Integrates seamlessly with existing exam flow
+- **Clear Distinction**: Green/teal color makes it visually distinct from other features
+
+#### Use Cases:
+- **Strict Exams**: Leave disabled for traditional exam conditions
+- **Open-Book Exams**: Enable for exams where reviewing is allowed
+- **Learning Assessments**: Enable for self-assessment and learning-focused exams
+- **Practice Exams**: Enable to combine exam format with learning feedback
+
+---
+
 ## Future Enhancements
 
 - [x] Intelligent question extraction and completion
@@ -1352,7 +1495,8 @@ const handleStartWithConfig = (config) => {
 - [x] Light mode text visibility fixes
 - [x] Question editing after generation
 - [x] Real-time progress tracking with visual feedback
-- [x] Learn with AI - AI-guided learning for practice mode ✨ **NEW**
+- [x] Learn with AI - AI-guided learning for practice mode
+- [x] Review Answers - Optional answer review in exam mode ✨ **NEW**
 - [ ] Color theme variants (currently disabled, future feature)
 - [ ] Incremental temp JSON storage for batch results
 - [ ] Knowledge Areas browser with pre-built sets
