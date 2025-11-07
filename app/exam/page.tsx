@@ -189,6 +189,7 @@ export default function ExamPage() {
               onSubmit={handleSubmit}
               isSubmitted={isAnswered}
               isLoading={isSubmitting}
+              showFeedback={reviewAnswers}
             />
 
             {/* Navigation */}
