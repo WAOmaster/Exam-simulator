@@ -772,7 +772,7 @@ Files Modified:
 
 Result: Light mode now features bright, clean overlays with proper contrast and professional glassmorphism effects.
 
-### Theme System Simplification (Current - Not Yet Committed)
+### Theme System Simplification (Commit: 5dcb975)
 
 **Problem:**
 - Theme colors made UI too vivid and overpowering
@@ -786,7 +786,7 @@ Result: Light mode now features bright, clean overlays with proper contrast and 
 - Removed dynamic theme color variables from backgrounds
 
 **Changes:**
-- `components/ThemeSwitcher.tsx`: Commented out color theme picker, kept only dark/light toggle
+- `components/ThemeSwitcher.tsx`: Disabled color theme picker using `{false && ...}` conditional, kept only dark/light toggle
 - `app/page.tsx`: Replaced theme-color gradients with fixed subtle gradients:
   * Main background: `from-blue-50 via-purple-50 to-pink-50` (light) / `from-blue-950 via-purple-950 to-pink-950` (dark)
   * Generate Questions button: Fixed `from-blue-600 to-purple-600` gradient
@@ -797,18 +797,66 @@ Result: Light mode now features bright, clean overlays with proper contrast and 
   * Duration buttons: Fixed blue active state
 - `components/QuestionSetCard.tsx`: Fixed blue "Start Exam" button
 - `components/ExportDialog.tsx`: Fixed blue selected format, checkmark, info box, and export button
+- `CLAUDE.md`: Added comprehensive documentation of all recent development work
+
+**Files Modified:**
+- `components/ThemeSwitcher.tsx` - Disabled color picker
+- `app/page.tsx` - Fixed 20+ color instances
+- `components/QuestionSetCard.tsx` - Fixed button color
+- `components/ExportDialog.tsx` - Fixed dialog colors
+- `CLAUDE.md` - Updated documentation
+
+**Result:**
+- UI now has consistent, subtle blue/purple/pink gradient aesthetic
+- Dark/light mode switching works across all backgrounds
+- Visual experience is more refined and less overwhelming
+- Color theme system preserved for future implementation
 
 **Future Requirement:**
 The color theme system (blue, purple, green, orange, pink) remains in the codebase as a future feature. To re-enable:
-1. Uncomment color theme picker in `ThemeSwitcher.tsx`
+1. Change `{false && ...}` to `{true && ...}` in ThemeSwitcher.tsx
 2. Restore theme-aware utility classes usage in components
 3. Update backgrounds to use CSS variables instead of fixed colors
 
-**Files Modified (Not Yet Committed):**
-- `components/ThemeSwitcher.tsx` - Commented out color picker
-- `app/page.tsx` - Fixed gradients and colors
-- `components/QuestionSetCard.tsx` - Fixed button color
-- `components/ExportDialog.tsx` - Fixed dialog colors
+### Light Mode Visibility Improvements (Commit: 098e86a)
+
+**Problem:**
+- Light mode had excessive white overlay (40% opacity), washing out all content
+- App title "AI Exam Generator" was invisible (white text on white background)
+- Subtitle and descriptions were invisible in light mode
+- Font colors weren't adapting properly between light and dark modes
+
+**Solution:**
+- Reduced overlay opacity from 40% to 15% for better content visibility
+- Made text utility classes adaptive to mode (dark text in light mode, light text in dark mode)
+- Fixed hardcoded `text-white` instances to use mode-aware classes
+
+**Changes:**
+- `app/globals.css`:
+  * Reduced `--overlay-bg` opacity: `rgba(255, 255, 255, 0.4)` → `rgba(255, 255, 255, 0.15)` (62.5% reduction)
+  * Updated `.text-theme-light` utility:
+    - Light mode: `rgba(23, 23, 23, 0.9)` - dark text
+    - Dark mode: `rgba(255, 255, 255, 0.9)` - light text
+  * Updated `.text-theme-light-muted` utility:
+    - Light mode: `rgba(23, 23, 23, 0.7)` - dark text
+    - Dark mode: `rgba(255, 255, 255, 0.7)` - light text
+
+- `app/page.tsx`:
+  * H1 title "AI Exam Generator": `text-white` → `text-gray-900 dark:text-white`
+  * Trophy icon: `text-yellow-300` → `text-yellow-500` (better visibility in light mode)
+  * Footer "Powered by" text: `text-white` → `text-gray-900 dark:text-white`
+
+**Files Modified:**
+- `app/globals.css` - Reduced overlay opacity, made text colors adaptive
+- `app/page.tsx` - Fixed 3 hardcoded white text instances
+
+**Result:**
+- Light mode now has proper contrast with all text clearly visible
+- Title, subtitles, and descriptions are dark gray in light mode
+- Reduced white overlay allows gradient background colors to show through
+- Dark mode remains unchanged and looks great
+- Smooth adaptive text colors across all content
+- Professional, polished appearance in both modes
 
 ## Future Enhancements
 
@@ -818,6 +866,7 @@ The color theme system (blue, purple, green, orange, pink) remains in the codeba
 - [x] Visual home page enhancements
 - [x] Theme system with dark/light mode
 - [x] Light mode improvements
+- [x] Light mode text visibility fixes
 - [ ] Color theme variants (currently disabled, future feature)
 - [ ] Real-time progress tracking with visual feedback
 - [ ] Incremental temp JSON storage for batch results
