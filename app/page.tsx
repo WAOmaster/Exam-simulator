@@ -87,7 +87,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-theme-primary via-theme-secondary to-theme-accent dark:from-theme-primary dark:via-theme-secondary dark:to-theme-accent" style={{
       backgroundImage: 'linear-gradient(to bottom right, var(--primary), var(--secondary), var(--accent))'
     }}>
-      <div className="min-h-screen bg-black bg-opacity-30 dark:bg-opacity-50 backdrop-blur-sm">
+      <div className="min-h-screen overlay-bg backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 py-12">
           {/* Header */}
           <motion.div
@@ -127,7 +127,7 @@ export default function Home() {
                 <Sparkles className="w-16 h-16 text-white" />
               </div>
               <div className="flex items-center gap-4 relative z-10">
-                <div className="p-3 bg-white bg-opacity-20 rounded-lg backdrop-blur-sm">
+                <div className="p-3 glass-bg rounded-lg backdrop-blur-sm">
                   <Wand2 className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-left">
@@ -145,7 +145,7 @@ export default function Home() {
                 <BookMarked className="w-16 h-16 text-white" />
               </div>
               <div className="flex items-center gap-4 relative z-10">
-                <div className="p-3 bg-white bg-opacity-20 rounded-lg backdrop-blur-sm">
+                <div className="p-3 glass-bg rounded-lg backdrop-blur-sm">
                   <BookMarked className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-left">
@@ -163,7 +163,7 @@ export default function Home() {
             transition={{ delay: 0.2 }}
             className="mb-8"
           >
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 transition-colors">
+            <div className="bg-card dark:bg-gray-800 rounded-2xl shadow-2xl p-8 transition-colors">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
                 <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                 Explore Sample Questions
@@ -189,19 +189,19 @@ export default function Home() {
                     >
                       {/* Background gradient overlay */}
                       {!isSelected && (
-                        <div className="absolute inset-0 bg-white dark:bg-gray-900 opacity-90 dark:opacity-85" />
+                        <div className="absolute inset-0 overlay-strong" />
                       )}
 
                       {isSelected && (
                         <div className="absolute top-3 right-3 z-10">
-                          <div className="bg-white bg-opacity-30 backdrop-blur-sm rounded-full p-1">
+                          <div className="glass-bg backdrop-blur-sm rounded-full p-1">
                             <CheckCircle className="w-5 h-5 text-white" />
                           </div>
                         </div>
                       )}
 
                       <div className={`flex items-start gap-3 relative z-10 ${isSelected ? 'text-white' : 'text-gray-800 dark:text-gray-100'}`}>
-                        <div className={`p-2 rounded-lg ${isSelected ? 'bg-white bg-opacity-25 backdrop-blur-sm' : `bg-gradient-to-br ${subject.color} bg-opacity-20`}`}>
+                        <div className={`p-2 rounded-lg ${isSelected ? 'glass-bg backdrop-blur-sm' : `bg-gradient-to-br ${subject.color} bg-opacity-20`}`}>
                           <Icon className={`w-6 h-6 ${isSelected ? 'text-white' : ''}`} style={!isSelected ? {color: 'inherit'} : {}} />
                         </div>
                         <div className="flex-1">
@@ -213,7 +213,7 @@ export default function Home() {
                             <span className={`font-medium ${isSelected ? 'text-white text-opacity-90' : 'text-gray-600 dark:text-gray-400'}`}>
                               {subject.questionCount} questions
                             </span>
-                            <span className={`px-2 py-1 rounded font-medium ${isSelected ? 'bg-white bg-opacity-25 backdrop-blur-sm text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}>
+                            <span className={`px-2 py-1 rounded font-medium ${isSelected ? 'glass-bg backdrop-blur-sm text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}>
                               {subject.difficulty}
                             </span>
                           </div>
@@ -231,13 +231,13 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden transition-colors"
+              className="bg-card dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden transition-colors"
             >
               {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8 dark:from-gray-900 dark:to-gray-800" style={{
                 backgroundImage: 'linear-gradient(to right, color-mix(in srgb, var(--primary) 15%, white), color-mix(in srgb, var(--secondary) 15%, white))'
               }}>
-                <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
+                <div className="flex items-center gap-4 p-4 bg-card dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
                   <FileText className="w-10 h-10 text-theme-primary" />
                   <div>
                     <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">
@@ -247,7 +247,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
+                <div className="flex items-center gap-4 p-4 bg-card dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
                   <div className={`p-2 rounded-lg bg-gradient-to-br ${selectedSubjectData.color}`}>
                     {(() => {
                       const Icon = iconMap[selectedSubjectData.icon] || FileText;
@@ -262,7 +262,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
+                <div className="flex items-center gap-4 p-4 bg-card dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
                   <Brain className="w-10 h-10 text-theme-accent" />
                   <div>
                     <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">AI</p>
@@ -373,7 +373,7 @@ export default function Home() {
                       className={`p-4 rounded-lg border-2 transition-all ${
                         mode === 'practice'
                           ? 'border-theme-primary bg-theme-primary-light'
-                          : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-theme-primary'
+                          : 'border-gray-300 dark:border-gray-600 bg-card dark:bg-gray-700 hover:border-theme-primary'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -394,7 +394,7 @@ export default function Home() {
                       className={`p-4 rounded-lg border-2 transition-all ${
                         mode === 'exam'
                           ? 'border-theme-primary bg-theme-primary-light'
-                          : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-theme-primary'
+                          : 'border-gray-300 dark:border-gray-600 bg-card dark:bg-gray-700 hover:border-theme-primary'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -487,7 +487,7 @@ export default function Home() {
             transition={{ delay: 0.4 }}
             className="mt-8"
           >
-            <div className="flex items-center justify-center gap-3 p-4 bg-white bg-opacity-10 dark:bg-black dark:bg-opacity-20 backdrop-blur-md rounded-xl border border-white border-opacity-20">
+            <div className="flex items-center justify-center gap-3 p-4 glass-bg backdrop-blur-md rounded-xl border border-glass">
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Zap className="w-5 h-5 text-yellow-300 fill-yellow-300 animate-pulse" />

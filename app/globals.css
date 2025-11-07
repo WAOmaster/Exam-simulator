@@ -12,6 +12,12 @@
   --card-border: #e5e7eb;
   --muted: #f3f4f6;
   --muted-foreground: #6b7280;
+
+  /* Light mode specific overlays */
+  --overlay-bg: rgba(255, 255, 255, 0.4);
+  --overlay-strong: rgba(255, 255, 255, 0.6);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
 }
 
 /* Dark Mode */
@@ -22,6 +28,12 @@
   --card-border: #2a2a2a;
   --muted: #1f1f1f;
   --muted-foreground: #9ca3af;
+
+  /* Dark mode specific overlays */
+  --overlay-bg: rgba(0, 0, 0, 0.3);
+  --overlay-strong: rgba(0, 0, 0, 0.5);
+  --glass-bg: rgba(0, 0, 0, 0.2);
+  --glass-border: rgba(255, 255, 255, 0.2);
 }
 
 /* Color Theme: Blue (Default) */
@@ -216,4 +228,30 @@ body {
 
 .text-theme-light-muted {
   color: rgba(255, 255, 255, 0.7);
+}
+
+/* Overlay and glass morphism utilities */
+.overlay-bg {
+  background-color: var(--overlay-bg);
+}
+
+.overlay-strong {
+  background-color: var(--overlay-strong);
+}
+
+.glass-bg {
+  background-color: var(--glass-bg);
+}
+
+.border-glass {
+  border-color: var(--glass-border);
+}
+
+/* Card background utility */
+.bg-card {
+  background-color: var(--card-bg);
+}
+
+.border-card {
+  border-color: var(--card-border);
 }
