@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Clock, Brain, Trophy, Sparkles } from 'lucide-react';
+import { X, Clock, Brain, Trophy, Sparkles, FileText } from 'lucide-react';
 
 interface ExamSetupModalProps {
   isOpen: boolean;
@@ -11,6 +11,7 @@ interface ExamSetupModalProps {
     mode: 'practice' | 'exam';
     useTimer: boolean;
     learnWithAI: boolean;
+    reviewAnswers: boolean;
     examDuration: number;
   }) => void;
   questionSetTitle: string;
@@ -27,10 +28,11 @@ export default function ExamSetupModal({
   const [mode, setMode] = useState<'practice' | 'exam'>('exam');
   const [useTimer, setUseTimer] = useState(true);
   const [learnWithAI, setLearnWithAI] = useState(false);
+  const [reviewAnswers, setReviewAnswers] = useState(false);
   const [examDuration, setExamDuration] = useState(90);
 
   const handleStart = () => {
-    onStart({ mode, useTimer, learnWithAI, examDuration });
+    onStart({ mode, useTimer, learnWithAI, reviewAnswers, examDuration });
   };
 
   const durations = [30, 60, 90, 120];
@@ -180,6 +182,37 @@ export default function ExamSetupModal({
                         <div
                           className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
                             learnWithAI ? 'translate-x-6' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Review Answers Toggle (Exam Mode Only) */}
+                {mode === 'exam' && (
+                  <div>
+                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 border border-green-200 dark:border-green-700 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <FileText className="w-6 h-6 text-green-600 dark:text-green-400" />
+                        <div>
+                          <h3 className="font-semibold text-gray-800 dark:text-gray-100">
+                            Review Answers
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                            Review answers during exam (optional)
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setReviewAnswers(!reviewAnswers)}
+                        className={`relative w-14 h-8 rounded-full transition-colors ${
+                          reviewAnswers ? 'bg-green-600 dark:bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
+                        }`}
+                      >
+                        <div
+                          className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                            reviewAnswers ? 'translate-x-6' : 'translate-x-0'
                           }`}
                         />
                       </button>

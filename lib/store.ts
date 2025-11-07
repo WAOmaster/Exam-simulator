@@ -20,6 +20,7 @@ interface ExamState {
   mode: 'practice' | 'exam';
   useTimer: boolean;
   learnWithAI: boolean; // AI-guided learning (practice mode only)
+  reviewAnswers: boolean; // Review answers during exam (exam mode only)
 
   // Question set management
   currentQuestionSetId: string | null;
@@ -29,7 +30,7 @@ interface ExamState {
   setQuestions: (questions: Question[]) => void;
   setCurrentQuestionIndex: (index: number) => void;
   submitAnswer: (questionId: number, selectedAnswer: string, isCorrect: boolean) => void;
-  startExam: (duration: number, mode?: 'practice' | 'exam', useTimer?: boolean, learnWithAI?: boolean) => void;
+  startExam: (duration: number, mode?: 'practice' | 'exam', useTimer?: boolean, learnWithAI?: boolean, reviewAnswers?: boolean) => void;
   completeExam: () => void;
   resetExam: () => void;
   nextQuestion: () => void;
@@ -58,6 +59,7 @@ export const useExamStore = create<ExamState>()(
       mode: 'exam',
       useTimer: true,
       learnWithAI: false,
+      reviewAnswers: false,
 
       // Question set management
       currentQuestionSetId: null,
@@ -79,7 +81,7 @@ export const useExamStore = create<ExamState>()(
           return { userAnswers: newAnswers };
         }),
 
-      startExam: (duration, mode = 'exam', useTimer = true, learnWithAI = false) =>
+      startExam: (duration, mode = 'exam', useTimer = true, learnWithAI = false, reviewAnswers = false) =>
         set({
           isExamStarted: true,
           isExamCompleted: false,
@@ -88,6 +90,7 @@ export const useExamStore = create<ExamState>()(
           mode,
           useTimer,
           learnWithAI: mode === 'practice' ? learnWithAI : false, // Only enable in practice mode
+          reviewAnswers: mode === 'exam' ? reviewAnswers : false, // Only enable in exam mode
           currentQuestionIndex: 0,
           userAnswers: new Map(),
         }),

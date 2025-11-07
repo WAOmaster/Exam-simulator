@@ -75,6 +75,7 @@ export default function LibraryPage() {
     mode: 'practice' | 'exam';
     useTimer: boolean;
     learnWithAI: boolean;
+    reviewAnswers: boolean;
     examDuration: number;
   }) => {
     if (!selectedQuestionSet) return;
@@ -87,7 +88,7 @@ export default function LibraryPage() {
     setCurrentQuestionSet(selectedQuestionSet.id); // Set questions from the set
 
     // Now start the exam with the configured settings
-    startExam(config.examDuration, config.mode, config.useTimer, config.learnWithAI);
+    startExam(config.examDuration, config.mode, config.useTimer, config.learnWithAI, config.reviewAnswers);
 
     // Close modal
     setShowSetupModal(false);
