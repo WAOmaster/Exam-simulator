@@ -20,6 +20,7 @@ export default function ExamPage() {
     examStartTime,
     examDuration,
     useTimer,
+    reviewAnswers,
     submitAnswer,
     nextQuestion,
     previousQuestion,
@@ -206,7 +207,7 @@ export default function ExamPage() {
               </button>
 
               <div className="flex gap-3">
-                {isAnswered && !showExplanation && (
+                {isAnswered && !showExplanation && reviewAnswers && (
                   <button
                     onClick={handleReviewAnswer}
                     className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
