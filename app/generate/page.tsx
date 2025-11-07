@@ -9,10 +9,16 @@ import URLInput from '@/components/URLInput';
 import GenerationControls from '@/components/GenerationControls';
 import QuestionPreview from '@/components/QuestionPreview';
 import SaveDialog from '@/components/SaveDialog';
+import ProgressTracker, { ProgressStage } from '@/components/ProgressTracker';
 import { useExamStore } from '@/lib/store';
 import { GenerationConfig, ContentSource, Question, QuestionSet } from '@/lib/types';
 
 type InputTab = 'upload' | 'url' | 'search' | 'text';
+
+// Helper function to edit a question in the generated questions array
+const editQuestionInArray = (questions: Question[], questionId: number, updatedQuestion: Question): Question[] => {
+  return questions.map((q) => (q.id === questionId ? { ...updatedQuestion, id: questionId } : q));
+};
 
 // Helper function to convert InputTab to QuestionSet sourceType
 const getSourceType = (tab: InputTab): 'upload' | 'url' | 'search' | 'manual' | 'pre-built' => {
@@ -100,6 +106,11 @@ export default function GeneratePage() {
     preview: string;
   } | null>(null);
   const [progressMessage, setProgressMessage] = useState<string>('');
+  const [showProgress, setShowProgress] = useState(false);
+  const [progressStages, setProgressStages] = useState<ProgressStage[]>([]);
+  const [currentStageIndex, setCurrentStageIndex] = useState(0);
+  const [progressComplete, setProgressComplete] = useState(false);
+  const [progressError, setProgressError] = useState(false);
 
   const tabs = [
     { id: 'upload' as InputTab, label: 'Upload File', icon: Upload },
@@ -165,6 +176,54 @@ export default function GeneratePage() {
       questionCount: hasQuestions ? estimatedQuestions : 0,
       preview,
     });
+  };
+
+  // Initialize progress stages based on generation type
+  const initializeProgressStages = (isExtraction: boolean, estimatedQuestions: number, isBatch: boolean): ProgressStage[] => {
+    if (isExtraction && isBatch) {
+      const numBatches = Math.ceil(estimatedQuestions / 15);
+      return [
+        { label: 'Analyzing content structure', status: 'pending' },
+        { label: `Splitting into ${numBatches} batches`, status: 'pending' },
+        { label: `Processing batch operations (${numBatches} batches)`, status: 'pending' },
+        { label: 'Combining results', status: 'pending' },
+        { label: 'Validating questions', status: 'pending' },
+        { label: 'Finalizing', status: 'pending' },
+      ];
+    } else if (isExtraction) {
+      return [
+        { label: 'Analyzing content structure', status: 'pending' },
+        { label: 'Detecting question patterns', status: 'pending' },
+        { label: 'Extracting questions', status: 'pending' },
+        { label: 'Completing missing information', status: 'pending' },
+        { label: 'Generating explanations', status: 'pending' },
+        { label: 'Finalizing', status: 'pending' },
+      ];
+    } else {
+      return [
+        { label: 'Analyzing content', status: 'pending' },
+        { label: 'Identifying key concepts', status: 'pending' },
+        { label: 'Generating questions', status: 'pending' },
+        { label: 'Creating answer options', status: 'pending' },
+        { label: 'Writing explanations', status: 'pending' },
+        { label: 'Finalizing', status: 'pending' },
+      ];
+    }
+  };
+
+  // Simulate progress through stages
+  const simulateProgress = async (stages: ProgressStage[], totalDuration: number) => {
+    const stageDelay = totalDuration / stages.length;
+
+    for (let i = 0; i < stages.length; i++) {
+      setCurrentStageIndex(i);
+      setProgressStages(prev => prev.map((stage, idx) => ({
+        ...stage,
+        status: idx === i ? 'in_progress' : idx < i ? 'completed' : 'pending',
+      })));
+
+      await new Promise(resolve => setTimeout(resolve, stageDelay));
+    }
   };
 
   const handleFileProcessed = (content: string, fileName: string) => {
@@ -234,20 +293,30 @@ export default function GeneratePage() {
     setError('');
     setGeneratedQuestions([]);
     setProgressMessage('');
+    setShowProgress(true);
+    setProgressComplete(false);
+    setProgressError(false);
 
     try {
-      // Show initial progress message
+      // Initialize progress tracking
       const isExtractionModeFinal = contentAnalysis?.hasQuestions;
       const estimatedQuestions = contentAnalysis?.questionCount || config.numberOfQuestions;
+      const isBatchMode = isExtractionModeFinal && estimatedQuestions > 25;
 
-      if (isExtractionModeFinal && estimatedQuestions > 25) {
-        const numBatches = Math.ceil(estimatedQuestions / 15);
-        setProgressMessage(`Processing ${estimatedQuestions} questions in ${numBatches} batches...`);
-      } else if (isExtractionModeFinal) {
-        setProgressMessage(`Extracting ${estimatedQuestions} questions...`);
-      } else {
-        setProgressMessage(`Generating ${config.numberOfQuestions} questions...`);
-      }
+      // Create progress stages
+      const stages = initializeProgressStages(isExtractionModeFinal || false, estimatedQuestions, isBatchMode);
+      setProgressStages(stages);
+      setCurrentStageIndex(0);
+
+      // Calculate expected duration (rough estimates)
+      const expectedDuration = isBatchMode
+        ? Math.ceil(estimatedQuestions / 15) * 3000 // 3 seconds per batch
+        : estimatedQuestions > 10
+        ? 8000 // 8 seconds for medium sets
+        : 5000; // 5 seconds for small sets
+
+      // Start progress simulation
+      const progressPromise = simulateProgress(stages, expectedDuration);
 
       // Pass estimated count to backend to override its detection
       const enhancedConfig = {
@@ -255,6 +324,7 @@ export default function GeneratePage() {
         estimatedQuestionCount: isExtractionModeFinal ? estimatedQuestions : undefined
       };
 
+      // Make API call
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -263,16 +333,39 @@ export default function GeneratePage() {
 
       const data = await response.json();
 
+      // Wait for progress simulation to complete
+      await progressPromise;
+
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Failed to generate questions');
       }
 
+      // Mark all stages as completed
+      setProgressStages(prev => prev.map(stage => ({ ...stage, status: 'completed' })));
+      setCurrentStageIndex(stages.length);
+      setProgressComplete(true);
+
+      // Set results
       setGeneratedQuestions(data.questions);
       setProcessingMode(data.metadata?.processingMode || 'generated');
-      setProgressMessage(''); // Clear progress on success
+
+      // Hide progress after a short delay
+      setTimeout(() => {
+        setShowProgress(false);
+      }, 2000);
     } catch (err: any) {
       setError(err.message || 'Failed to generate questions');
-      setProgressMessage(''); // Clear progress on error
+      setProgressError(true);
+      setProgressStages(prev => prev.map((stage, idx) => ({
+        ...stage,
+        status: idx === currentStageIndex ? 'error' : stage.status,
+        message: idx === currentStageIndex ? err.message : stage.message,
+      })));
+
+      // Hide progress after showing error
+      setTimeout(() => {
+        setShowProgress(false);
+      }, 3000);
     } finally {
       setIsGenerating(false);
     }
@@ -289,6 +382,11 @@ export default function GeneratePage() {
     } catch (err: any) {
       throw new Error(err.message || 'Failed to save question set');
     }
+  };
+
+  const handleEditQuestion = (questionId: number, updatedQuestion: Question) => {
+    // Update the generated questions array
+    setGeneratedQuestions(prev => editQuestionInArray(prev, questionId, updatedQuestion));
   };
 
   const handleStartExam = () => {
@@ -570,19 +668,14 @@ export default function GeneratePage() {
               </button>
             </div>
 
-            {/* Progress Message */}
-            {progressMessage && (
-              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Loader2 className="w-5 h-5 animate-spin text-blue-600 dark:text-blue-400" />
-                  <p className="text-sm font-medium text-blue-800 dark:text-blue-200">{progressMessage}</p>
-                </div>
-                <p className="text-xs text-blue-600 dark:text-blue-300 mt-2">
-                  {contentAnalysis?.questionCount && contentAnalysis.questionCount > 25
-                    ? 'Large question sets are processed in batches to ensure quality. This may take 30-60 seconds.'
-                    : 'Processing your request...'}
-                </p>
-              </div>
+            {/* Progress Tracker */}
+            {showProgress && (
+              <ProgressTracker
+                stages={progressStages}
+                currentStageIndex={currentStageIndex}
+                isComplete={progressComplete}
+                hasError={progressError}
+              />
             )}
 
             {/* Error Message */}
@@ -617,7 +710,10 @@ export default function GeneratePage() {
                     </div>
                   )}
 
-                  <QuestionPreview questions={generatedQuestions} />
+                  <QuestionPreview
+                    questions={generatedQuestions}
+                    onEditQuestion={handleEditQuestion}
+                  />
 
                   <div className="flex flex-col gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <button

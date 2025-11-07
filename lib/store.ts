@@ -36,6 +36,7 @@ interface ExamState {
   goToQuestion: (index: number) => void;
   getScore: () => { correct: number; total: number; percentage: number };
   updateQuestionExplanation: (questionId: number, explanation: string) => void;
+  editQuestion: (questionId: number, updatedQuestion: Question) => void;
 
   // Question set actions
   setCurrentQuestionSet: (questionSetId: string) => void;
@@ -141,6 +142,34 @@ export const useExamStore = create<ExamState>()(
                 questions: questionSet.questions.map((q) =>
                   q.id === questionId ? { ...q, explanation } : q
                 ),
+              };
+            }
+            return questionSet;
+          });
+
+          return {
+            questions: updatedQuestions,
+            availableQuestionSets: updatedQuestionSets,
+          };
+        }),
+
+      editQuestion: (questionId, updatedQuestion) =>
+        set((state) => {
+          // Update the question in the questions array
+          const updatedQuestions = state.questions.map((q) =>
+            q.id === questionId ? { ...updatedQuestion, id: questionId } : q
+          );
+
+          // Also update in available question sets if this question belongs to one
+          const updatedQuestionSets = state.availableQuestionSets.map((questionSet) => {
+            const hasQuestion = questionSet.questions.some((q) => q.id === questionId);
+            if (hasQuestion) {
+              return {
+                ...questionSet,
+                questions: questionSet.questions.map((q) =>
+                  q.id === questionId ? { ...updatedQuestion, id: questionId } : q
+                ),
+                updatedAt: new Date().toISOString(),
               };
             }
             return questionSet;

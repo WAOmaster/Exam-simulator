@@ -1,13 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import { Question } from '@/lib/types';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Edit2 } from 'lucide-react';
+import QuestionEditModal from './QuestionEditModal';
 
 interface QuestionPreviewProps {
   questions: Question[];
+  onEditQuestion?: (questionId: number, updatedQuestion: Question) => void;
 }
 
-export default function QuestionPreview({ questions }: QuestionPreviewProps) {
+export default function QuestionPreview({ questions, onEditQuestion }: QuestionPreviewProps) {
+  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   if (questions.length === 0) {
     return null;
   }
@@ -52,6 +56,15 @@ export default function QuestionPreview({ questions }: QuestionPreviewProps) {
                   {question.question}
                 </p>
               </div>
+              {onEditQuestion && (
+                <button
+                  onClick={() => setEditingQuestion(question)}
+                  className="ml-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0"
+                  title="Edit question"
+                >
+                  <Edit2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                </button>
+              )}
             </div>
 
             {/* Options */}
@@ -106,6 +119,20 @@ export default function QuestionPreview({ questions }: QuestionPreviewProps) {
           </div>
         ))}
       </div>
+
+      {/* Edit Modal */}
+      {editingQuestion && (
+        <QuestionEditModal
+          question={editingQuestion}
+          onSave={(updatedQuestion) => {
+            if (onEditQuestion) {
+              onEditQuestion(editingQuestion.id, updatedQuestion);
+            }
+            setEditingQuestion(null);
+          }}
+          onClose={() => setEditingQuestion(null)}
+        />
+      )}
     </div>
   );
 }
