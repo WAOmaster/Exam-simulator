@@ -80,9 +80,16 @@ export default function ExamPage() {
     // Submit the answer
     submitAnswer(currentQuestion.id, selectedAnswer, isCorrect);
 
-    // In exam mode, don't show explanation automatically
+    // In exam mode without review, auto-advance to next question
     setTimeout(() => {
       setIsSubmitting(false);
+
+      // Auto-advance if review answers is disabled
+      if (!reviewAnswers) {
+        setTimeout(() => {
+          handleNext();
+        }, 300);
+      }
     }, 300);
   };
 
