@@ -9,14 +9,75 @@ import URLInput from '@/components/URLInput';
 import GenerationControls from '@/components/GenerationControls';
 import QuestionPreview from '@/components/QuestionPreview';
 import SaveDialog from '@/components/SaveDialog';
+import ProgressTracker, { ProgressStage } from '@/components/ProgressTracker';
 import { useExamStore } from '@/lib/store';
 import { GenerationConfig, ContentSource, Question, QuestionSet } from '@/lib/types';
 
 type InputTab = 'upload' | 'url' | 'search' | 'text';
 
+// Helper function to edit a question in the generated questions array
+const editQuestionInArray = (questions: Question[], questionId: number, updatedQuestion: Question): Question[] => {
+  return questions.map((q) => (q.id === questionId ? { ...updatedQuestion, id: questionId } : q));
+};
+
 // Helper function to convert InputTab to QuestionSet sourceType
 const getSourceType = (tab: InputTab): 'upload' | 'url' | 'search' | 'manual' | 'pre-built' => {
   return tab === 'text' ? 'manual' : tab;
+};
+
+// Helper function to generate smart title based on configuration
+const generateTitle = (config: GenerationConfig, activeTab: InputTab, searchQuery?: string): string => {
+  const subject = config.subject || 'General';
+
+  if (activeTab === 'search' && searchQuery) {
+    // For search, use the search query as the basis
+    return `${searchQuery} - Practice Questions`;
+  }
+
+  if (config.topicFocus) {
+    // If there's a topic focus, use it
+    return `${config.topicFocus} - ${subject} Questions`;
+  }
+
+  // Default: subject-based title
+  return `${subject} Practice Questions`;
+};
+
+// Helper function to generate smart description
+const generateDescription = (config: GenerationConfig, activeTab: InputTab, questionCount: number, searchQuery?: string): string => {
+  const parts: string[] = [];
+
+  // Add question count
+  parts.push(`${questionCount} ${config.difficulty === 'mixed' ? 'mixed difficulty' : config.difficulty} questions`);
+
+  // Add subject
+  if (config.subject) {
+    parts.push(`covering ${config.subject}`);
+  }
+
+  // Add source-specific details
+  if (activeTab === 'search' && searchQuery) {
+    parts.push(`generated from search: "${searchQuery}"`);
+  } else if (activeTab === 'upload') {
+    parts.push('extracted from uploaded file');
+  } else if (activeTab === 'url') {
+    parts.push('generated from web content');
+  } else if (activeTab === 'text') {
+    parts.push('generated from provided text');
+  }
+
+  // Add topic focus if present
+  if (config.topicFocus) {
+    parts.push(`with focus on ${config.topicFocus}`);
+  }
+
+  // Add question types
+  if (config.questionTypes.length > 0) {
+    const types = config.questionTypes.join(', ').replace('multiple-choice', 'multiple choice').replace('true-false', 'true/false');
+    parts.push(`(${types})`);
+  }
+
+  return parts.join(' ');
 };
 
 export default function GeneratePage() {
@@ -45,6 +106,11 @@ export default function GeneratePage() {
     preview: string;
   } | null>(null);
   const [progressMessage, setProgressMessage] = useState<string>('');
+  const [showProgress, setShowProgress] = useState(false);
+  const [progressStages, setProgressStages] = useState<ProgressStage[]>([]);
+  const [currentStageIndex, setCurrentStageIndex] = useState(0);
+  const [progressComplete, setProgressComplete] = useState(false);
+  const [progressError, setProgressError] = useState(false);
 
   const tabs = [
     { id: 'upload' as InputTab, label: 'Upload File', icon: Upload },
@@ -110,6 +176,54 @@ export default function GeneratePage() {
       questionCount: hasQuestions ? estimatedQuestions : 0,
       preview,
     });
+  };
+
+  // Initialize progress stages based on generation type
+  const initializeProgressStages = (isExtraction: boolean, estimatedQuestions: number, isBatch: boolean): ProgressStage[] => {
+    if (isExtraction && isBatch) {
+      const numBatches = Math.ceil(estimatedQuestions / 15);
+      return [
+        { label: 'Analyzing content structure', status: 'pending' },
+        { label: `Splitting into ${numBatches} batches`, status: 'pending' },
+        { label: `Processing batch operations (${numBatches} batches)`, status: 'pending' },
+        { label: 'Combining results', status: 'pending' },
+        { label: 'Validating questions', status: 'pending' },
+        { label: 'Finalizing', status: 'pending' },
+      ];
+    } else if (isExtraction) {
+      return [
+        { label: 'Analyzing content structure', status: 'pending' },
+        { label: 'Detecting question patterns', status: 'pending' },
+        { label: 'Extracting questions', status: 'pending' },
+        { label: 'Completing missing information', status: 'pending' },
+        { label: 'Generating explanations', status: 'pending' },
+        { label: 'Finalizing', status: 'pending' },
+      ];
+    } else {
+      return [
+        { label: 'Analyzing content', status: 'pending' },
+        { label: 'Identifying key concepts', status: 'pending' },
+        { label: 'Generating questions', status: 'pending' },
+        { label: 'Creating answer options', status: 'pending' },
+        { label: 'Writing explanations', status: 'pending' },
+        { label: 'Finalizing', status: 'pending' },
+      ];
+    }
+  };
+
+  // Simulate progress through stages
+  const simulateProgress = async (stages: ProgressStage[], totalDuration: number) => {
+    const stageDelay = totalDuration / stages.length;
+
+    for (let i = 0; i < stages.length; i++) {
+      setCurrentStageIndex(i);
+      setProgressStages(prev => prev.map((stage, idx) => ({
+        ...stage,
+        status: idx === i ? 'in_progress' : idx < i ? 'completed' : 'pending',
+      })));
+
+      await new Promise(resolve => setTimeout(resolve, stageDelay));
+    }
   };
 
   const handleFileProcessed = (content: string, fileName: string) => {
@@ -179,20 +293,30 @@ export default function GeneratePage() {
     setError('');
     setGeneratedQuestions([]);
     setProgressMessage('');
+    setShowProgress(true);
+    setProgressComplete(false);
+    setProgressError(false);
 
     try {
-      // Show initial progress message
-      const isExtractionModeFinal = contentAnalysis?.hasQuestions;
+      // Initialize progress tracking
+      const isExtractionModeFinal = contentAnalysis?.hasQuestions ?? false;
       const estimatedQuestions = contentAnalysis?.questionCount || config.numberOfQuestions;
+      const isBatchMode = isExtractionModeFinal && estimatedQuestions > 25;
 
-      if (isExtractionModeFinal && estimatedQuestions > 25) {
-        const numBatches = Math.ceil(estimatedQuestions / 15);
-        setProgressMessage(`Processing ${estimatedQuestions} questions in ${numBatches} batches...`);
-      } else if (isExtractionModeFinal) {
-        setProgressMessage(`Extracting ${estimatedQuestions} questions...`);
-      } else {
-        setProgressMessage(`Generating ${config.numberOfQuestions} questions...`);
-      }
+      // Create progress stages
+      const stages = initializeProgressStages(isExtractionModeFinal, estimatedQuestions, isBatchMode);
+      setProgressStages(stages);
+      setCurrentStageIndex(0);
+
+      // Calculate expected duration (rough estimates)
+      const expectedDuration = isBatchMode
+        ? Math.ceil(estimatedQuestions / 15) * 3000 // 3 seconds per batch
+        : estimatedQuestions > 10
+        ? 8000 // 8 seconds for medium sets
+        : 5000; // 5 seconds for small sets
+
+      // Start progress simulation
+      const progressPromise = simulateProgress(stages, expectedDuration);
 
       // Pass estimated count to backend to override its detection
       const enhancedConfig = {
@@ -200,6 +324,7 @@ export default function GeneratePage() {
         estimatedQuestionCount: isExtractionModeFinal ? estimatedQuestions : undefined
       };
 
+      // Make API call
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -208,16 +333,39 @@ export default function GeneratePage() {
 
       const data = await response.json();
 
+      // Wait for progress simulation to complete
+      await progressPromise;
+
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Failed to generate questions');
       }
 
+      // Mark all stages as completed
+      setProgressStages(prev => prev.map(stage => ({ ...stage, status: 'completed' })));
+      setCurrentStageIndex(stages.length);
+      setProgressComplete(true);
+
+      // Set results
       setGeneratedQuestions(data.questions);
       setProcessingMode(data.metadata?.processingMode || 'generated');
-      setProgressMessage(''); // Clear progress on success
+
+      // Hide progress after a short delay
+      setTimeout(() => {
+        setShowProgress(false);
+      }, 2000);
     } catch (err: any) {
       setError(err.message || 'Failed to generate questions');
-      setProgressMessage(''); // Clear progress on error
+      setProgressError(true);
+      setProgressStages(prev => prev.map((stage, idx) => ({
+        ...stage,
+        status: idx === currentStageIndex ? 'error' : stage.status,
+        message: idx === currentStageIndex ? err.message : stage.message,
+      })));
+
+      // Hide progress after showing error
+      setTimeout(() => {
+        setShowProgress(false);
+      }, 3000);
     } finally {
       setIsGenerating(false);
     }
@@ -234,6 +382,11 @@ export default function GeneratePage() {
     } catch (err: any) {
       throw new Error(err.message || 'Failed to save question set');
     }
+  };
+
+  const handleEditQuestion = (questionId: number, updatedQuestion: Question) => {
+    // Update the generated questions array
+    setGeneratedQuestions(prev => editQuestionInArray(prev, questionId, updatedQuestion));
   };
 
   const handleStartExam = () => {
@@ -356,17 +509,23 @@ export default function GeneratePage() {
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="e.g., AWS Lambda functions and best practices"
+                        placeholder="e.g., Machine Learning algorithms for classification"
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                        The AI will search for information and generate questions based on the latest knowledge
+                        AI searches academic sources, textbooks, and research papers to generate accurate questions
                       </p>
                     </div>
 
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                    <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                      <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                        🎓 STEM-Enhanced Search
+                      </p>
                       <p className="text-sm text-blue-800 dark:text-blue-200">
-                        <strong>Tip:</strong> Be specific in your search query. Include key topics, concepts, or areas you want the questions to focus on.
+                        Questions are generated from curated academic sources including MIT OpenCourseWare, arXiv, IEEE, ACM, textbooks, and peer-reviewed journals. For best results, include specific topics or concepts in your search.
+                      </p>
+                      <p className="text-xs text-blue-700 dark:text-blue-300 mt-2">
+                        <strong>Examples:</strong> "Quantum entanglement in physics" • "Binary search tree algorithms" • "Organic chemistry reaction mechanisms"
                       </p>
                     </div>
                   </div>
@@ -509,19 +668,14 @@ export default function GeneratePage() {
               </button>
             </div>
 
-            {/* Progress Message */}
-            {progressMessage && (
-              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Loader2 className="w-5 h-5 animate-spin text-blue-600 dark:text-blue-400" />
-                  <p className="text-sm font-medium text-blue-800 dark:text-blue-200">{progressMessage}</p>
-                </div>
-                <p className="text-xs text-blue-600 dark:text-blue-300 mt-2">
-                  {contentAnalysis?.questionCount && contentAnalysis.questionCount > 25
-                    ? 'Large question sets are processed in batches to ensure quality. This may take 30-60 seconds.'
-                    : 'Processing your request...'}
-                </p>
-              </div>
+            {/* Progress Tracker */}
+            {showProgress && (
+              <ProgressTracker
+                stages={progressStages}
+                currentStageIndex={currentStageIndex}
+                isComplete={progressComplete}
+                hasError={progressError}
+              />
             )}
 
             {/* Error Message */}
@@ -556,7 +710,10 @@ export default function GeneratePage() {
                     </div>
                   )}
 
-                  <QuestionPreview questions={generatedQuestions} />
+                  <QuestionPreview
+                    questions={generatedQuestions}
+                    onEditQuestion={handleEditQuestion}
+                  />
 
                   <div className="flex flex-col gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <button
@@ -594,8 +751,8 @@ export default function GeneratePage() {
           onClose={() => setShowSaveDialog(false)}
           questionSet={{
             id: '',
-            title: '',
-            description: '',
+            title: generateTitle(config, activeTab, searchQuery),
+            description: generateDescription(config, activeTab, generatedQuestions.length, searchQuery),
             subject: config.subject,
             questions: generatedQuestions,
             metadata: {

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Library as LibraryIcon, ArrowLeft, Search, Filter, Loader2, AlertCircle } from 'lucide-react';
 import QuestionSetCard from '@/components/QuestionSetCard';
+import ExamSetupModal from '@/components/ExamSetupModal';
 import { useExamStore } from '@/lib/store';
 import { QuestionSet } from '@/lib/types';
 
@@ -18,6 +19,8 @@ export default function LibraryPage() {
   const [filterSubject, setFilterSubject] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showSetupModal, setShowSetupModal] = useState(false);
+  const [selectedQuestionSet, setSelectedQuestionSet] = useState<QuestionSet | null>(null);
 
   // Load question sets from store on mount
   useEffect(() => {
@@ -63,18 +66,35 @@ export default function LibraryPage() {
   };
 
   const handleStartExam = (questionSet: QuestionSet) => {
+    // Open setup modal instead of directly starting
+    setSelectedQuestionSet(questionSet);
+    setShowSetupModal(true);
+  };
+
+  const handleStartWithConfig = (config: {
+    mode: 'practice' | 'exam';
+    useTimer: boolean;
+    learnWithAI: boolean;
+    reviewAnswers: boolean;
+    examDuration: number;
+  }) => {
+    if (!selectedQuestionSet) return;
+
     // First reset the exam
     resetExam();
 
     // Then load the questions from the selected question set
     loadQuestionSets(questionSets); // Ensure question sets are in store
-    setCurrentQuestionSet(questionSet.id); // Set questions from the set
+    setCurrentQuestionSet(selectedQuestionSet.id); // Set questions from the set
 
-    // Now start the exam with the loaded questions
-    startExam(90, 'exam', true);
+    // Now start the exam with the configured settings
+    startExam(config.examDuration, config.mode, config.useTimer, config.learnWithAI, config.reviewAnswers);
 
-    // Navigate to exam page
-    router.push('/exam');
+    // Close modal
+    setShowSetupModal(false);
+
+    // Navigate to appropriate page
+    router.push(config.mode === 'practice' ? '/practice' : '/exam');
   };
 
   const handleDeleteSet = async (questionSet: QuestionSet) => {
@@ -233,6 +253,17 @@ export default function LibraryPage() {
           </>
         )}
       </div>
+
+      {/* Exam Setup Modal */}
+      {selectedQuestionSet && (
+        <ExamSetupModal
+          isOpen={showSetupModal}
+          onClose={() => setShowSetupModal(false)}
+          onStart={handleStartWithConfig}
+          questionSetTitle={selectedQuestionSet.title}
+          questionCount={selectedQuestionSet.questions.length}
+        />
+      )}
     </div>
   );
 }

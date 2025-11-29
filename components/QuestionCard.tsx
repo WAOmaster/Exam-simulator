@@ -14,6 +14,7 @@ interface QuestionCardProps {
   onSubmit: () => void;
   isSubmitted: boolean;
   isLoading?: boolean;
+  showFeedback?: boolean; // Show color-coded feedback (for review mode)
 }
 
 export default function QuestionCard({
@@ -25,6 +26,7 @@ export default function QuestionCard({
   onSubmit,
   isSubmitted,
   isLoading = false,
+  showFeedback = true, // Default to true for practice mode compatibility
 }: QuestionCardProps) {
   const getOptionStyle = (optionId: string) => {
     if (!isSubmitted) {
@@ -33,7 +35,15 @@ export default function QuestionCard({
         : 'border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700/50';
     }
 
-    // After submission
+    // After submission - only show feedback if showFeedback is true
+    if (!showFeedback) {
+      // Don't show any color coding when feedback is disabled
+      return selectedAnswer === optionId
+        ? 'border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700/50'
+        : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 opacity-60';
+    }
+
+    // Show color-coded feedback (review mode enabled)
     if (optionId === question.correctAnswer) {
       return 'border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/30';
     }
@@ -46,7 +56,7 @@ export default function QuestionCard({
   };
 
   const getOptionIcon = (optionId: string) => {
-    if (!isSubmitted) return null;
+    if (!isSubmitted || !showFeedback) return null;
 
     if (optionId === question.correctAnswer) {
       return <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />;

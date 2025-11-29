@@ -680,16 +680,827 @@ Look for:
 3. **503 overload** → Retry logic will switch models
 4. **Save failed** → Check question set structure and db.ts
 
+## Recent Development Work
+
+### Export Functionality (Commits: b0af4ff, ca5e925)
+
+**Feature:** Comprehensive export system for question sets
+
+**Implementations:**
+- Created `lib/exportUtils.ts` with export functions for multiple formats
+- Supported formats: JSON, CSV, Markdown, PDF (full), PDF (questions only)
+- Added `components/ExportDialog.tsx` with format selection and options
+- Integrated export button into `components/QuestionSetCard.tsx`
+- Configurable options: Include answers, explanations, and metadata
+
+**Dependencies Added:**
+- `file-saver` (^2.0.5) - For client-side file downloads
+- `@types/file-saver` (^2.0.7) - TypeScript definitions
+- `jspdf` - For PDF generation
+
+**Files Modified:**
+- `lib/exportUtils.ts` - Core export functionality
+- `components/ExportDialog.tsx` - Export UI modal
+- `components/QuestionSetCard.tsx` - Added export button
+- `package.json` - Added dependencies
+
+### Visual Enhancements (Commit: 6ca1f69)
+
+**Feature:** Enhanced home page visual appeal
+
+**Changes:**
+- Added native gradient colors to all subject cards in "Explore Sample Questions"
+- Updated quick action buttons with visual icons:
+  * Generate Questions: Wand2 icon
+  * My Library: BookMarked icon
+- Enhanced Gemini AI branding with animated Zap icon
+- Added gradient backgrounds and glassmorphism effects
+
+**Files Modified:**
+- `app/page.tsx` - Visual enhancements throughout
+- `data/default-questions/subjects.json` - Added gradient color definitions
+
+### Theme System Implementation (Commits: 7419223, e0e8571, 6b288a5)
+
+**Phase 1 - Theme Selector Fix (Commit: 7419223)**
+
+Problem: Theme color selector showed the currently active theme's color on all options instead of each option's native color.
+
+Solution:
+- Added `ringColor` and `dotColor` properties to theme definitions in `ThemeSwitcher.tsx`
+- Replaced dynamic `ring-primary` class with static theme-specific colors
+- Updated indicator dot from `var(--primary)` to static colors
+
+Result: Each theme option now correctly displays its own color (blue, purple, green, orange, pink)
+
+**Phase 2 - Theme-Aware Colors (Commit: e0e8571)**
+
+Problem: UI elements with hardcoded blue colors didn't change when switching themes.
+
+Solution:
+- Created theme-aware utility classes in `globals.css`:
+  * `.bg-theme-primary`, `.text-theme-primary`, `.border-theme-primary`
+  * Gradient utilities: `.from-theme-primary`, `.via-theme-secondary`, `.to-theme-accent`
+  * Light text utilities: `.text-theme-light`, `.text-theme-light-muted`
+- Replaced 40+ instances of hardcoded colors in `app/page.tsx`
+- Updated `QuestionSetCard.tsx` and `ExportDialog.tsx` components
+
+Files Modified:
+- `app/globals.css` - Added 20+ theme-aware utility classes
+- `app/page.tsx` - Replaced hardcoded colors (backgrounds, buttons, icons, text)
+- `components/QuestionSetCard.tsx` - "Start Exam" button
+- `components/ExportDialog.tsx` - Format selection, checkboxes, info box, export button
+
+Result: All 5 color themes (blue, purple, green, orange, pink) work correctly throughout the application.
+
+**Phase 3 - Light Mode Improvements (Commit: 6b288a5)**
+
+Problem: Light mode had poor contrast and didn't look as polished as dark mode.
+
+Solution:
+- Added light mode-specific CSS variables in `globals.css`:
+  * `--overlay-bg`: Adaptive overlays (white 40% light, black 30% dark)
+  * `--overlay-strong`: Stronger overlays (white 60% light, black 50% dark)
+  * `--glass-bg`: Glassmorphism backgrounds (white 70% light, black 20% dark)
+  * `--glass-border`: Border colors (white 30% light, white 20% dark)
+- Created new utility classes: `.overlay-bg`, `.glass-bg`, `.bg-card`, `.border-card`
+- Replaced 15+ hardcoded `bg-white` and `bg-black` instances in `app/page.tsx`
+
+Files Modified:
+- `app/globals.css` - Added adaptive overlay variables and utilities
+- `app/page.tsx` - Replaced hardcoded backgrounds with theme-aware classes
+
+Result: Light mode now features bright, clean overlays with proper contrast and professional glassmorphism effects.
+
+### Theme System Simplification (Commit: 5dcb975)
+
+**Problem:**
+- Theme colors made UI too vivid and overpowering
+- Backgrounds didn't properly sync with dark/light mode
+- Overall visual experience was too colorful
+
+**Solution:**
+- Disabled color theme selector (kept code for future use)
+- Fixed backgrounds to respect light/dark mode properly
+- Set fixed blue color scheme as default
+- Removed dynamic theme color variables from backgrounds
+
+**Changes:**
+- `components/ThemeSwitcher.tsx`: Disabled color theme picker using `{false && ...}` conditional, kept only dark/light toggle
+- `app/page.tsx`: Replaced theme-color gradients with fixed subtle gradients:
+  * Main background: `from-blue-50 via-purple-50 to-pink-50` (light) / `from-blue-950 via-purple-950 to-pink-950` (dark)
+  * Generate Questions button: Fixed `from-blue-600 to-purple-600` gradient
+  * Stats section: Fixed `from-blue-50 to-purple-50` gradient (light)
+  * Gemini badge: Fixed `from-blue-500 to-purple-500` gradient
+  * Mode selectors: Fixed blue borders and backgrounds
+  * Timer toggle: Fixed blue background
+  * Duration buttons: Fixed blue active state
+- `components/QuestionSetCard.tsx`: Fixed blue "Start Exam" button
+- `components/ExportDialog.tsx`: Fixed blue selected format, checkmark, info box, and export button
+- `CLAUDE.md`: Added comprehensive documentation of all recent development work
+
+**Files Modified:**
+- `components/ThemeSwitcher.tsx` - Disabled color picker
+- `app/page.tsx` - Fixed 20+ color instances
+- `components/QuestionSetCard.tsx` - Fixed button color
+- `components/ExportDialog.tsx` - Fixed dialog colors
+- `CLAUDE.md` - Updated documentation
+
+**Result:**
+- UI now has consistent, subtle blue/purple/pink gradient aesthetic
+- Dark/light mode switching works across all backgrounds
+- Visual experience is more refined and less overwhelming
+- Color theme system preserved for future implementation
+
+**Future Requirement:**
+The color theme system (blue, purple, green, orange, pink) remains in the codebase as a future feature. To re-enable:
+1. Change `{false && ...}` to `{true && ...}` in ThemeSwitcher.tsx
+2. Restore theme-aware utility classes usage in components
+3. Update backgrounds to use CSS variables instead of fixed colors
+
+### Light Mode Visibility Improvements (Commit: 098e86a)
+
+**Problem:**
+- Light mode had excessive white overlay (40% opacity), washing out all content
+- App title "AI Exam Generator" was invisible (white text on white background)
+- Subtitle and descriptions were invisible in light mode
+- Font colors weren't adapting properly between light and dark modes
+
+**Solution:**
+- Reduced overlay opacity from 40% to 15% for better content visibility
+- Made text utility classes adaptive to mode (dark text in light mode, light text in dark mode)
+- Fixed hardcoded `text-white` instances to use mode-aware classes
+
+**Changes:**
+- `app/globals.css`:
+  * Reduced `--overlay-bg` opacity: `rgba(255, 255, 255, 0.4)` → `rgba(255, 255, 255, 0.15)` (62.5% reduction)
+  * Updated `.text-theme-light` utility:
+    - Light mode: `rgba(23, 23, 23, 0.9)` - dark text
+    - Dark mode: `rgba(255, 255, 255, 0.9)` - light text
+  * Updated `.text-theme-light-muted` utility:
+    - Light mode: `rgba(23, 23, 23, 0.7)` - dark text
+    - Dark mode: `rgba(255, 255, 255, 0.7)` - light text
+
+- `app/page.tsx`:
+  * H1 title "AI Exam Generator": `text-white` → `text-gray-900 dark:text-white`
+  * Trophy icon: `text-yellow-300` → `text-yellow-500` (better visibility in light mode)
+  * Footer "Powered by" text: `text-white` → `text-gray-900 dark:text-white`
+
+**Files Modified:**
+- `app/globals.css` - Reduced overlay opacity, made text colors adaptive
+- `app/page.tsx` - Fixed 3 hardcoded white text instances
+
+**Result:**
+- Light mode now has proper contrast with all text clearly visible
+- Title, subtitles, and descriptions are dark gray in light mode
+- Reduced white overlay allows gradient background colors to show through
+- Dark mode remains unchanged and looks great
+- Smooth adaptive text colors across all content
+- Professional, polished appearance in both modes
+
+### Question Editing and Real-time Progress Tracking (Current Session)
+
+**Features Implemented:**
+Two highly requested features to improve user experience:
+1. Question editing after generation
+2. Real-time progress tracking for batch operations
+
+---
+
+#### Feature 1: Question Editing
+
+**Problem:**
+Users had no way to modify questions after generation. If a question had a typo, incorrect answer, or needed adjustment, they had to regenerate the entire set.
+
+**Solution:**
+Implemented comprehensive question editing functionality allowing users to modify all aspects of generated questions.
+
+**Implementation:**
+
+1. **`components/QuestionEditModal.tsx` (NEW)** - Full-featured modal for editing questions
+   - Edit question text (textarea with validation)
+   - Modify all answer options with add/remove capability (minimum 2 options)
+   - Change correct answer (radio button selection)
+   - Update explanation
+   - Change difficulty (easy/medium/hard dropdown)
+   - Edit category
+   - Modify question type (multiple-choice/true-false/scenario)
+   - Form validation before save
+   - Framer Motion animations
+   - Full dark mode support
+
+2. **`lib/store.ts`** - Added `editQuestion` action (Lines 156-182)
+   - Updates question in `questions` array
+   - Updates question in `availableQuestionSets` if it belongs to a saved set
+   - Updates `updatedAt` timestamp for modified sets
+   - Preserves question ID
+
+3. **`components/QuestionPreview.tsx`** - Added edit functionality
+   - Import QuestionEditModal and Edit2 icon
+   - Added `onEditQuestion` prop (optional callback)
+   - Added edit button to each question card header
+   - Modal state management with `editingQuestion`
+   - Save handler that calls parent callback
+
+4. **`app/generate/page.tsx`** - Integration with generation page
+   - Added `handleEditQuestion` function to update generated questions array
+   - Helper function `editQuestionInArray` to immutably update question
+   - Pass `onEditQuestion` prop to QuestionPreview
+   - Updates persist through save and start exam flows
+
+**Key Features:**
+- ✅ Edit all question properties (text, options, answer, explanation, difficulty, category, type)
+- ✅ Add/remove answer options dynamically (with validation)
+- ✅ Instant validation (empty text, minimum 2 options)
+- ✅ Updates persist to saved question sets
+- ✅ Smooth animations and transitions
+- ✅ Full dark mode support
+- ✅ Works in both generation preview and library
+
+**Files Created:**
+- `components/QuestionEditModal.tsx` - 262 lines, full modal implementation
+
+**Files Modified:**
+- `lib/store.ts` - Added `editQuestion` action and interface
+- `components/QuestionPreview.tsx` - Added edit button and modal integration
+- `app/generate/page.tsx` - Added edit handler and integration
+
+**User Flow:**
+1. Generate questions → Click edit icon on any question
+2. Modal opens with all fields pre-filled
+3. Make changes (question text, options, correct answer, explanation, etc.)
+4. Click "Save Changes"
+5. Changes immediately reflected in preview
+6. Save to library or start exam with edited questions
+
+---
+
+#### Feature 2: Real-time Progress Tracking
+
+**Problem:**
+During question generation, especially for large sets (50-100 questions) processed in batches, users saw only a simple loading spinner with no feedback about what was happening or how long it would take.
+
+**Solution:**
+Implemented visual progress tracking that shows detailed stages of the generation process with animated progress bars and step-by-step status updates.
+
+**Implementation:**
+
+1. **`components/ProgressTracker.tsx` (NEW)** - Advanced progress visualization component
+   - Animated progress bar with percentage
+   - Stage-by-stage status display (pending/in_progress/completed/error)
+   - Icons for each status: CheckCircle (completed), AlertCircle (error), Loader2 (in progress), empty circle (pending)
+   - Optional total/completed item counts
+   - Color-coded: blue (in progress), green (completed), red (error)
+   - Smooth Framer Motion animations
+   - Auto-scrolling stage list for long operations
+   - Completion/error messages
+   - Full dark mode support
+
+2. **`app/generate/page.tsx`** - Integration with generation flow
+   - Added progress state variables: `showProgress`, `progressStages`, `currentStageIndex`, `progressComplete`, `progressError`
+   - Created `initializeProgressStages()` function that generates appropriate stages based on:
+     * Extraction mode vs generation mode
+     * Batch processing (>25 questions) vs single batch
+     * Example stages for batch extraction (90 questions):
+       - "Analyzing content structure"
+       - "Splitting into 6 batches"
+       - "Processing batch operations (6 batches)"
+       - "Combining results"
+       - "Validating questions"
+       - "Finalizing"
+   - Created `simulateProgress()` function for smooth stage transitions
+   - Updated `handleGenerateQuestions()` to:
+     * Initialize progress tracker
+     * Calculate expected duration based on operation type
+     * Run progress simulation in parallel with API call
+     * Mark stages as completed/error based on result
+     * Auto-hide progress after 2-3 seconds on completion
+
+**Progress Stage Examples:**
+
+**Extraction Mode (Batch):**
+```
+1. Analyzing content structure
+2. Splitting into 6 batches
+3. Processing batch operations (6 batches)
+4. Combining results
+5. Validating questions
+6. Finalizing
+```
+
+**Extraction Mode (Single):**
+```
+1. Analyzing content structure
+2. Detecting question patterns
+3. Extracting questions
+4. Completing missing information
+5. Generating explanations
+6. Finalizing
+```
+
+**Generation Mode:**
+```
+1. Analyzing content
+2. Identifying key concepts
+3. Generating questions
+4. Creating answer options
+5. Writing explanations
+6. Finalizing
+```
+
+**Duration Estimation:**
+- Batch mode (>25 questions): 3 seconds per batch (e.g., 18 seconds for 6 batches)
+- Medium sets (10-25 questions): 8 seconds
+- Small sets (<10 questions): 5 seconds
+
+**Key Features:**
+- ✅ Visual progress bar with percentage
+- ✅ Stage-by-stage status updates
+- ✅ Adaptive stages based on operation type
+- ✅ Smooth animations and transitions
+- ✅ Error handling with detailed error messages
+- ✅ Auto-hide on completion
+- ✅ Full dark mode support
+- ✅ Responsive design with scrolling for long stage lists
+
+**Files Created:**
+- `components/ProgressTracker.tsx` - 171 lines, full progress tracking component
+
+**Files Modified:**
+- `app/generate/page.tsx` - Added progress tracking integration throughout generation flow
+
+**User Experience Improvements:**
+- Users see exactly what's happening during generation
+- Clear feedback for long-running operations (batch processing)
+- Reduces perceived wait time with engaging progress display
+- Error states clearly communicated with specific stage failures
+- Professional, polished UX matching modern web applications
+
+---
+
+**Testing Recommendations:**
+
+1. **Question Editing:**
+   - Generate 10 questions → Edit question text → Verify changes persist
+   - Add/remove answer options → Ensure minimum 2 options enforced
+   - Change correct answer → Verify preview updates
+   - Save to library → Start exam → Verify edits are included
+   - Test validation: try saving empty question, empty options
+
+2. **Progress Tracking:**
+   - Generate small set (10 questions) → Observe 6 stages in ~5 seconds
+   - Generate medium set (25 questions) → Observe 6 stages in ~8 seconds
+   - Upload file with 90 questions → Observe batch stages with correct count
+   - Test error handling: use invalid API key → See error stage
+   - Verify auto-hide after completion
+
+**Dependencies:**
+- No new dependencies added (all features use existing libraries)
+
+**Performance:**
+- Question editing: Instant updates (no API calls, local state only)
+- Progress tracking: Negligible overhead (simple state updates and timers)
+
+**Accessibility:**
+- Both features fully keyboard navigable
+- Screen reader friendly with semantic HTML
+- Clear focus indicators
+- High contrast color schemes in both themes
+
+### Learn with AI Feature (Current Session)
+
+**Feature Implemented:**
+AI-guided learning system that helps students deeply understand the concepts behind each question, available exclusively in Practice Mode.
+
+---
+
+#### Problem:
+Students often want to understand not just whether their answer is correct, but the underlying concepts, related topics, and how to learn more about the subject matter. Traditional exam systems only provide explanations, not comprehensive learning guidance.
+
+#### Solution:
+Implemented an AI-powered learning companion that analyzes each question and provides structured, educational content including topic identification, key concepts, guided learning, and further study resources.
+
+#### Implementation:
+
+1. **Store Updates** (`lib/store.ts`)
+   - Added `learnWithAI: boolean` to exam state (practice mode only)
+   - Updated `startExam()` function signature to accept `learnWithAI` parameter
+   - Automatically disabled in exam mode (only available in practice mode)
+
+2. **Home Page** (`app/page.tsx`)
+   - Added Learn with AI toggle in exam setup (only visible when Practice Mode is selected)
+   - Beautiful purple/pink gradient styling to distinguish from other toggles
+   - State management with `learnWithAI` boolean
+   - Passed to `startExam()` when initiating practice session
+
+3. **API Endpoint** (`app/api/ai/learn/route.ts` - NEW)
+   - POST endpoint that accepts question, options, and correct answer
+   - Calls Gemini 2.0 Flash API with educational prompt
+   - Returns structured learning content:
+     * **Topic**: Specific topic/concept being tested
+     * **Subject Area**: Broader field (e.g., "Computer Science", "Physics")
+     * **Key Concepts**: 3-5 essential concepts (bulleted list)
+     * **Learning Guide**: Comprehensive explanation (max 300 words)
+       - Fundamental concepts in simple terms
+       - Why correct answer is correct
+       - Common misconceptions
+       - Connection to broader understanding
+     * **Further Learning**: 3-4 search queries/topics for deeper study
+   - Word limit enforcement (truncates at 300 words if exceeded)
+   - JSON parsing with fallback handling
+   - Error handling with friendly error messages
+
+4. **LearnWithAI Component** (`components/LearnWithAI.tsx` - NEW)
+   - Expandable panel with "Learn with AI" button
+   - Lazy loading: fetches content only when button clicked
+   - Animated expand/collapse with Framer Motion
+   - Beautiful gradient purple/pink styling consistent with theme
+   - Structured display sections:
+     * Header with Sparkles icon
+     * Topic and Subject Area in grid layout
+     * Key Concepts with bullet points and Lightbulb icon
+     * Guided Learning with BookOpen icon
+     * Further Learning with clickable Google search links
+   - Loading state with spinner
+   - Error handling with red error message
+   - Close button for collapsing panel
+
+5. **Practice Page Integration** (`app/practice/page.tsx`)
+   - Import LearnWithAI component
+   - Get `learnWithAI` from store
+   - Conditionally render LearnWithAI after question options
+   - Only shows when:
+     * `learnWithAI` is enabled
+     * User has selected an answer
+   - Positioned within question card for seamless UX
+
+#### Key Features:
+- ✅ **Practice Mode Only**: Exclusively available in practice mode to focus on learning
+- ✅ **On-Demand Loading**: Content fetched only when user clicks button
+- ✅ **Structured Learning**: Organized into clear sections (topic, concepts, guide, resources)
+- ✅ **Word Limit**: Learning guide capped at 300 words for focused, digestible content
+- ✅ **External Resources**: Clickable links to Google searches for each further learning topic
+- ✅ **Beautiful UI**: Gradient purple/pink styling with smooth animations
+- ✅ **Smart Caching**: Once loaded, content persists when toggling open/close
+- ✅ **Error Handling**: Graceful fallbacks and error messages
+- ✅ **Full Dark Mode**: Consistent theming in light and dark modes
+- ✅ **Accessible**: Keyboard navigable, semantic HTML, clear focus indicators
+
+#### User Flow:
+1. User selects Practice Mode on home page
+2. Toggle "Learn with AI" switch (shows purple/pink gradient toggle)
+3. Start practice session
+4. Answer a question (select any option)
+5. Click "Learn with AI" button (appears below options)
+6. AI analyzes question and generates learning content
+7. Expandable panel shows:
+   - Topic and subject area
+   - Key concepts to understand
+   - Guided learning explanation (max 300 words)
+   - Links to further learning resources
+8. User can close/reopen panel without reloading
+9. Navigate to next question and repeat
+
+#### Technical Highlights:
+
+**AI Prompt Engineering:**
+- Educational tone optimized for learning
+- Structured JSON output for consistent parsing
+- Temperature 0.7 for balanced creativity and accuracy
+- Max 2048 tokens for comprehensive responses
+- Explicit word limit enforcement in prompt
+
+**API Call:**
+```typescript
+POST /api/ai/learn
+Body: {
+  question: string,
+  options: Array<{id: string, text: string}>,
+  correctAnswer: string
+}
+Response: {
+  success: boolean,
+  learning: {
+    topic: string,
+    subjectArea: string,
+    keyConcepts: string[],
+    learningGuide: string,
+    furtherLearning: string[]
+  }
+}
+```
+
+**Performance:**
+- Lazy loading: API called only when button clicked
+- Content cached after first load
+- ~2-3 second response time with Gemini 2.0 Flash
+- No performance impact when feature disabled
+
+**Styling:**
+- Purple (#9333ea) to Pink (#db2777) gradients
+- Consistent with app's theme system
+- Smooth transitions and animations
+- Responsive design with proper spacing
+
+#### Files Created:
+- `app/api/ai/learn/route.ts` - 127 lines, AI learning API endpoint
+- `components/LearnWithAI.tsx` - 184 lines, learning content display component
+
+#### Files Modified:
+- `lib/store.ts` - Added learnWithAI state and parameter
+- `app/page.tsx` - Added Learn with AI toggle
+- `app/practice/page.tsx` - Integrated LearnWithAI component
+
+#### Benefits:
+- **Deeper Understanding**: Students learn concepts, not just memorize answers
+- **Self-Paced Learning**: Access learning content when ready
+- **Guided Discovery**: AI breaks down complex topics into digestible parts
+- **Extended Learning**: Links to external resources for deep dives
+- **Engaging UX**: Beautiful, interactive interface encourages exploration
+- **Practice-Focused**: Only available in practice mode to avoid exam mode distractions
+
+#### Future Enhancements (for Learn with AI):
+- [ ] Save learning content to review later
+- [ ] Personal learning history and progress tracking
+- [ ] Adaptive difficulty based on learning patterns
+- [ ] Video/image resources in further learning
+- [ ] Multi-language support
+- [ ] Voice narration of learning content
+
+---
+
+### Exam Setup Modal for Library (Current Session)
+
+**Feature Implemented:**
+Added comprehensive exam configuration modal to library page, allowing users to fully customize their exam/practice session settings before starting from saved question sets.
+
+---
+
+#### Problem:
+When starting an exam from the library, users were forced into a hardcoded configuration (90 minutes, exam mode, timer on). They had no control over:
+- Mode selection (practice vs exam)
+- Timer preferences (on/off and duration)
+- Learn with AI feature (practice mode only)
+
+This inconsistency with the home page experience limited flexibility and user control.
+
+#### Solution:
+Implemented a modal dialog that appears when starting any exam from the library, providing the same configuration options available on the home page.
+
+#### Implementation:
+
+1. **ExamSetupModal Component** (`components/ExamSetupModal.tsx` - NEW)
+   - Full-screen modal with backdrop blur
+   - Displays question set title and question count
+   - Mode selection: Practice Mode vs Exam Mode (radio buttons with icons)
+   - Timer toggle: Enable/disable countdown timer
+   - Learn with AI toggle: Only visible in practice mode (purple/pink gradient)
+   - Duration selector: 30, 60, 90, 120 minutes (only when timer enabled)
+   - Action buttons: Cancel and Start (dynamic text based on mode)
+   - Framer Motion animations for smooth transitions
+   - Full dark mode support
+
+2. **Library Page Updates** (`app/library/page.tsx`)
+   - Added state: `showSetupModal`, `selectedQuestionSet`
+   - Updated `handleStartExam()`: Opens modal instead of directly starting
+   - Created `handleStartWithConfig()`: Starts exam with user-selected configuration
+   - Integrated modal component with conditional rendering
+   - Passes configuration to `startExam()` with all 4 parameters
+
+#### Key Features:
+- ✅ **Consistent UX**: Same configuration options as home page
+- ✅ **Mode Selection**: Choose between practice and exam mode
+- ✅ **Flexible Timer**: Toggle on/off and select duration
+- ✅ **Learn with AI**: Available in practice mode with purple/pink styling
+- ✅ **Smart Defaults**: Pre-selected sensible defaults (exam mode, timer on, 90 min)
+- ✅ **Beautiful Modal**: Professional design with backdrop blur and animations
+- ✅ **Dark Mode**: Full dark mode support throughout
+- ✅ **Accessible**: Keyboard navigable, clear focus indicators
+
+#### User Flow:
+1. Navigate to My Library page
+2. Browse saved question sets
+3. Click "Start Exam" on any question set
+4. **Modal appears** with configuration options:
+   - Select mode (Practice or Exam)
+   - Toggle timer on/off
+   - If practice mode: Toggle Learn with AI
+   - If timer on: Select duration (30/60/90/120 min)
+5. Click "Start Practice" or "Start Exam"
+6. Navigate to appropriate page with configured settings
+
+#### Technical Highlights:
+
+**Modal Props:**
+```typescript
+interface ExamSetupModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onStart: (config: {
+    mode: 'practice' | 'exam';
+    useTimer: boolean;
+    learnWithAI: boolean;
+    examDuration: number;
+  }) => void;
+  questionSetTitle: string;
+  questionCount: number;
+}
+```
+
+**Configuration Flow:**
+```typescript
+// Library page handler
+const handleStartWithConfig = (config) => {
+  resetExam();
+  loadQuestionSets(questionSets);
+  setCurrentQuestionSet(selectedQuestionSet.id);
+  startExam(config.examDuration, config.mode, config.useTimer, config.learnWithAI);
+  router.push(config.mode === 'practice' ? '/practice' : '/exam');
+};
+```
+
+**Styling:**
+- Backdrop: `bg-black/50 backdrop-blur-sm`
+- Modal: Max width 2xl, max height 90vh with scroll
+- Sticky header and footer for long content
+- Grid layouts for mode and duration selection
+- Consistent blue theme with purple/pink accents for Learn with AI
+
+#### Files Created:
+- `components/ExamSetupModal.tsx` - 267 lines, full modal implementation
+
+#### Files Modified:
+- `app/library/page.tsx` - Added modal integration and configuration handlers
+
+#### Benefits:
+- **User Control**: Full control over exam/practice settings from library
+- **Consistency**: Same experience as starting from home page
+- **Flexibility**: Can practice or take exams from the same question set with different settings
+- **Learn with AI Access**: Can enable AI-guided learning for any saved question set
+- **Better UX**: Clear, intuitive modal interface with smart defaults
+
+---
+
+### Review Answers Feature (Current Session)
+
+**Feature Implemented:**
+Optional review capability for exam mode that allows students to review their submitted answers and see explanations during the exam, providing flexibility for different exam styles.
+
+---
+
+#### Problem:
+Traditional exam mode locked students into their answers with no ability to review explanations until the exam was complete. Some learning scenarios benefit from allowing students to:
+- Review their submitted answers during the exam
+- See explanations for questions they've already answered
+- Reflect on their understanding while still in exam mode
+
+However, this should be optional to support both strict exam conditions and more flexible learning assessments.
+
+#### Solution:
+Implemented an optional "Review Answers" toggle that can be enabled in exam mode, giving users control over whether they can review explanations during their exam session.
+
+#### Implementation:
+
+1. **Store Updates** (`lib/store.ts`)
+   - Added `reviewAnswers: boolean` to exam state (exam mode only)
+   - Updated `startExam()` function signature to accept `reviewAnswers` parameter
+   - Automatically disabled in practice mode (only available in exam mode)
+   - State set to `false` by default (strict exam mode)
+
+2. **Home Page** (`app/page.tsx`)
+   - Added Review Answers toggle in exam setup (only visible when Exam Mode is selected)
+   - Green/teal gradient styling to distinguish from other toggles
+   - State management with `reviewAnswers` boolean
+   - Passed to `startExam()` when initiating exam session
+
+3. **ExamSetupModal Component** (`components/ExamSetupModal.tsx`)
+   - Added Review Answers toggle to modal (exam mode only)
+   - Same green/teal gradient styling for consistency
+   - Included in configuration passed to library page
+   - Hidden when practice mode is selected
+
+4. **Library Page Updates** (`app/library/page.tsx`)
+   - Updated `handleStartWithConfig()` to accept `reviewAnswers` parameter
+   - Passes review configuration to `startExam()` function
+
+5. **Exam Page Integration** (`app/exam/page.tsx`)
+   - Import `reviewAnswers` from store
+   - Conditionally render "Review Answer" button based on `reviewAnswers` setting
+   - Button only appears when:
+     * Question has been answered
+     * Explanation is not currently shown
+     * Review mode is enabled by user
+   - Opens evaluation pane with explanation when clicked
+
+#### Key Features:
+- ✅ **Exam Mode Only**: Exclusively available in exam mode (practice mode has instant feedback)
+- ✅ **Optional Setting**: Disabled by default, users must explicitly enable
+- ✅ **Consistent UI**: Green/teal gradient styling distinguishes from other toggles
+- ✅ **Full Integration**: Works seamlessly with both home page and library setup
+- ✅ **Smart Conditional**: Review button only shows when appropriate
+- ✅ **Evaluation Pane**: Uses existing EvaluationPane component for consistency
+- ✅ **Full Dark Mode**: Consistent theming in light and dark modes
+- ✅ **Accessible**: Keyboard navigable, clear focus indicators
+
+#### User Flow:
+1. User selects Exam Mode on home page or in library modal
+2. Toggle "Review Answers" switch (shows green/teal gradient toggle)
+3. Start exam session
+4. Answer a question (select option and submit)
+5. "Review Answer" button appears (purple button between Previous and Next)
+6. Click "Review Answer" to open evaluation pane
+7. Evaluation pane shows:
+   - User's selected answer
+   - Correct answer
+   - Explanation
+   - Whether answer was correct/incorrect
+8. Close pane and continue with exam
+9. Navigate to next question
+
+#### Technical Highlights:
+
+**Store Function Signature:**
+```typescript
+startExam: (
+  duration: number,
+  mode?: 'practice' | 'exam',
+  useTimer?: boolean,
+  learnWithAI?: boolean,
+  reviewAnswers?: boolean
+) => void
+```
+
+**Conditional Rendering Logic:**
+```typescript
+// Exam page - app/exam/page.tsx
+{isAnswered && !showExplanation && reviewAnswers && (
+  <button onClick={handleReviewAnswer}>
+    Review Answer
+  </button>
+)}
+```
+
+**Configuration Flow:**
+```typescript
+// Home page or Library modal
+const handleStart = () => {
+  startExam(
+    examDuration,
+    'exam',
+    useTimer,
+    false, // learnWithAI (exam mode only)
+    reviewAnswers // NEW parameter
+  );
+};
+```
+
+**Styling:**
+- Toggle: `bg-gradient-to-r from-green-50 to-teal-50` (light mode)
+- Toggle: `from-green-900/20 to-teal-900/20` (dark mode)
+- Border: `border-green-200 dark:border-green-700`
+- Icon: `text-green-600 dark:text-green-400` (FileText icon)
+- Button: Purple gradient for "Review Answer" button
+
+#### Files Modified:
+- `lib/store.ts` - Added reviewAnswers state and parameter
+- `app/page.tsx` - Added Review Answers toggle
+- `components/ExamSetupModal.tsx` - Added Review Answers toggle to modal
+- `app/library/page.tsx` - Pass reviewAnswers config to startExam()
+- `app/exam/page.tsx` - Conditionally show review button
+
+#### Benefits:
+- **Flexible Assessment**: Supports both strict exams and flexible learning assessments
+- **User Control**: Students choose their exam style
+- **Better Learning**: Can review and learn during exam if enabled
+- **Maintains Integrity**: Disabled by default preserves traditional exam behavior
+- **Consistent UX**: Integrates seamlessly with existing exam flow
+- **Clear Distinction**: Green/teal color makes it visually distinct from other features
+
+#### Use Cases:
+- **Strict Exams**: Leave disabled for traditional exam conditions
+- **Open-Book Exams**: Enable for exams where reviewing is allowed
+- **Learning Assessments**: Enable for self-assessment and learning-focused exams
+- **Practice Exams**: Enable to combine exam format with learning feedback
+
+---
+
 ## Future Enhancements
 
 - [x] Intelligent question extraction and completion
 - [x] Batch processing for large question sets
-- [ ] Real-time progress tracking with visual feedback
+- [x] Comprehensive export functionality (JSON, CSV, Markdown, PDF)
+- [x] Visual home page enhancements
+- [x] Theme system with dark/light mode
+- [x] Light mode improvements
+- [x] Light mode text visibility fixes
+- [x] Question editing after generation
+- [x] Real-time progress tracking with visual feedback
+- [x] Learn with AI - AI-guided learning for practice mode
+- [x] Review Answers - Optional answer review in exam mode ✨ **NEW**
+- [ ] Color theme variants (currently disabled, future feature)
 - [ ] Incremental temp JSON storage for batch results
-- [ ] Question editing after generation
 - [ ] Knowledge Areas browser with pre-built sets
 - [ ] Community question sets with ratings
-- [ ] Export questions to various formats
 - [ ] Real-time collaboration on question sets
 - [ ] Advanced analytics and insights
 - [ ] Mobile app version

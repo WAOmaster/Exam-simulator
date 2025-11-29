@@ -20,6 +20,7 @@ export default function ExamPage() {
     examStartTime,
     examDuration,
     useTimer,
+    reviewAnswers,
     submitAnswer,
     nextQuestion,
     previousQuestion,
@@ -79,9 +80,16 @@ export default function ExamPage() {
     // Submit the answer
     submitAnswer(currentQuestion.id, selectedAnswer, isCorrect);
 
-    // In exam mode, don't show explanation automatically
+    // In exam mode without review, auto-advance to next question
     setTimeout(() => {
       setIsSubmitting(false);
+
+      // Auto-advance if review answers is disabled
+      if (!reviewAnswers) {
+        setTimeout(() => {
+          handleNext();
+        }, 300);
+      }
     }, 300);
   };
 
@@ -188,6 +196,7 @@ export default function ExamPage() {
               onSubmit={handleSubmit}
               isSubmitted={isAnswered}
               isLoading={isSubmitting}
+              showFeedback={reviewAnswers}
             />
 
             {/* Navigation */}
@@ -206,7 +215,7 @@ export default function ExamPage() {
               </button>
 
               <div className="flex gap-3">
-                {isAnswered && !showExplanation && (
+                {isAnswered && !showExplanation && reviewAnswers && (
                   <button
                     onClick={handleReviewAnswer}
                     className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"

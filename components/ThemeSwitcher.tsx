@@ -9,12 +9,42 @@ export default function ThemeSwitcher() {
   const { mode, colorTheme, setMode, setColorTheme, toggleMode } = useTheme();
   const [showColorPicker, setShowColorPicker] = useState(false);
 
-  const colorThemes: { name: ColorTheme; label: string; colors: string }[] = [
-    { name: 'blue', label: 'Blue', colors: 'from-blue-500 to-blue-600' },
-    { name: 'purple', label: 'Purple', colors: 'from-purple-500 to-purple-600' },
-    { name: 'green', label: 'Green', colors: 'from-green-500 to-green-600' },
-    { name: 'orange', label: 'Orange', colors: 'from-orange-500 to-orange-600' },
-    { name: 'pink', label: 'Pink', colors: 'from-pink-500 to-pink-600' },
+  const colorThemes: { name: ColorTheme; label: string; colors: string; ringColor: string; dotColor: string }[] = [
+    {
+      name: 'blue',
+      label: 'Blue',
+      colors: 'from-blue-500 to-blue-600',
+      ringColor: 'ring-blue-500',
+      dotColor: '#2563eb'
+    },
+    {
+      name: 'purple',
+      label: 'Purple',
+      colors: 'from-purple-500 to-purple-600',
+      ringColor: 'ring-purple-500',
+      dotColor: '#7c3aed'
+    },
+    {
+      name: 'green',
+      label: 'Green',
+      colors: 'from-green-500 to-green-600',
+      ringColor: 'ring-green-500',
+      dotColor: '#059669'
+    },
+    {
+      name: 'orange',
+      label: 'Orange',
+      colors: 'from-orange-500 to-orange-600',
+      ringColor: 'ring-orange-500',
+      dotColor: '#ea580c'
+    },
+    {
+      name: 'pink',
+      label: 'Pink',
+      colors: 'from-pink-500 to-pink-600',
+      ringColor: 'ring-pink-500',
+      dotColor: '#ec4899'
+    },
   ];
 
   return (
@@ -34,8 +64,9 @@ export default function ThemeSwitcher() {
         )}
       </motion.button>
 
-      {/* Color Theme Picker */}
-      <div className="relative">
+      {/* Color Theme Picker - DISABLED FOR NOW (Future Feature)
+      TODO: Re-enable color themes in future release */}
+      {false && <div className="relative">
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -78,7 +109,7 @@ export default function ThemeSwitcher() {
                       }}
                       className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all ${
                         colorTheme === theme.name
-                          ? 'bg-gray-100 dark:bg-gray-700 ring-2 ring-primary ring-offset-2 dark:ring-offset-gray-800'
+                          ? `bg-gray-100 dark:bg-gray-700 ring-2 ${theme.ringColor} ring-offset-2 dark:ring-offset-gray-800`
                           : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
                       }`}
                     >
@@ -92,7 +123,7 @@ export default function ThemeSwitcher() {
                         <motion.div
                           layoutId="active-theme"
                           className="ml-auto w-2 h-2 rounded-full"
-                          style={{ backgroundColor: 'var(--primary)' }}
+                          style={{ backgroundColor: theme.dotColor }}
                         />
                       )}
                     </button>
@@ -102,7 +133,7 @@ export default function ThemeSwitcher() {
             </>
           )}
         </AnimatePresence>
-      </div>
+      </div>}
     </div>
   );
 }

@@ -1,0 +1,352 @@
+[
+  {
+    "id": 1,
+    "question": "Who painted the Mona Lisa?",
+    "options": [
+      { "id": "A", "text": "Michelangelo" },
+      { "id": "B", "text": "Leonardo da Vinci" },
+      { "id": "C", "text": "Raphael" },
+      { "id": "D", "text": "Donatello" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Leonardo da Vinci painted the Mona Lisa around 1503-1519. It's one of the most famous paintings in the world, housed in the Louvre Museum in Paris.",
+    "category": "Art History",
+    "difficulty": "easy"
+  },
+  {
+    "id": 2,
+    "question": "Who wrote 'Romeo and Juliet'?",
+    "options": [
+      { "id": "A", "text": "Charles Dickens" },
+      { "id": "B", "text": "William Shakespeare" },
+      { "id": "C", "text": "Jane Austen" },
+      { "id": "D", "text": "Mark Twain" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "William Shakespeare wrote 'Romeo and Juliet' in the early 1590s. It's one of his most famous tragedies about two star-crossed lovers.",
+    "category": "Literature",
+    "difficulty": "easy"
+  },
+  {
+    "id": 3,
+    "question": "What does 'Renaissance' mean?",
+    "options": [
+      { "id": "A", "text": "Revolution" },
+      { "id": "B", "text": "Rebirth" },
+      { "id": "C", "text": "Reform" },
+      { "id": "D", "text": "Resistance" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Renaissance means 'rebirth' in French. It refers to the 14th-17th century cultural movement that marked the transition from medieval to modern times.",
+    "category": "History",
+    "difficulty": "easy"
+  },
+  {
+    "id": 4,
+    "question": "Who was the ancient Greek philosopher who taught Alexander the Great?",
+    "options": [
+      { "id": "A", "text": "Socrates" },
+      { "id": "B", "text": "Plato" },
+      { "id": "C", "text": "Aristotle" },
+      { "id": "D", "text": "Pythagoras" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "Aristotle tutored Alexander the Great when he was young. Aristotle was one of the most influential philosophers in Western thought, studying under Plato.",
+    "category": "Philosophy",
+    "difficulty": "medium"
+  },
+  {
+    "id": 5,
+    "question": "What year did World War II end?",
+    "options": [
+      { "id": "A", "text": "1943" },
+      { "id": "B", "text": "1944" },
+      { "id": "C", "text": "1945" },
+      { "id": "D", "text": "1946" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "World War II ended in 1945, with Germany surrendering in May and Japan in September after atomic bombs were dropped on Hiroshima and Nagasaki.",
+    "category": "History",
+    "difficulty": "easy"
+  },
+  {
+    "id": 6,
+    "question": "Which art movement is Salvador Dalí associated with?",
+    "options": [
+      { "id": "A", "text": "Impressionism" },
+      { "id": "B", "text": "Surrealism" },
+      { "id": "C", "text": "Cubism" },
+      { "id": "D", "text": "Abstract Expressionism" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Salvador Dalí was a prominent Surrealist artist known for dreamlike, bizarre imagery. His most famous work is 'The Persistence of Memory' featuring melting clocks.",
+    "category": "Art History",
+    "difficulty": "medium"
+  },
+  {
+    "id": 7,
+    "question": "Who wrote '1984' and 'Animal Farm'?",
+    "options": [
+      { "id": "A", "text": "Aldous Huxley" },
+      { "id": "B", "text": "George Orwell" },
+      { "id": "C", "text": "Ray Bradbury" },
+      { "id": "D", "text": "H.G. Wells" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "George Orwell wrote both '1984' (1949) and 'Animal Farm' (1945), dystopian novels that critique totalitarianism and political corruption.",
+    "category": "Literature",
+    "difficulty": "easy"
+  },
+  {
+    "id": 8,
+    "question": "What is the Socratic Method?",
+    "options": [
+      { "id": "A", "text": "A form of meditation" },
+      { "id": "B", "text": "A teaching method using questions to stimulate critical thinking" },
+      { "id": "C", "text": "A type of logical fallacy" },
+      { "id": "D", "text": "A mathematical proof technique" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "The Socratic Method is a form of cooperative dialogue using questions to stimulate critical thinking and illuminate ideas. Named after ancient Greek philosopher Socrates.",
+    "category": "Philosophy",
+    "difficulty": "medium"
+  },
+  {
+    "id": 9,
+    "question": "Who composed the 'Moonlight Sonata'?",
+    "options": [
+      { "id": "A", "text": "Mozart" },
+      { "id": "B", "text": "Beethoven" },
+      { "id": "C", "text": "Bach" },
+      { "id": "D", "text": "Chopin" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Ludwig van Beethoven composed the 'Moonlight Sonata' (Piano Sonata No. 14) in 1801. It's one of his most popular compositions.",
+    "category": "Music",
+    "difficulty": "easy"
+  },
+  {
+    "id": 10,
+    "question": "What ancient civilization built Machu Picchu?",
+    "options": [
+      { "id": "A", "text": "Aztec" },
+      { "id": "B", "text": "Maya" },
+      { "id": "C", "text": "Inca" },
+      { "id": "D", "text": "Olmec" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "The Inca Empire built Machu Picchu in the 15th century in Peru. It's a UNESCO World Heritage site and one of the New Seven Wonders of the World.",
+    "category": "History",
+    "difficulty": "medium"
+  },
+  {
+    "id": 11,
+    "question": "What is haiku?",
+    "options": [
+      { "id": "A", "text": "A Japanese form of poetry with 5-7-5 syllable pattern" },
+      { "id": "B", "text": "A Chinese martial art" },
+      { "id": "C", "text": "A type of Japanese painting" },
+      { "id": "D", "text": "A traditional Japanese dance" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Haiku is a traditional Japanese poetry form consisting of three lines with 5, 7, and 5 syllables respectively. It often captures moments in nature.",
+    "category": "Literature",
+    "difficulty": "easy"
+  },
+  {
+    "id": 12,
+    "question": "Who painted 'The Starry Night'?",
+    "options": [
+      { "id": "A", "text": "Claude Monet" },
+      { "id": "B", "text": "Vincent van Gogh" },
+      { "id": "C", "text": "Pablo Picasso" },
+      { "id": "D", "text": "Edvard Munch" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Vincent van Gogh painted 'The Starry Night' in 1889 while at an asylum in Saint-Rémy-de-Provence, France. It's one of the most recognized paintings in modern culture.",
+    "category": "Art History",
+    "difficulty": "easy"
+  },
+  {
+    "id": 13,
+    "question": "What is existentialism?",
+    "options": [
+      { "id": "A", "text": "A philosophy emphasizing individual freedom and choice" },
+      { "id": "B", "text": "A belief that nothing exists" },
+      { "id": "C", "text": "A scientific theory about existence" },
+      { "id": "D", "text": "A religious doctrine" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Existentialism is a philosophy that emphasizes individual freedom, choice, and personal responsibility. Key figures include Sartre, Camus, and Kierkegaard.",
+    "category": "Philosophy",
+    "difficulty": "hard"
+  },
+  {
+    "id": 14,
+    "question": "Who wrote 'The Odyssey'?",
+    "options": [
+      { "id": "A", "text": "Virgil" },
+      { "id": "B", "text": "Homer" },
+      { "id": "C", "text": "Sophocles" },
+      { "id": "D", "text": "Euripides" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Homer wrote 'The Odyssey', an ancient Greek epic poem about Odysseus's journey home after the Trojan War. It's a foundational work of Western literature.",
+    "category": "Literature",
+    "difficulty": "medium"
+  },
+  {
+    "id": 15,
+    "question": "What was the Magna Carta?",
+    "options": [
+      { "id": "A", "text": "A medieval charter limiting royal power" },
+      { "id": "B", "text": "A religious text" },
+      { "id": "C", "text": "A declaration of war" },
+      { "id": "D", "text": "A trade agreement" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The Magna Carta (1215) was a charter that limited the powers of King John of England. It established the principle that everyone, including the king, was subject to law.",
+    "category": "History",
+    "difficulty": "medium"
+  },
+  {
+    "id": 16,
+    "question": "What is the Baroque period in music?",
+    "options": [
+      { "id": "A", "text": "A period from roughly 1600-1750 characterized by ornate complexity" },
+      { "id": "B", "text": "A modern electronic music genre" },
+      { "id": "C", "text": "A type of folk music" },
+      { "id": "D", "text": "A minimalist music movement" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The Baroque period (1600-1750) featured complex polyphony and ornate musical style. Composers include Bach, Handel, and Vivaldi.",
+    "category": "Music",
+    "difficulty": "hard"
+  },
+  {
+    "id": 17,
+    "question": "Who sculpted 'David'?",
+    "options": [
+      { "id": "A", "text": "Donatello" },
+      { "id": "B", "text": "Leonardo da Vinci" },
+      { "id": "C", "text": "Michelangelo" },
+      { "id": "D", "text": "Bernini" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "Michelangelo's 'David' (1501-1504) is a masterpiece of Renaissance sculpture, depicting the biblical hero. It stands 17 feet tall in Florence, Italy.",
+    "category": "Art History",
+    "difficulty": "easy"
+  },
+  {
+    "id": 18,
+    "question": "What is metaphor in literature?",
+    "options": [
+      { "id": "A", "text": "A direct comparison using 'like' or 'as'" },
+      { "id": "B", "text": "A figure of speech making implicit comparison" },
+      { "id": "C", "text": "Exaggeration for emphasis" },
+      { "id": "D", "text": "Giving human qualities to non-human things" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "A metaphor is a figure of speech that makes an implicit comparison between unlike things (e.g., 'Time is money'). Unlike similes, metaphors don't use 'like' or 'as'.",
+    "category": "Literature",
+    "difficulty": "medium"
+  },
+  {
+    "id": 19,
+    "question": "What was the Enlightenment?",
+    "options": [
+      { "id": "A", "text": "An 18th-century intellectual movement emphasizing reason" },
+      { "id": "B", "text": "A religious revival" },
+      { "id": "C", "text": "An artistic style" },
+      { "id": "D", "text": "A political revolution" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The Enlightenment (17th-18th century) was an intellectual movement emphasizing reason, science, and individualism over tradition. Key figures include Voltaire, Rousseau, and Kant.",
+    "category": "Philosophy",
+    "difficulty": "hard"
+  },
+  {
+    "id": 20,
+    "question": "Who painted 'The Last Supper'?",
+    "options": [
+      { "id": "A", "text": "Raphael" },
+      { "id": "B", "text": "Michelangelo" },
+      { "id": "C", "text": "Leonardo da Vinci" },
+      { "id": "D", "text": "Caravaggio" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "Leonardo da Vinci painted 'The Last Supper' (1495-1498) on a wall in Milan. It depicts Jesus's final meal with his apostles before his crucifixion.",
+    "category": "Art History",
+    "difficulty": "easy"
+  },
+  {
+    "id": 21,
+    "question": "What is iambic pentameter?",
+    "options": [
+      { "id": "A", "text": "A poetic meter with five iambs per line" },
+      { "id": "B", "text": "A type of rhyme scheme" },
+      { "id": "C", "text": "A musical rhythm" },
+      { "id": "D", "text": "A narrative structure" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Iambic pentameter is a metrical pattern of five iambs (unstressed-stressed syllable pairs) per line. Shakespeare frequently used this rhythm in his plays and sonnets.",
+    "category": "Literature",
+    "difficulty": "hard"
+  },
+  {
+    "id": 22,
+    "question": "What was the French Revolution's motto?",
+    "options": [
+      { "id": "A", "text": "Peace, Bread, Land" },
+      { "id": "B", "text": "Liberty, Equality, Fraternity" },
+      { "id": "C", "text": "Freedom or Death" },
+      { "id": "D", "text": "Power to the People" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "'Liberty, Equality, Fraternity' (Liberté, Égalité, Fraternité) was the motto of the French Revolution (1789-1799) and remains France's national motto today.",
+    "category": "History",
+    "difficulty": "medium"
+  },
+  {
+    "id": 23,
+    "question": "Who composed 'The Four Seasons'?",
+    "options": [
+      { "id": "A", "text": "Johann Sebastian Bach" },
+      { "id": "B", "text": "Antonio Vivaldi" },
+      { "id": "C", "text": "Wolfgang Amadeus Mozart" },
+      { "id": "D", "text": "Franz Joseph Haydn" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Antonio Vivaldi composed 'The Four Seasons' (1720s), a set of four violin concertos representing spring, summer, autumn, and winter. It's one of the most popular Baroque pieces.",
+    "category": "Music",
+    "difficulty": "medium"
+  },
+  {
+    "id": 24,
+    "question": "What is the 'categorical imperative' in Kant's philosophy?",
+    "options": [
+      { "id": "A", "text": "Act only according to rules you'd want to be universal laws" },
+      { "id": "B", "text": "The end justifies the means" },
+      { "id": "C", "text": "Survival of the fittest" },
+      { "id": "D", "text": "Knowledge comes from experience" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Kant's categorical imperative is a moral principle stating you should act only according to rules you could want to become universal laws. It's foundational to his deontological ethics.",
+    "category": "Philosophy",
+    "difficulty": "hard"
+  },
+  {
+    "id": 25,
+    "question": "What literary device is 'The pen is mightier than the sword'?",
+    "options": [
+      { "id": "A", "text": "Metaphor" },
+      { "id": "B", "text": "Simile" },
+      { "id": "C", "text": "Personification" },
+      { "id": "D", "text": "Alliteration" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "This is a metaphor comparing writing (pen) to warfare (sword), suggesting that written words have more influence than violence. It's from Edward Bulwer-Lytton's 1839 play.",
+    "category": "Literature",
+    "difficulty": "medium"
+  }
+]

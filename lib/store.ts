@@ -19,6 +19,8 @@ interface ExamState {
   examDuration: number; // in minutes
   mode: 'practice' | 'exam';
   useTimer: boolean;
+  learnWithAI: boolean; // AI-guided learning (practice mode only)
+  reviewAnswers: boolean; // Review answers during exam (exam mode only)
 
   // Question set management
   currentQuestionSetId: string | null;
@@ -28,7 +30,7 @@ interface ExamState {
   setQuestions: (questions: Question[]) => void;
   setCurrentQuestionIndex: (index: number) => void;
   submitAnswer: (questionId: number, selectedAnswer: string, isCorrect: boolean) => void;
-  startExam: (duration: number, mode?: 'practice' | 'exam', useTimer?: boolean) => void;
+  startExam: (duration: number, mode?: 'practice' | 'exam', useTimer?: boolean, learnWithAI?: boolean, reviewAnswers?: boolean) => void;
   completeExam: () => void;
   resetExam: () => void;
   nextQuestion: () => void;
@@ -36,6 +38,7 @@ interface ExamState {
   goToQuestion: (index: number) => void;
   getScore: () => { correct: number; total: number; percentage: number };
   updateQuestionExplanation: (questionId: number, explanation: string) => void;
+  editQuestion: (questionId: number, updatedQuestion: Question) => void;
 
   // Question set actions
   setCurrentQuestionSet: (questionSetId: string) => void;
@@ -55,6 +58,8 @@ export const useExamStore = create<ExamState>()(
       examDuration: 90, // default 90 minutes
       mode: 'exam',
       useTimer: true,
+      learnWithAI: false,
+      reviewAnswers: false,
 
       // Question set management
       currentQuestionSetId: null,
@@ -76,7 +81,7 @@ export const useExamStore = create<ExamState>()(
           return { userAnswers: newAnswers };
         }),
 
-      startExam: (duration, mode = 'exam', useTimer = true) =>
+      startExam: (duration, mode = 'exam', useTimer = true, learnWithAI = false, reviewAnswers = false) =>
         set({
           isExamStarted: true,
           isExamCompleted: false,
@@ -84,6 +89,8 @@ export const useExamStore = create<ExamState>()(
           examDuration: duration,
           mode,
           useTimer,
+          learnWithAI: mode === 'practice' ? learnWithAI : false, // Only enable in practice mode
+          reviewAnswers: mode === 'exam' ? reviewAnswers : false, // Only enable in exam mode
           currentQuestionIndex: 0,
           userAnswers: new Map(),
         }),
@@ -141,6 +148,34 @@ export const useExamStore = create<ExamState>()(
                 questions: questionSet.questions.map((q) =>
                   q.id === questionId ? { ...q, explanation } : q
                 ),
+              };
+            }
+            return questionSet;
+          });
+
+          return {
+            questions: updatedQuestions,
+            availableQuestionSets: updatedQuestionSets,
+          };
+        }),
+
+      editQuestion: (questionId, updatedQuestion) =>
+        set((state) => {
+          // Update the question in the questions array
+          const updatedQuestions = state.questions.map((q) =>
+            q.id === questionId ? { ...updatedQuestion, id: questionId } : q
+          );
+
+          // Also update in available question sets if this question belongs to one
+          const updatedQuestionSets = state.availableQuestionSets.map((questionSet) => {
+            const hasQuestion = questionSet.questions.some((q) => q.id === questionId);
+            if (hasQuestion) {
+              return {
+                ...questionSet,
+                questions: questionSet.questions.map((q) =>
+                  q.id === questionId ? { ...updatedQuestion, id: questionId } : q
+                ),
+                updatedAt: new Date().toISOString(),
               };
             }
             return questionSet;

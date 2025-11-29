@@ -1,0 +1,352 @@
+[
+  {
+    "id": 1,
+    "question": "What is the value of π (pi) approximately?",
+    "options": [
+      { "id": "A", "text": "3.14159" },
+      { "id": "B", "text": "2.71828" },
+      { "id": "C", "text": "1.61803" },
+      { "id": "D", "text": "4.66920" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Pi (π) is approximately 3.14159. It represents the ratio of a circle's circumference to its diameter and is an irrational number.",
+    "category": "Geometry",
+    "difficulty": "easy"
+  },
+  {
+    "id": 2,
+    "question": "What is the solution to the equation: 2x + 5 = 15?",
+    "options": [
+      { "id": "A", "text": "x = 5" },
+      { "id": "B", "text": "x = 10" },
+      { "id": "C", "text": "x = 7.5" },
+      { "id": "D", "text": "x = 20" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Solving: 2x + 5 = 15 → 2x = 10 → x = 5. Subtract 5 from both sides, then divide by 2.",
+    "category": "Algebra",
+    "difficulty": "easy"
+  },
+  {
+    "id": 3,
+    "question": "What is the derivative of x²?",
+    "options": [
+      { "id": "A", "text": "x" },
+      { "id": "B", "text": "2x" },
+      { "id": "C", "text": "x²" },
+      { "id": "D", "text": "2x²" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "Using the power rule: d/dx(xⁿ) = nxⁿ⁻¹. For x², the derivative is 2x¹ = 2x.",
+    "category": "Calculus",
+    "difficulty": "medium"
+  },
+  {
+    "id": 4,
+    "question": "What is the sum of interior angles in a triangle?",
+    "options": [
+      { "id": "A", "text": "90°" },
+      { "id": "B", "text": "180°" },
+      { "id": "C", "text": "270°" },
+      { "id": "D", "text": "360°" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "The sum of all interior angles in any triangle always equals 180 degrees, regardless of the triangle's shape or size.",
+    "category": "Geometry",
+    "difficulty": "easy"
+  },
+  {
+    "id": 5,
+    "question": "What is the Pythagorean theorem?",
+    "options": [
+      { "id": "A", "text": "a + b = c" },
+      { "id": "B", "text": "a² + b² = c²" },
+      { "id": "C", "text": "a × b = c" },
+      { "id": "D", "text": "a² - b² = c²" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "The Pythagorean theorem states that in a right triangle, the square of the hypotenuse (c) equals the sum of squares of the other two sides: a² + b² = c².",
+    "category": "Geometry",
+    "difficulty": "easy"
+  },
+  {
+    "id": 6,
+    "question": "What is the factorial of 5 (5!)?",
+    "options": [
+      { "id": "A", "text": "25" },
+      { "id": "B", "text": "120" },
+      { "id": "C", "text": "60" },
+      { "id": "D", "text": "100" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "5! = 5 × 4 × 3 × 2 × 1 = 120. Factorial represents the product of all positive integers up to that number.",
+    "category": "Number Theory",
+    "difficulty": "easy"
+  },
+  {
+    "id": 7,
+    "question": "What is the quadratic formula?",
+    "options": [
+      { "id": "A", "text": "x = (-b ± √(b² - 4ac)) / 2a" },
+      { "id": "B", "text": "x = -b / 2a" },
+      { "id": "C", "text": "x = b² - 4ac" },
+      { "id": "D", "text": "x = a + b + c" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The quadratic formula x = (-b ± √(b² - 4ac)) / 2a solves equations of the form ax² + bx + c = 0, where a ≠ 0.",
+    "category": "Algebra",
+    "difficulty": "medium"
+  },
+  {
+    "id": 8,
+    "question": "What is the integral of 2x?",
+    "options": [
+      { "id": "A", "text": "2" },
+      { "id": "B", "text": "x" },
+      { "id": "C", "text": "x² + C" },
+      { "id": "D", "text": "2x² + C" }
+    ],
+    "correctAnswer": "C",
+    "explanation": "∫2x dx = x² + C. Using the power rule for integration: ∫xⁿ dx = xⁿ⁺¹/(n+1) + C, where C is the constant of integration.",
+    "category": "Calculus",
+    "difficulty": "medium"
+  },
+  {
+    "id": 9,
+    "question": "What is the area of a circle with radius r?",
+    "options": [
+      { "id": "A", "text": "2πr" },
+      { "id": "B", "text": "πr²" },
+      { "id": "C", "text": "πr" },
+      { "id": "D", "text": "2πr²" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "The area of a circle is πr², where r is the radius. This formula comes from integration or geometric derivation.",
+    "category": "Geometry",
+    "difficulty": "easy"
+  },
+  {
+    "id": 10,
+    "question": "What is a prime number?",
+    "options": [
+      { "id": "A", "text": "A number divisible only by 1 and itself" },
+      { "id": "B", "text": "An even number" },
+      { "id": "C", "text": "A number greater than 10" },
+      { "id": "D", "text": "A number divisible by 2" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "A prime number is a natural number greater than 1 that has no positive divisors other than 1 and itself. Examples include 2, 3, 5, 7, 11.",
+    "category": "Number Theory",
+    "difficulty": "easy"
+  },
+  {
+    "id": 11,
+    "question": "What is the slope-intercept form of a linear equation?",
+    "options": [
+      { "id": "A", "text": "ax + by = c" },
+      { "id": "B", "text": "y = mx + b" },
+      { "id": "C", "text": "y - y₁ = m(x - x₁)" },
+      { "id": "D", "text": "x = my + b" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "The slope-intercept form is y = mx + b, where m is the slope and b is the y-intercept. It's useful for graphing and understanding linear relationships.",
+    "category": "Algebra",
+    "difficulty": "easy"
+  },
+  {
+    "id": 12,
+    "question": "What is the value of sin(90°)?",
+    "options": [
+      { "id": "A", "text": "0" },
+      { "id": "B", "text": "1" },
+      { "id": "C", "text": "-1" },
+      { "id": "D", "text": "√2/2" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "sin(90°) = 1. At 90 degrees (π/2 radians), the sine function reaches its maximum value on the unit circle.",
+    "category": "Trigonometry",
+    "difficulty": "easy"
+  },
+  {
+    "id": 13,
+    "question": "What is the determinant of a 2×2 matrix [[a,b],[c,d]]?",
+    "options": [
+      { "id": "A", "text": "a + b + c + d" },
+      { "id": "B", "text": "ad - bc" },
+      { "id": "C", "text": "ac - bd" },
+      { "id": "D", "text": "ab - cd" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "For a 2×2 matrix [[a,b],[c,d]], the determinant is ad - bc. This value is important for matrix operations and determining invertibility.",
+    "category": "Linear Algebra",
+    "difficulty": "medium"
+  },
+  {
+    "id": 14,
+    "question": "What is the sum of an arithmetic series with first term a₁, last term aₙ, and n terms?",
+    "options": [
+      { "id": "A", "text": "n(a₁ + aₙ)" },
+      { "id": "B", "text": "n(a₁ + aₙ)/2" },
+      { "id": "C", "text": "(a₁ + aₙ)/2" },
+      { "id": "D", "text": "n × a₁ × aₙ" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "The sum of an arithmetic series is S = n(a₁ + aₙ)/2, which represents the average of first and last terms multiplied by the number of terms.",
+    "category": "Series & Sequences",
+    "difficulty": "medium"
+  },
+  {
+    "id": 15,
+    "question": "What is the value of e (Euler's number) approximately?",
+    "options": [
+      { "id": "A", "text": "2.71828" },
+      { "id": "B", "text": "3.14159" },
+      { "id": "C", "text": "1.41421" },
+      { "id": "D", "text": "1.61803" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Euler's number e ≈ 2.71828 is the base of natural logarithms. It's fundamental in calculus, especially in exponential growth and decay.",
+    "category": "Number Theory",
+    "difficulty": "easy"
+  },
+  {
+    "id": 16,
+    "question": "What is the chain rule in calculus?",
+    "options": [
+      { "id": "A", "text": "d/dx[f(g(x))] = f'(g(x)) × g'(x)" },
+      { "id": "B", "text": "d/dx[f(g(x))] = f'(x) + g'(x)" },
+      { "id": "C", "text": "d/dx[f(g(x))] = f'(x) × g'(x)" },
+      { "id": "D", "text": "d/dx[f(g(x))] = f(x) + g(x)" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The chain rule states: d/dx[f(g(x))] = f'(g(x)) × g'(x). It's used to differentiate composite functions.",
+    "category": "Calculus",
+    "difficulty": "hard"
+  },
+  {
+    "id": 17,
+    "question": "What is a vector?",
+    "options": [
+      { "id": "A", "text": "A quantity with only magnitude" },
+      { "id": "B", "text": "A quantity with magnitude and direction" },
+      { "id": "C", "text": "A scalar value" },
+      { "id": "D", "text": "A unit of measurement" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "A vector is a quantity characterized by both magnitude (size) and direction. Examples include velocity, force, and displacement.",
+    "category": "Linear Algebra",
+    "difficulty": "easy"
+  },
+  {
+    "id": 18,
+    "question": "What is the limit of (sin x)/x as x approaches 0?",
+    "options": [
+      { "id": "A", "text": "0" },
+      { "id": "B", "text": "1" },
+      { "id": "C", "text": "∞" },
+      { "id": "D", "text": "undefined" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "lim(x→0) (sin x)/x = 1. This is a fundamental limit in calculus, often proved using L'Hôpital's rule or geometric arguments.",
+    "category": "Calculus",
+    "difficulty": "hard"
+  },
+  {
+    "id": 19,
+    "question": "What is the formula for combinations C(n,r)?",
+    "options": [
+      { "id": "A", "text": "n!/(r!(n-r)!)" },
+      { "id": "B", "text": "n!/r!" },
+      { "id": "C", "text": "n × r" },
+      { "id": "D", "text": "n!/(n-r)!" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The number of ways to choose r items from n items is C(n,r) = n!/(r!(n-r)!), where order doesn't matter.",
+    "category": "Combinatorics",
+    "difficulty": "medium"
+  },
+  {
+    "id": 20,
+    "question": "What is the Fundamental Theorem of Calculus?",
+    "options": [
+      { "id": "A", "text": "It relates derivatives and integrals" },
+      { "id": "B", "text": "It defines limits" },
+      { "id": "C", "text": "It proves the chain rule" },
+      { "id": "D", "text": "It defines continuity" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The Fundamental Theorem of Calculus links differentiation and integration, showing they are inverse operations. It enables computation of definite integrals.",
+    "category": "Calculus",
+    "difficulty": "hard"
+  },
+  {
+    "id": 21,
+    "question": "What is the distance formula between two points (x₁,y₁) and (x₂,y₂)?",
+    "options": [
+      { "id": "A", "text": "√((x₂-x₁)² + (y₂-y₁)²)" },
+      { "id": "B", "text": "(x₂-x₁) + (y₂-y₁)" },
+      { "id": "C", "text": "(x₂-x₁)² + (y₂-y₁)²" },
+      { "id": "D", "text": "√((x₂+x₁)² + (y₂+y₁)²)" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The distance formula d = √((x₂-x₁)² + (y₂-y₁)²) derives from the Pythagorean theorem applied to coordinate geometry.",
+    "category": "Geometry",
+    "difficulty": "medium"
+  },
+  {
+    "id": 22,
+    "question": "What is the sum of the first n natural numbers?",
+    "options": [
+      { "id": "A", "text": "n(n+1)/2" },
+      { "id": "B", "text": "n²" },
+      { "id": "C", "text": "n(n-1)/2" },
+      { "id": "D", "text": "2n" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The sum of first n natural numbers is 1+2+3+...+n = n(n+1)/2. This formula was famously discovered by young Gauss.",
+    "category": "Series & Sequences",
+    "difficulty": "medium"
+  },
+  {
+    "id": 23,
+    "question": "What is the golden ratio (φ) approximately?",
+    "options": [
+      { "id": "A", "text": "1.41421" },
+      { "id": "B", "text": "1.61803" },
+      { "id": "C", "text": "2.71828" },
+      { "id": "D", "text": "3.14159" }
+    ],
+    "correctAnswer": "B",
+    "explanation": "The golden ratio φ ≈ 1.61803 is (1+√5)/2. It appears in nature, art, and architecture, and has unique mathematical properties.",
+    "category": "Number Theory",
+    "difficulty": "medium"
+  },
+  {
+    "id": 24,
+    "question": "What is an eigenvalue?",
+    "options": [
+      { "id": "A", "text": "A scalar λ where Av = λv for some vector v" },
+      { "id": "B", "text": "The determinant of a matrix" },
+      { "id": "C", "text": "The trace of a matrix" },
+      { "id": "D", "text": "The rank of a matrix" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "An eigenvalue λ of matrix A satisfies Av = λv for some non-zero vector v (eigenvector). Eigenvalues are fundamental in linear algebra applications.",
+    "category": "Linear Algebra",
+    "difficulty": "hard"
+  },
+  {
+    "id": 25,
+    "question": "What is the Binomial Theorem for (a+b)ⁿ?",
+    "options": [
+      { "id": "A", "text": "∑C(n,k)aⁿ⁻ᵏbᵏ for k=0 to n" },
+      { "id": "B", "text": "aⁿ + bⁿ" },
+      { "id": "C", "text": "(a+b)ⁿ = aⁿbⁿ" },
+      { "id": "D", "text": "n(a+b)" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The Binomial Theorem states (a+b)ⁿ = ∑C(n,k)aⁿ⁻ᵏbᵏ from k=0 to n, where C(n,k) are binomial coefficients. It expands powers of binomials.",
+    "category": "Algebra",
+    "difficulty": "hard"
+  }
+]
