@@ -1,0 +1,144 @@
+[
+  {
+    "id": 1,
+    "question": "A company operates a fleet of servers on premises and operates a fleet of Amazon EC2 instances in its organization in AWS Organizations. The company's AWS accounts contain hundreds of VPCs. The company wants to connect its AWS accounts to its on-premises network. AWS Site-to-Site VPN connections are already established to a single AWS account. The company wants to control which VPCs can communicate with other VPCs.\n\nWhich combination of steps will achieve this level of control with the LEAST operational effort? (Choose three.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a transit gateway in an AWS account. Share the transit gateway across accounts by using AWS Resource Access Manager (AWS RAM)."
+      },
+      {
+        "id": "B",
+        "text": "Configure attachments to all VPCs and VPNs."
+      },
+      {
+        "id": "C",
+        "text": "Setup transit gateway route tables. Associate the VPCs and VPNs with the route tables."
+      },
+      {
+        "id": "D",
+        "text": "Configure VPC peering between the VPCs."
+      },
+      {
+        "id": "E",
+        "text": "Configure attachments between the VPCs and VPNs."
+      },
+      {
+        "id": "F",
+        "text": "Setup route tables on the VPCs and VPNs."
+      }
+    ],
+    "correctAnswer": "A,B,C",
+    "explanation": "Using AWS Transit Gateway with Resource Access Manager allows centralized VPC connectivity management across accounts. Configuring attachments to all VPCs/VPNs and setting up transit gateway route tables provides granular control over inter-VPC communication with minimal operational overhead compared to managing individual VPC peering connections.",
+    "category": "AWS - SAP-C02",
+    "difficulty": "hard"
+  },
+  {
+    "id": 2,
+    "question": "A company needs to architect a hybrid DNS solution. This solution will use an Amazon Route 53 private hosted zone for the domain cloud.example.com for the resources stored within VPCs.\nThe company has the following DNS resolution requirements:\n- On-premises systems should be able to resolve and connect to cloud.example.com.\n- All VPCs should be able to resolve cloud.example.com.\n- There is already an AWS Direct Connect connection between the on-premises corporate network and AWS Transit Gateway.\n\nWhich architecture should the company use to meet these requirements with the HIGHEST performance?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Associate the private hosted zone to all the VPCs. Create a Route 53 inbound resolver in the shared services VPC. Attach all VPCs to the transit gateway and create forwarding rules in the on-premises DNS server for cloud.example.com that point to the inbound resolver."
+      },
+      {
+        "id": "B",
+        "text": "Associate the private hosted zone to all the VPCs. Deploy an Amazon EC2 conditional forwarder in the shared services VPC. Attach all VPCs to the transit gateway and create forwarding rules in the on-premises DNS server for cloud.example.com that point to the conditional forwarder."
+      },
+      {
+        "id": "C",
+        "text": "Associate the private hosted zone to the shared services VPC. Create a Route 53 outbound resolver in the shared services VPC. Attach all VPCs to the transit gateway and create forwarding rules in the on-premises DNS server for cloud.example.com that point to the outbound resolver."
+      },
+      {
+        "id": "D",
+        "text": "Associate the private hosted zone to the shared services VPC. Create a Route 53 inbound resolver in the shared services VPC. Attach the shared services VPC to the transit gateway and create forwarding rules in the on-premises DNS server for cloud.example.com that point to the inbound resolver."
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Route 53 inbound resolver allows on-premises DNS queries to resolve Route 53 private hosted zones. By associating the hosted zone with all VPCs and creating forwarding rules from on-premises to the inbound resolver, both requirements are met with optimal performance using AWS-managed DNS infrastructure.",
+    "category": "AWS - SAP-C02",
+    "difficulty": "hard"
+  },
+  {
+    "id": 3,
+    "question": "Example Corp. has an on-premises data center and a VPC named VPC A in the Example Corp. AWS account. The on-premises network connects to VPC A through an AWS Site-To-Site VPN. The on-premises servers can properly access VPC A. Example Corp. just acquired AnyCompany, which has a VPC named VPC B. There is no IP address overlap among these networks. Example Corp. has peered VPC A and VPC B.\n\nExample Corp. wants to connect from its on-premise servers to VPC B. Example Corp. has properly set up the network ACL and security groups.\n\nWhich solution will meet this requirement with the LEAST operational effort?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a transit gateway. Attach the Site-to-Site VPN, VPC A, and VPC B to the transit gateway. Update the transit gateway route tables for all networks to add IP range routes for all other networks."
+      },
+      {
+        "id": "B",
+        "text": "Create a transit gateway. Create a Site-to-Site VPN connection between the on-premises network and VPC B, and connect the VPN connection to the transit gateway. Add a route to direct traffic to the peered VPCs, and add an authorization rule to give clients access to the VPCs A and B."
+      },
+      {
+        "id": "C",
+        "text": "Update the route tables for the Site-to-Site VPN and both VPCs for all three networks. Configure BGP propagation for all three networks. Wait for up to 5 minutes for BGP propagation to finish."
+      },
+      {
+        "id": "D",
+        "text": "Modify the Site-to-Site VPN's virtual private gateway definition to include VPC A and VPC B. Split the two routers of the virtual private getaway between the two VPCs."
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "AWS Transit Gateway acts as a hub that enables transitive routing between VPCs and VPN connections. By attaching all resources to a single transit gateway and configuring route tables, on-premises can reach both VPCs without creating additional VPN connections or complex peering arrangements. VPC peering does not support transitive routing.",
+    "category": "AWS - SAP-C02",
+    "difficulty": "medium"
+  },
+  {
+    "id": 4,
+    "question": "A company is planning a migration from an on-premises data center to the AWS Cloud. The company plans to use multiple AWS accounts that are managed in an organization in AWS Organizations. The company will create a small number of accounts initially and will add accounts as needed. A solutions architect must design a solution that turns on AWS CloudTrail in all AWS accounts.\n\nWhat is the MOST operationally efficient solution that meets these requirements?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create an AWS Lambda function that creates a new CloudTrail trail in all AWS accounts in the organization. Invoke the Lambda function daily by using a scheduled action in Amazon EventBridge."
+      },
+      {
+        "id": "B",
+        "text": "Create a new CloudTrail trail in the organization's management account. Configure the trail to log all events for all AWS accounts in the organization."
+      },
+      {
+        "id": "C",
+        "text": "Create a new CloudTrail trail in all AWS accounts in the organization. Create new trails whenever a new account is created. Define an SCP that prevents deletion or modification of trails. Apply the SCP to the root OU."
+      },
+      {
+        "id": "D",
+        "text": "Create an AWS Systems Manager Automation runbook that creates a CloudTrail trail in all AWS accounts in the organization. Invoke the automation by using Systems Manager State Manager."
+      }
+    ],
+    "correctAnswer": "B",
+    "explanation": "AWS Organizations supports organization trails that automatically apply to all accounts in the organization, including accounts added in the future. Creating an organization trail in the management account is the most operationally efficient solution as it requires minimal setup and automatically covers new accounts without additional automation.",
+    "category": "AWS - SAP-C02",
+    "difficulty": "medium"
+  },
+  {
+    "id": 5,
+    "question": "A company is building an electronic document management system in which users upload their documents. The application stack is entirely serverless and runs on AWS in the eu-central-1 Region. The system includes a web application that uses an Amazon CloudFront distribution for delivery with Amazon S3 as the origin. The web application communicates with Amazon API Gateway Regional endpoints. The API Gateway APIs call AWS Lambda functions that store metadata in an Amazon Aurora Serverless database and put the documents into an S3 bucket.\nThe company is growing steadily and has completed a proof of concept with its largest customer. The company must improve latency outside of Europe.\n\nWhich combination of actions will meet these requirements? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable S3 Transfer Acceleration on the S3 bucket. Ensure that the web application uses the Transfer Acceleration signed URLs."
+      },
+      {
+        "id": "B",
+        "text": "Create an accelerator in AWS Global Accelerator. Attach the accelerator to the CloudFront distribution."
+      },
+      {
+        "id": "C",
+        "text": "Change the API Gateway Regional endpoints to edge-optimized endpoints."
+      },
+      {
+        "id": "D",
+        "text": "Provision the entire stack in two other locations that are spread across the world. Use global databases on the Aurora Serverless cluster."
+      },
+      {
+        "id": "E",
+        "text": "Add an Amazon RDS proxy between the Lambda functions and the Aurora Serverless database."
+      }
+    ],
+    "correctAnswer": "A,C",
+    "explanation": "S3 Transfer Acceleration optimizes upload speeds from users worldwide to S3 buckets. Edge-optimized API Gateway endpoints use CloudFront edge locations to reduce latency for API calls from distant regions. Together, these solutions improve both document upload and API performance globally without requiring multi-region infrastructure deployment.",
+    "category": "AWS - SAP-C02",
+    "difficulty": "hard"
+  }
+]
