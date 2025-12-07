@@ -316,7 +316,11 @@ export default function GeneratePage() {
       // Validate each question has required fields
       const invalidQuestions: number[] = [];
       questions.forEach((q, idx) => {
-        if (!q.question || !q.options || !Array.isArray(q.options) || !q.correctAnswer) {
+        // Skip correctAnswer validation for HOTSPOT and drag-and-drop questions
+        const isSpecialType = q.type === 'hotspot' || q.type === 'drag-and-drop';
+        const hasCorrectAnswer = isSpecialType || q.correctAnswer;
+
+        if (!q.question || !q.options || !Array.isArray(q.options) || !hasCorrectAnswer) {
           invalidQuestions.push(idx + 1);
         }
       });
