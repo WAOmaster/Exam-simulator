@@ -7,7 +7,7 @@ export interface Question {
   explanation: string;
   category: string;
   difficulty: 'easy' | 'medium' | 'hard';
-  type?: 'multiple-choice' | 'true-false' | 'scenario';
+  type?: 'multiple-choice' | 'true-false' | 'scenario' | 'hotspot' | 'drag-and-drop';
 }
 
 // Question set types
@@ -82,6 +82,15 @@ export interface ContentSource {
     fileType?: string;
     url?: string;
     searchQuery?: string;
+    isJSON?: boolean;
+    cleaningMetadata?: {
+      isExamDump: boolean;
+      needsEnhancement: boolean;
+      originalCount: number;
+      cleanedCount: number;
+      missingExplanations: number;
+      missingDifficulty: number;
+    };
   };
 }
 
@@ -107,6 +116,16 @@ export interface UploadResponse {
   fileName: string;
   fileType: string;
   error?: string;
+  // For JSON files with questions
+  questions?: Question[];
+  cleaningMetadata?: {
+    isExamDump: boolean;
+    needsEnhancement: boolean;
+    originalCount: number;
+    cleanedCount: number;
+    missingExplanations: number;
+    missingDifficulty: number;
+  };
 }
 
 export interface ScrapeResponse {

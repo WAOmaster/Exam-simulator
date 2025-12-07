@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Parse the file
-    const { text, fileName, fileType } = await parseFile(buffer, file.name, file.type);
+    const { text, fileName, fileType, questions, cleaningMetadata } = await parseFile(buffer, file.name, file.type);
 
     // Check if content was extracted
     if (!text || text.trim().length === 0) {
@@ -45,6 +45,8 @@ export async function POST(request: NextRequest) {
       content: text,
       fileName,
       fileType,
+      questions,
+      cleaningMetadata,
     } as UploadResponse);
   } catch (error: any) {
     console.error('Upload error:', error);

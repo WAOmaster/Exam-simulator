@@ -1,0 +1,36 @@
+[
+  {
+    "id": 1,
+    "question": "A company operates a fleet of servers on premises and operates a fleet of Amazon EC2 instances in its organization in AWS Organizations. The company's AWS accounts contain hundreds of VPCs. The company wants to connect its AWS accounts to its on-premises network. AWS Site-to-Site VPN connections are already established to a single AWS account. The company wants to control which VPCs can communicate with other VPCs.\n\nWhich combination of steps will achieve this level of control with the LEAST operational effort? (Choose three.)\nA. Create a transit gateway in an AWS account. Share the transit gateway across accounts by using AWS Resource Access Manager (AWS RAM). Most Voted\nB. Configure attachments to all VPCs and VPNs. Most Voted\nC. Setup transit gateway route tables. Associate the VPCs and VPNs with the route tables. Most Voted\nD. Configure VPC peering between the VPCs.\nE. Configure attachments between the VPCs and VPNs.\nF. Setup route tables on the VPCs and VPNs.\nHide Answer\nSuggested Answer: ABC 🗳️\nCommunity vote distribution\nABC (72%)\nACE (28%)",
+    "options": [
+      {
+        "id": "A.",
+        "text": "Create a transit gateway in an AWS account. Share the transit gateway across accounts by using AWS Resource Access Manager (AWS RAM). Most Voted"
+      },
+      {
+        "id": "B.",
+        "text": "Configure attachments to all VPCs and VPNs. Most Voted"
+      },
+      {
+        "id": "C.",
+        "text": "Setup transit gateway route tables. Associate the VPCs and VPNs with the route tables. Most Voted"
+      },
+      {
+        "id": "D.",
+        "text": "Configure VPC peering between the VPCs."
+      },
+      {
+        "id": "E.",
+        "text": "Configure attachments between the VPCs and VPNs."
+      },
+      {
+        "id": "F.",
+        "text": "Setup route tables on the VPCs and VPNs."
+      }
+    ],
+    "correctAnswer": "A.,B.,C.",
+    "explanation": "",
+    "category": "AWS - SAP-C02",
+    "difficulty": ""
+  }
+]
