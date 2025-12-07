@@ -82,6 +82,15 @@ export interface ContentSource {
     fileType?: string;
     url?: string;
     searchQuery?: string;
+    isJSON?: boolean;
+    cleaningMetadata?: {
+      isExamDump: boolean;
+      needsEnhancement: boolean;
+      originalCount: number;
+      cleanedCount: number;
+      missingExplanations: number;
+      missingDifficulty: number;
+    };
   };
 }
 
