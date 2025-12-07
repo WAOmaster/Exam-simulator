@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Upload, Link as LinkIcon, Search, FileText, Sparkles, Loader2, ArrowLeft } from 'lucide-react';
+import { Upload, Link as LinkIcon, Search, FileText, Sparkles, Loader2, ArrowLeft, FileJson } from 'lucide-react';
 import FileUploader from '@/components/FileUploader';
 import URLInput from '@/components/URLInput';
 import GenerationControls from '@/components/GenerationControls';
@@ -13,7 +13,7 @@ import ProgressTracker, { ProgressStage } from '@/components/ProgressTracker';
 import { useExamStore } from '@/lib/store';
 import { GenerationConfig, ContentSource, Question, QuestionSet } from '@/lib/types';
 
-type InputTab = 'upload' | 'url' | 'search' | 'text';
+type InputTab = 'upload' | 'url' | 'search' | 'text' | 'json';
 
 // Helper function to edit a question in the generated questions array
 const editQuestionInArray = (questions: Question[], questionId: number, updatedQuestion: Question): Question[] => {
@@ -22,7 +22,9 @@ const editQuestionInArray = (questions: Question[], questionId: number, updatedQ
 
 // Helper function to convert InputTab to QuestionSet sourceType
 const getSourceType = (tab: InputTab): 'upload' | 'url' | 'search' | 'manual' | 'pre-built' => {
-  return tab === 'text' ? 'manual' : tab;
+  if (tab === 'text') return 'manual';
+  if (tab === 'json') return 'upload';
+  return tab;
 };
 
 // Helper function to generate smart title based on configuration
@@ -64,6 +66,8 @@ const generateDescription = (config: GenerationConfig, activeTab: InputTab, ques
     parts.push('generated from web content');
   } else if (activeTab === 'text') {
     parts.push('generated from provided text');
+  } else if (activeTab === 'json') {
+    parts.push('enhanced from bulk JSON upload');
   }
 
   // Add topic focus if present
@@ -111,12 +115,15 @@ export default function GeneratePage() {
   const [currentStageIndex, setCurrentStageIndex] = useState(0);
   const [progressComplete, setProgressComplete] = useState(false);
   const [progressError, setProgressError] = useState(false);
+  const [jsonQuestions, setJsonQuestions] = useState<Question[]>([]);
+  const [jsonFileName, setJsonFileName] = useState<string>('');
 
   const tabs = [
     { id: 'upload' as InputTab, label: 'Upload File', icon: Upload },
     { id: 'url' as InputTab, label: 'Fetch URL', icon: LinkIcon },
     { id: 'search' as InputTab, label: 'Search Knowledge', icon: Search },
     { id: 'text' as InputTab, label: 'Paste Text', icon: FileText },
+    { id: 'json' as InputTab, label: 'Upload JSON', icon: FileJson },
   ];
 
   // Analyze content to detect if it contains questions
@@ -244,6 +251,154 @@ export default function GeneratePage() {
     });
     analyzeContent(content);
     setError('');
+  };
+
+  const handleJSONFile = async (file: File) => {
+    try {
+      setError('');
+      setJsonQuestions([]);
+
+      const text = await file.text();
+      let parsed: any;
+
+      try {
+        parsed = JSON.parse(text);
+      } catch (parseError) {
+        throw new Error('Invalid JSON file. Please ensure the file contains valid JSON.');
+      }
+
+      // Validate structure - expect array of questions
+      let questions: Question[];
+
+      if (Array.isArray(parsed)) {
+        questions = parsed;
+      } else if (parsed.questions && Array.isArray(parsed.questions)) {
+        questions = parsed.questions;
+      } else {
+        throw new Error('Invalid format. Expected an array of questions or an object with a "questions" array.');
+      }
+
+      if (questions.length === 0) {
+        throw new Error('No questions found in JSON file.');
+      }
+
+      if (questions.length > 500) {
+        throw new Error('Maximum 500 questions allowed. Please split into smaller files.');
+      }
+
+      // Validate each question has required fields
+      const invalidQuestions: number[] = [];
+      questions.forEach((q, idx) => {
+        if (!q.question || !q.options || !Array.isArray(q.options) || !q.correctAnswer) {
+          invalidQuestions.push(idx + 1);
+        }
+      });
+
+      if (invalidQuestions.length > 0) {
+        throw new Error(
+          `Invalid question format at positions: ${invalidQuestions.slice(0, 5).join(', ')}${
+            invalidQuestions.length > 5 ? ` and ${invalidQuestions.length - 5} more` : ''
+          }. Each question must have: question, options (array), and correctAnswer.`
+        );
+      }
+
+      // Auto-detect subject from first question's category or set a default
+      const detectedSubject = questions[0]?.category || 'General';
+      if (!config.subject.trim()) {
+        setConfig(prev => ({ ...prev, subject: detectedSubject }));
+      }
+
+      setJsonQuestions(questions);
+      setJsonFileName(file.name);
+
+    } catch (err: any) {
+      setError(err.message || 'Failed to process JSON file');
+      setJsonQuestions([]);
+    }
+  };
+
+  const handleEnhanceJSONQuestions = async () => {
+    if (jsonQuestions.length === 0) {
+      setError('Please upload a JSON file first');
+      return;
+    }
+
+    setIsGenerating(true);
+    setError('');
+    setGeneratedQuestions([]);
+    setShowProgress(true);
+    setProgressComplete(false);
+    setProgressError(false);
+
+    try {
+      // Initialize progress tracking for enhancement
+      const totalQuestions = jsonQuestions.length;
+      const numBatches = Math.ceil(totalQuestions / 10); // 10 questions per batch
+
+      const stages: ProgressStage[] = [
+        { label: 'Validating question structure', status: 'pending' },
+        { label: `Splitting into ${numBatches} batches`, status: 'pending' },
+        { label: `Enhancing questions (${numBatches} batches)`, status: 'pending' },
+        { label: 'Improving explanations', status: 'pending' },
+        { label: 'Assigning difficulty levels', status: 'pending' },
+        { label: 'Finalizing enhancements', status: 'pending' },
+      ];
+
+      setProgressStages(stages);
+      setCurrentStageIndex(0);
+
+      // Calculate expected duration (3 seconds per batch)
+      const expectedDuration = numBatches * 3000;
+
+      // Start progress simulation
+      const progressPromise = simulateProgress(stages, expectedDuration);
+
+      // Call enhancement API
+      const response = await fetch('/api/enhance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questions: jsonQuestions }),
+      });
+
+      const data = await response.json();
+
+      // Wait for progress simulation to complete
+      await progressPromise;
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to enhance questions');
+      }
+
+      // Mark all stages as completed
+      setProgressStages(prev => prev.map(stage => ({ ...stage, status: 'completed' })));
+      setCurrentStageIndex(stages.length);
+      setProgressComplete(true);
+
+      // Set enhanced questions
+      setGeneratedQuestions(data.questions);
+      setProcessingMode('generated');
+
+      // Hide progress after a short delay
+      setTimeout(() => {
+        setShowProgress(false);
+      }, 2000);
+
+    } catch (err: any) {
+      setError(err.message || 'Failed to enhance questions');
+      setProgressError(true);
+      setProgressStages(prev => prev.map((stage, idx) => ({
+        ...stage,
+        status: idx === currentStageIndex ? 'error' : stage.status,
+        message: idx === currentStageIndex ? err.message : stage.message,
+      })));
+
+      // Hide progress after showing error
+      setTimeout(() => {
+        setShowProgress(false);
+      }, 3000);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleGenerateQuestions = async () => {
@@ -560,6 +715,84 @@ export default function GeneratePage() {
                     </div>
                   </div>
                 )}
+
+                {activeTab === 'json' && (
+                  <div className="space-y-4">
+                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
+                      <input
+                        type="file"
+                        id="json-upload"
+                        accept=".json"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            handleJSONFile(file);
+                          }
+                        }}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="json-upload"
+                        className="cursor-pointer flex flex-col items-center gap-4"
+                      >
+                        <div className="p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full">
+                          <FileJson className="w-12 h-12 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                            Click to upload JSON file
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            Upload 200-500 questions in JSON format
+                          </p>
+                        </div>
+                        <div className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                          Browse Files
+                        </div>
+                      </label>
+                    </div>
+
+                    {jsonQuestions.length > 0 && (
+                      <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-300 dark:border-green-700 rounded-lg">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-green-100 dark:bg-green-800 rounded-lg">
+                            <FileJson className="w-5 h-5 text-green-700 dark:text-green-300" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-green-900 dark:text-green-100 mb-1">
+                              ✓ JSON Loaded Successfully
+                            </h3>
+                            <div className="text-sm text-green-800 dark:text-green-200 space-y-1">
+                              <p><strong>File:</strong> {jsonFileName}</p>
+                              <p><strong>Questions:</strong> {jsonQuestions.length}</p>
+                              <p className="text-xs text-green-700 dark:text-green-300 mt-2">
+                                Click "Enhance with AI" to improve explanations and assign difficulty levels
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                      <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                        📋 JSON Format Requirements
+                      </p>
+                      <div className="text-sm text-blue-800 dark:text-blue-200 space-y-2">
+                        <p>Upload a JSON file with an array of questions. Each question must include:</p>
+                        <ul className="list-disc list-inside space-y-1 text-xs ml-2">
+                          <li><code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">question</code> - The question text</li>
+                          <li><code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">options</code> - Array of answer options with id and text</li>
+                          <li><code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">correctAnswer</code> - The correct option id</li>
+                          <li><code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">category</code> - Subject/topic (optional)</li>
+                        </ul>
+                        <p className="text-xs text-blue-700 dark:text-blue-300 mt-3">
+                          <strong>Note:</strong> AI will automatically enhance missing explanations and assign difficulty levels
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Content Analysis Display */}
@@ -622,25 +855,29 @@ export default function GeneratePage() {
               )}
             </div>
 
-            {/* Generation Controls */}
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                2. Configure Generation
-              </h2>
-              <GenerationControls
-                onConfigChange={setConfig}
-                isExtractionMode={contentAnalysis?.hasQuestions}
-                estimatedQuestions={contentAnalysis?.questionCount || 0}
-              />
-            </div>
+            {/* Generation Controls - Hide for JSON mode */}
+            {activeTab !== 'json' && (
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                  2. Configure Generation
+                </h2>
+                <GenerationControls
+                  onConfigChange={setConfig}
+                  isExtractionMode={contentAnalysis?.hasQuestions}
+                  estimatedQuestions={contentAnalysis?.questionCount || 0}
+                />
+              </div>
+            )}
 
-            {/* Generate Button */}
+            {/* Generate/Enhance Button */}
             <div className="flex gap-4">
               <button
-                onClick={handleGenerateQuestions}
-                disabled={isGenerating}
+                onClick={activeTab === 'json' ? handleEnhanceJSONQuestions : handleGenerateQuestions}
+                disabled={isGenerating || (activeTab === 'json' && jsonQuestions.length === 0)}
                 className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 text-white text-lg font-bold rounded-lg shadow-xl transition-all disabled:opacity-50 ${
-                  contentAnalysis?.hasQuestions
+                  activeTab === 'json'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 dark:from-purple-700 dark:to-pink-700 dark:hover:from-purple-600 dark:hover:to-pink-600'
+                    : contentAnalysis?.hasQuestions
                     ? 'bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 dark:from-green-700 dark:to-teal-700 dark:hover:from-green-600 dark:hover:to-teal-600'
                     : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-700 dark:to-purple-700 dark:hover:from-blue-600 dark:hover:to-purple-600'
                 }`}
@@ -648,11 +885,16 @@ export default function GeneratePage() {
                 {isGenerating ? (
                   <>
                     <Loader2 className="w-6 h-6 animate-spin" />
-                    {contentAnalysis?.hasQuestions ? 'Extracting & Enhancing...' : 'Generating Questions...'}
+                    {activeTab === 'json' ? 'Enhancing Questions...' : contentAnalysis?.hasQuestions ? 'Extracting & Enhancing...' : 'Generating Questions...'}
                   </>
                 ) : (
                   <>
-                    {contentAnalysis?.hasQuestions ? (
+                    {activeTab === 'json' ? (
+                      <>
+                        <Sparkles className="w-6 h-6" />
+                        Enhance with AI ({jsonQuestions.length} questions)
+                      </>
+                    ) : contentAnalysis?.hasQuestions ? (
                       <>
                         <FileText className="w-6 h-6" />
                         Extract & Enhance Questions
