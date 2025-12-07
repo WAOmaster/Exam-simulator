@@ -329,6 +329,10 @@ export function validateQuestions(questions: CleanedQuestion[]): {
   const errors: string[] = [];
 
   questions.forEach((q, index) => {
+    // Skip option/answer validation for HOTSPOT and drag-and-drop questions
+    // These use numeric IDs and different answer formats
+    const skipValidation = q.type === 'hotspot' || q.type === 'drag-and-drop';
+
     // Check required fields
     if (!q.question || q.question.trim().length === 0) {
       errors.push(`Question ${index + 1}: Missing question text`);
@@ -338,13 +342,10 @@ export function validateQuestions(questions: CleanedQuestion[]): {
       errors.push(`Question ${index + 1}: Must have at least 2 options`);
     }
 
-    if (!q.correctAnswer || q.correctAnswer.trim().length === 0) {
+    // Only validate correctAnswer for non-HOTSPOT/drag-and-drop questions
+    if (!skipValidation && (!q.correctAnswer || q.correctAnswer.trim().length === 0)) {
       errors.push(`Question ${index + 1}: Missing correct answer`);
     }
-
-    // Skip option/answer validation for HOTSPOT and drag-and-drop questions
-    // These use numeric IDs and different answer formats
-    const skipValidation = q.type === 'hotspot' || q.type === 'drag-and-drop';
 
     if (!skipValidation) {
       // Validate correct answer references existing options
