@@ -24,7 +24,7 @@ export interface CleanedQuestion {
   explanation: string;
   category: string;
   difficulty: 'easy' | 'medium' | 'hard';
-  type?: 'multiple-choice' | 'true-false' | 'scenario';
+  type?: 'multiple-choice' | 'true-false' | 'scenario' | 'hotspot' | 'drag-and-drop';
   needsEnhancement?: boolean;
 }
 
@@ -97,9 +97,15 @@ function cleanOptionText(text: string): string {
 
 /**
  * Normalize option ID format (A., A, etc. -> A)
+ * Preserves numeric IDs for HOTSPOT and drag-and-drop questions
  */
 function normalizeOptionId(id: string): string {
-  // Remove periods, parentheses, brackets
+  // If it's a numeric ID (1, 2, 3, etc.), keep it as is
+  if (/^\d+\.?$/.test(id.trim())) {
+    return id.replace(/\./g, '').trim();
+  }
+
+  // Otherwise, remove periods, parentheses, brackets and uppercase
   return id.replace(/[.)\]]/g, '').trim().toUpperCase();
 }
 
@@ -123,7 +129,31 @@ function normalizeCorrectAnswer(answer: string): string {
 function inferQuestionType(
   question: string,
   options: Array<{ id: string; text: string }>
-): 'multiple-choice' | 'true-false' | 'scenario' {
+): 'multiple-choice' | 'true-false' | 'scenario' | 'hotspot' | 'drag-and-drop' {
+  const questionLower = question.toLowerCase();
+
+  // HOTSPOT detection
+  if (questionLower.includes('hotspot') || questionLower.includes('hot spot')) {
+    return 'hotspot';
+  }
+
+  // Drag-and-drop detection
+  if (
+    questionLower.includes('drag') ||
+    questionLower.includes('drop') ||
+    questionLower.includes('drag and drop') ||
+    questionLower.includes('drag-and-drop')
+  ) {
+    return 'drag-and-drop';
+  }
+
+  // Check if all option IDs are numeric (common for HOTSPOT/drag-and-drop)
+  const allNumeric = options.every((opt) => /^\d+$/.test(opt.id));
+  if (allNumeric && options.length > 2) {
+    // Could be HOTSPOT or drag-and-drop, default to drag-and-drop
+    return 'drag-and-drop';
+  }
+
   // True/False detection
   if (options.length === 2) {
     const optionTexts = options.map((o) => o.text.toLowerCase());
@@ -226,7 +256,7 @@ export function cleanExamDumpJSON(rawQuestions: RawQuestion[]): CleaningResult {
         explanation: hasExplanation ? raw.explanation!.trim() : '',
         category: raw.category || 'General',
         difficulty,
-        type: type as 'multiple-choice' | 'true-false' | 'scenario',
+        type: type as 'multiple-choice' | 'true-false' | 'scenario' | 'hotspot' | 'drag-and-drop',
         needsEnhancement: !hasExplanation,
       });
     } catch (error) {
@@ -312,14 +342,20 @@ export function validateQuestions(questions: CleanedQuestion[]): {
       errors.push(`Question ${index + 1}: Missing correct answer`);
     }
 
-    // Validate correct answer references existing options
-    const optionIds = q.options.map((o) => o.id);
-    const correctAnswers = q.correctAnswer.split(',');
-    correctAnswers.forEach((answer) => {
-      if (!optionIds.includes(answer)) {
-        errors.push(`Question ${index + 1}: Correct answer '${answer}' not found in options`);
-      }
-    });
+    // Skip option/answer validation for HOTSPOT and drag-and-drop questions
+    // These use numeric IDs and different answer formats
+    const skipValidation = q.type === 'hotspot' || q.type === 'drag-and-drop';
+
+    if (!skipValidation) {
+      // Validate correct answer references existing options
+      const optionIds = q.options.map((o) => o.id);
+      const correctAnswers = q.correctAnswer.split(',');
+      correctAnswers.forEach((answer) => {
+        if (!optionIds.includes(answer)) {
+          errors.push(`Question ${index + 1}: Correct answer '${answer}' not found in options`);
+        }
+      });
+    }
   });
 
   return {

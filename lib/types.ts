@@ -7,7 +7,7 @@ export interface Question {
   explanation: string;
   category: string;
   difficulty: 'easy' | 'medium' | 'hard';
-  type?: 'multiple-choice' | 'true-false' | 'scenario';
+  type?: 'multiple-choice' | 'true-false' | 'scenario' | 'hotspot' | 'drag-and-drop';
 }
 
 // Question set types
