@@ -4,13 +4,13 @@ import { useState, useRef } from 'react';
 import { Upload, File, X, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface FileUploaderProps {
-  onFileProcessed: (content: string, fileName: string) => void;
+  onFileProcessed: (content: string, fileName: string, metadata?: any) => void;
   acceptedTypes?: string;
 }
 
 export default function FileUploader({
   onFileProcessed,
-  acceptedTypes = '.docx,.xlsx,.txt',
+  acceptedTypes = '.docx,.xlsx,.txt,.json',
 }: FileUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -67,7 +67,10 @@ export default function FileUploader({
       }
 
       setUploadStatus('success');
-      onFileProcessed(data.content, data.fileName);
+      onFileProcessed(data.content, data.fileName, {
+        questions: data.questions,
+        cleaningMetadata: data.cleaningMetadata,
+      });
     } catch (error: any) {
       setUploadStatus('error');
       setErrorMessage(error.message || 'Failed to process file');

@@ -107,6 +107,16 @@ export interface UploadResponse {
   fileName: string;
   fileType: string;
   error?: string;
+  // For JSON files with questions
+  questions?: Question[];
+  cleaningMetadata?: {
+    isExamDump: boolean;
+    needsEnhancement: boolean;
+    originalCount: number;
+    cleanedCount: number;
+    missingExplanations: number;
+    missingDifficulty: number;
+  };
 }
 
 export interface ScrapeResponse {

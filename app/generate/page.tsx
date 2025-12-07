@@ -233,14 +233,41 @@ export default function GeneratePage() {
     }
   };
 
-  const handleFileProcessed = (content: string, fileName: string) => {
-    setContentSource({
-      type: 'file',
-      content,
-      metadata: { fileName },
-    });
-    analyzeContent(content);
-    setError('');
+  const handleFileProcessed = (content: string, fileName: string, metadata?: any) => {
+    // Check if this is a JSON file with pre-parsed questions
+    if (metadata?.questions && metadata?.cleaningMetadata) {
+      // JSON file with questions - directly set as generated questions
+      setGeneratedQuestions(metadata.questions);
+      setContentSource({
+        type: 'file',
+        content,
+        metadata: {
+          fileName,
+          isJSON: true,
+          cleaningMetadata: metadata.cleaningMetadata,
+        },
+      });
+      setActiveTab('json');
+      setIsGenerating(false);
+      setError('');
+
+      // Auto-detect subject from questions if not set
+      if (metadata.questions.length > 0) {
+        const firstCategory = metadata.questions[0].category || '';
+        if (firstCategory && !config.subject) {
+          setConfig({ ...config, subject: firstCategory });
+        }
+      }
+    } else {
+      // Regular file upload (DOCX, TXT, etc.)
+      setContentSource({
+        type: 'file',
+        content,
+        metadata: { fileName },
+      });
+      analyzeContent(content);
+      setError('');
+    }
   };
 
   const handleURLContentFetched = (content: string, urls: string[]) => {
@@ -396,6 +423,53 @@ export default function GeneratePage() {
       setTimeout(() => {
         setShowProgress(false);
       }, 3000);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleEnhanceQuestions = async () => {
+    if (!generatedQuestions || generatedQuestions.length === 0) {
+      setError('No questions to enhance');
+      return;
+    }
+
+    setIsGenerating(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/enhance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questions: generatedQuestions }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to enhance questions');
+      }
+
+      // Update generated questions with enhanced versions
+      setGeneratedQuestions(data.questions);
+
+      // Update content source metadata to remove enhancement flag
+      if (contentSource?.metadata?.cleaningMetadata) {
+        setContentSource({
+          ...contentSource,
+          metadata: {
+            ...contentSource.metadata,
+            cleaningMetadata: {
+              ...contentSource.metadata.cleaningMetadata,
+              needsEnhancement: false,
+              missingExplanations: 0,
+            },
+          },
+        });
+      }
+    } catch (error: any) {
+      console.error('Enhancement error:', error);
+      setError(error.message || 'Failed to enhance questions. Please try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -948,6 +1022,69 @@ export default function GeneratePage() {
                         <>✨ Questions Extracted & AI Enhanced</>
                       ) : (
                         <>🤖 Questions AI Generated</>
+                      )}
+                    </div>
+                  )}
+
+                  {/* JSON Cleaning Metadata */}
+                  {contentSource?.metadata?.isJSON && contentSource?.metadata?.cleaningMetadata && (
+                    <div className="space-y-3">
+                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4">
+                        <div className="flex items-start gap-3">
+                          <FileJson className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                          <div className="flex-1 space-y-2">
+                            <h4 className="font-semibold text-green-900 dark:text-green-100">
+                              {contentSource.metadata.cleaningMetadata.isExamDump
+                                ? '🧹 Exam Dump Cleaned'
+                                : '📥 JSON Loaded'}
+                            </h4>
+                            <div className="text-sm text-green-700 dark:text-green-300 space-y-1">
+                              {contentSource.metadata.cleaningMetadata.isExamDump && (
+                                <p>✓ Removed metadata and formatting issues</p>
+                              )}
+                              <p>✓ Loaded {contentSource.metadata.cleaningMetadata.cleanedCount} questions</p>
+                              {contentSource.metadata.cleaningMetadata.missingExplanations > 0 && (
+                                <p className="text-amber-700 dark:text-amber-300">
+                                  ⚠ {contentSource.metadata.cleaningMetadata.missingExplanations} questions need explanations
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* AI Enhancement Option */}
+                      {contentSource.metadata.cleaningMetadata.needsEnhancement && (
+                        <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-700 rounded-lg p-4">
+                          <div className="flex items-start gap-3">
+                            <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-1">
+                                AI Enhancement Available
+                              </h4>
+                              <p className="text-sm text-purple-700 dark:text-purple-300 mb-3">
+                                Generate detailed explanations for {contentSource.metadata.cleaningMetadata.missingExplanations} questions
+                              </p>
+                              <button
+                                onClick={handleEnhanceQuestions}
+                                disabled={isGenerating}
+                                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium rounded-lg transition-all disabled:cursor-not-allowed flex items-center gap-2"
+                              >
+                                {isGenerating ? (
+                                  <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    Enhancing...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Sparkles className="w-4 h-4" />
+                                    Enhance with AI
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
                       )}
                     </div>
                   )}
