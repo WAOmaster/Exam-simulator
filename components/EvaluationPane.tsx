@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader2, CheckCircle, XCircle, Brain } from 'lucide-react';
+import { X, Loader2, CheckCircle, XCircle, Brain, ExternalLink, ShieldCheck } from 'lucide-react';
 import { formatExplanation } from '@/lib/formatExplanation';
 import { useExamStore } from '@/lib/store';
 
@@ -30,6 +30,7 @@ export default function EvaluationPane({
   questionId,
 }: EvaluationPaneProps) {
   const [explanation, setExplanation] = useState('');
+  const [sources, setSources] = useState<Array<{ title: string; url: string }>>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { updateQuestionExplanation } = useExamStore();
@@ -70,6 +71,7 @@ export default function EvaluationPane({
 
       const data = await response.json();
       setExplanation(data.explanation);
+      setSources(data.sources || []);
 
       // Save the fetched explanation to the question for future use
       if (questionId && data.explanation) {
@@ -187,6 +189,34 @@ export default function EvaluationPane({
                   </div>
                 )}
               </div>
+
+              {/* Grounded Sources */}
+              {!loading && sources.length > 0 && (
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <ShieldCheck className="w-4 h-4 text-green-600 dark:text-green-400" />
+                    <span className="text-xs font-medium text-green-700 dark:text-green-300">
+                      Verified with Google Search
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {sources.map((source, index) => (
+                      <a
+                        key={index}
+                        href={source.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-600 transition-colors group"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 shrink-0" />
+                        <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-blue-700 dark:group-hover:text-blue-300 truncate">
+                          {source.title || source.url}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         </>

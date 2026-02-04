@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, BookOpen } from 'lucide-react';
 import { Question } from '@/lib/types';
 
 interface QuestionCardProps {
@@ -14,7 +13,7 @@ interface QuestionCardProps {
   onSubmit: () => void;
   isSubmitted: boolean;
   isLoading?: boolean;
-  showFeedback?: boolean; // Show color-coded feedback (for review mode)
+  showFeedback?: boolean;
 }
 
 export default function QuestionCard({
@@ -26,91 +25,146 @@ export default function QuestionCard({
   onSubmit,
   isSubmitted,
   isLoading = false,
-  showFeedback = true, // Default to true for practice mode compatibility
+  showFeedback = true,
 }: QuestionCardProps) {
+
   const getOptionStyle = (optionId: string) => {
+    const baseStyle = "w-full text-left p-4 rounded-xl transition-all duration-200";
+
     if (!isSubmitted) {
-      return selectedAnswer === optionId
-        ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30'
-        : 'border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+      if (selectedAnswer === optionId) {
+        return `${baseStyle} option-selected shadow-sm`;
+      }
+      return `${baseStyle} option-default cursor-pointer hover:shadow-md`;
     }
 
     // After submission - only show feedback if showFeedback is true
     if (!showFeedback) {
-      // Don't show any color coding when feedback is disabled
       return selectedAnswer === optionId
-        ? 'border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700/50'
-        : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 opacity-60';
+        ? `${baseStyle} bg-muted border-2 border-card-border`
+        : `${baseStyle} bg-muted/50 border-2 border-transparent opacity-60`;
     }
 
-    // Show color-coded feedback (review mode enabled)
+    // Show color-coded feedback
     if (optionId === question.correctAnswer) {
-      return 'border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/30';
+      return `${baseStyle} option-correct shadow-sm`;
     }
 
     if (optionId === selectedAnswer && optionId !== question.correctAnswer) {
-      return 'border-red-500 dark:border-red-400 bg-red-50 dark:bg-red-900/30';
+      return `${baseStyle} option-incorrect shadow-sm`;
     }
 
-    return 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 opacity-60';
+    return `${baseStyle} bg-muted/30 border-2 border-transparent opacity-50`;
   };
 
   const getOptionIcon = (optionId: string) => {
     if (!isSubmitted || !showFeedback) return null;
 
     if (optionId === question.correctAnswer) {
-      return <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />;
+      return (
+        <motion.div
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: "spring", stiffness: 200, damping: 15 }}
+        >
+          <CheckCircle2 className="w-5 h-5 text-accent-green" />
+        </motion.div>
+      );
     }
 
     if (optionId === selectedAnswer && optionId !== question.correctAnswer) {
-      return <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />;
+      return (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 15 }}
+        >
+          <XCircle className="w-5 h-5 text-accent-red" />
+        </motion.div>
+      );
     }
 
     return null;
   };
 
+  // Option labels styled like bubble sheet
+  const optionLabels = ['A', 'B', 'C', 'D', 'E', 'F'];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 md:p-8 transition-colors"
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="card-paper p-6 md:p-8"
     >
       {/* Question Header */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-            Question {questionNumber} of {totalQuestions}
-          </span>
-          <span className="text-xs px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300">
+        <div className="flex items-center justify-between mb-5">
+          {/* Question number badge */}
+          <div className="flex items-center gap-3">
+            <span className="question-badge">
+              Q{questionNumber}
+            </span>
+            <span className="text-sm text-muted-foreground">
+              of {totalQuestions}
+            </span>
+          </div>
+
+          {/* Category tag */}
+          <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-muted rounded-lg text-muted-foreground">
+            <BookOpen className="w-3.5 h-3.5" />
             {question.category}
           </span>
         </div>
 
-        <h2 className="text-xl md:text-2xl font-semibold text-gray-800 dark:text-gray-100 leading-relaxed">
+        {/* Question text */}
+        <h2 className="text-xl md:text-2xl font-display leading-relaxed text-foreground">
           {question.question}
         </h2>
       </div>
 
-      {/* Options */}
-      <div className="space-y-3 mb-6">
-        {question.options.map((option) => (
+      {/* Options - Bubble sheet style */}
+      <div className="space-y-3 mb-8">
+        {question.options.map((option, index) => (
           <motion.button
             key={option.id}
-            whileHover={{ scale: isSubmitted ? 1 : 1.01 }}
-            whileTap={{ scale: isSubmitted ? 1 : 0.99 }}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.05, duration: 0.3 }}
+            whileHover={!isSubmitted ? { scale: 1.01, x: 4 } : {}}
+            whileTap={!isSubmitted ? { scale: 0.99 } : {}}
             onClick={() => !isSubmitted && onAnswerSelect(option.id)}
             disabled={isSubmitted}
-            className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${getOptionStyle(
-              option.id
-            )} ${isSubmitted ? 'cursor-default' : 'cursor-pointer'}`}
+            className={getOptionStyle(option.id)}
           >
-            <div className="flex items-start gap-3">
-              <span className="font-bold text-lg text-gray-700 dark:text-gray-300 min-w-[24px]">
-                {option.id}.
+            <div className="flex items-center gap-4">
+              {/* Bubble-style option indicator */}
+              <div className={`
+                flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center
+                font-mono font-bold text-sm transition-all duration-200
+                ${selectedAnswer === option.id
+                  ? isSubmitted
+                    ? showFeedback
+                      ? option.id === question.correctAnswer
+                        ? 'bg-accent-green text-white'
+                        : 'bg-accent-red text-white'
+                      : 'bg-accent-blue text-white'
+                    : 'bg-accent-blue text-white'
+                  : 'bg-muted text-muted-foreground'
+                }
+              `}>
+                {optionLabels[index] || option.id}
+              </div>
+
+              {/* Option text */}
+              <span className="flex-1 text-base leading-relaxed">
+                {option.text}
               </span>
-              <span className="flex-1 text-gray-800 dark:text-gray-200">{option.text}</span>
-              {getOptionIcon(option.id)}
+
+              {/* Feedback icon */}
+              <div className="flex-shrink-0">
+                {getOptionIcon(option.id)}
+              </div>
             </div>
           </motion.button>
         ))}
@@ -118,24 +172,43 @@ export default function QuestionCard({
 
       {/* Submit Button */}
       {!isSubmitted && (
-        <button
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          whileHover={selectedAnswer ? { scale: 1.01 } : {}}
+          whileTap={selectedAnswer ? { scale: 0.99 } : {}}
           onClick={onSubmit}
           disabled={!selectedAnswer || isLoading}
-          className={`w-full py-3 px-6 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-            selectedAnswer && !isLoading
-              ? 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white shadow-md hover:shadow-lg'
-              : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-          }`}
+          className={`
+            w-full py-4 px-6 rounded-xl font-semibold text-lg
+            transition-all duration-300 flex items-center justify-center gap-3
+            ${selectedAnswer && !isLoading
+              ? 'btn-primary'
+              : 'bg-muted text-muted-foreground cursor-not-allowed'
+            }
+          `}
         >
           {isLoading ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              Checking Answer...
+              <span>Checking Answer...</span>
             </>
           ) : (
-            'Submit Answer'
+            <span>Submit Answer</span>
           )}
-        </button>
+        </motion.button>
+      )}
+
+      {/* Post-submission indicator */}
+      {isSubmitted && !showFeedback && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center py-3 text-sm text-muted-foreground"
+        >
+          Answer recorded • Continue to next question
+        </motion.div>
       )}
     </motion.div>
   );

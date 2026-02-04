@@ -7,7 +7,9 @@ import Timer from '@/components/Timer';
 import ProgressBar from '@/components/ProgressBar';
 import EvaluationPane from '@/components/EvaluationPane';
 import LearnWithAI from '@/components/LearnWithAI';
-import { ChevronLeft, ChevronRight, Home, AlertCircle } from 'lucide-react';
+import CognitiveCompanion from '@/components/CognitiveCompanion';
+import SocraticDialogue from '@/components/SocraticDialogue';
+import { ChevronLeft, ChevronRight, Home, AlertCircle, MessageCircle } from 'lucide-react';
 
 export default function PracticePage() {
   const router = useRouter();
@@ -20,13 +22,23 @@ export default function PracticePage() {
     examDuration,
     useTimer,
     learnWithAI,
+    cognitiveCompanion,
+    socraticMode,
+    sessionMetrics,
+    questionViewTimes,
+    selectionChanges,
     submitAnswer,
     nextQuestion,
     previousQuestion,
+    recordQuestionView,
+    recordSelectionChange,
   } = useExamStore();
 
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showEvaluation, setShowEvaluation] = useState(false);
+  const [showCognitiveCompanion, setShowCognitiveCompanion] = useState(false);
+  const [showSocratic, setShowSocratic] = useState(false);
+  const [ccDismissed, setCcDismissed] = useState(false); // Track if CC was dismissed for this question
 
   useEffect(() => {
     if (!isExamStarted) {
@@ -35,10 +47,17 @@ export default function PracticePage() {
     }
 
     if (questions.length === 0) {
-      // No questions loaded, redirect to home
       router.push('/');
     }
   }, [isExamStarted, questions.length, router]);
+
+  // Track question view time
+  useEffect(() => {
+    const currentQuestion = questions[currentQuestionIndex];
+    if (currentQuestion) {
+      recordQuestionView(currentQuestion.id);
+    }
+  }, [currentQuestionIndex]);
 
   useEffect(() => {
     // Load saved answer for current question
@@ -51,6 +70,9 @@ export default function PracticePage() {
       } else {
         setSelectedAnswer(null);
         setShowEvaluation(false);
+        setShowCognitiveCompanion(false);
+        setShowSocratic(false);
+        setCcDismissed(false);
       }
     }
   }, [currentQuestionIndex, userAnswers]);
@@ -67,6 +89,11 @@ export default function PracticePage() {
   const answeredCount = userAnswers.size;
 
   const handleAnswerSelect = (answerId: string) => {
+    // Track selection changes
+    if (selectedAnswer && selectedAnswer !== answerId) {
+      recordSelectionChange(currentQuestion.id);
+    }
+
     setSelectedAnswer(answerId);
 
     const isCorrect = answerId === currentQuestion.correctAnswer;
@@ -74,12 +101,30 @@ export default function PracticePage() {
     // Auto-submit answer in practice mode
     submitAnswer(currentQuestion.id, answerId, isCorrect);
 
-    // Show evaluation pane immediately
-    setShowEvaluation(true);
+    // Determine which pane to show
+    if (!isCorrect && cognitiveCompanion) {
+      // Show Cognitive Companion for wrong answers when enabled
+      setShowCognitiveCompanion(true);
+      setShowEvaluation(false);
+      setShowSocratic(false);
+    } else if (!isCorrect && socraticMode && !cognitiveCompanion) {
+      // Show Socratic Dialogue for wrong answers when enabled (and CC not enabled)
+      setShowSocratic(true);
+      setShowEvaluation(false);
+      setShowCognitiveCompanion(false);
+    } else {
+      // Standard evaluation pane
+      setShowEvaluation(true);
+      setShowCognitiveCompanion(false);
+      setShowSocratic(false);
+    }
   };
 
   const handleNext = () => {
     setShowEvaluation(false);
+    setShowCognitiveCompanion(false);
+    setShowSocratic(false);
+    setCcDismissed(false);
     setSelectedAnswer(null);
     if (currentQuestionIndex < questions.length - 1) {
       nextQuestion();
@@ -88,6 +133,9 @@ export default function PracticePage() {
 
   const handlePrevious = () => {
     setShowEvaluation(false);
+    setShowCognitiveCompanion(false);
+    setShowSocratic(false);
+    setCcDismissed(false);
     setSelectedAnswer(null);
     previousQuestion();
   };
@@ -101,6 +149,25 @@ export default function PracticePage() {
   const handleTimeUp = () => {
     alert('Time is up! You can continue practicing or go back to home.');
   };
+
+  const handleCloseCognitiveCompanion = () => {
+    setShowCognitiveCompanion(false);
+    setCcDismissed(true);
+    // Show standard evaluation pane after CC is closed
+    setShowEvaluation(true);
+  };
+
+  // Compute response time for current question
+  const currentResponseTimeMs = questionViewTimes.get(currentQuestion.id)
+    ? Date.now() - (questionViewTimes.get(currentQuestion.id) || Date.now())
+    : 0;
+  const currentSelectionChanges = selectionChanges.get(currentQuestion.id) || 0;
+
+  // Check if the current answer is wrong (for showing Socratic button after CC dismissal)
+  const isCurrentAnswerWrong = selectedAnswer !== null && selectedAnswer !== currentQuestion.correctAnswer;
+  const showSocraticButton = ccDismissed && socraticMode && isCurrentAnswerWrong && !showSocratic;
+
+  const anySidePaneOpen = showEvaluation || showCognitiveCompanion || showSocratic;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -149,7 +216,7 @@ export default function PracticePage() {
       {/* Main Content - Split Layout */}
       <div className="flex">
         {/* Question Section */}
-        <div className={`transition-all duration-300 ${showEvaluation ? 'lg:w-2/3' : 'w-full'} px-4 py-8`}>
+        <div className={`transition-all duration-300 ${anySidePaneOpen ? 'lg:w-2/3' : 'w-full'} px-4 py-8`}>
           <div className="max-w-4xl mx-auto">
             {/* Practice Mode Info */}
             <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg flex items-center gap-3 transition-colors">
@@ -222,6 +289,20 @@ export default function PracticePage() {
                 })}
               </div>
 
+              {/* Try Socratic Dialogue button (after CC is dismissed) */}
+              {showSocraticButton && (
+                <button
+                  onClick={() => {
+                    setShowSocratic(true);
+                    setShowEvaluation(false);
+                  }}
+                  className="mt-4 w-full py-3 px-4 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-200 dark:border-indigo-700 rounded-lg text-indigo-700 dark:text-indigo-300 font-medium flex items-center justify-center gap-2 hover:from-indigo-100 hover:to-blue-100 dark:hover:from-indigo-900/30 dark:hover:to-blue-900/30 transition-all"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Try Socratic Dialogue
+                </button>
+              )}
+
               {/* Learn with AI (only if enabled and answer is selected) */}
               {learnWithAI && selectedAnswer && (
                 <LearnWithAI
@@ -271,7 +352,7 @@ export default function PracticePage() {
         </div>
 
         {/* Evaluation Pane */}
-        {selectedAnswer && (
+        {selectedAnswer && showEvaluation && (
           <EvaluationPane
             isOpen={showEvaluation}
             onClose={() => setShowEvaluation(false)}
@@ -282,6 +363,42 @@ export default function PracticePage() {
             isCorrect={selectedAnswer === currentQuestion.correctAnswer}
             explanation={currentQuestion.explanation}
             questionId={currentQuestion.id}
+          />
+        )}
+
+        {/* Cognitive Companion Pane */}
+        {selectedAnswer && showCognitiveCompanion && (
+          <CognitiveCompanion
+            isOpen={showCognitiveCompanion}
+            onClose={handleCloseCognitiveCompanion}
+            question={currentQuestion.question}
+            options={currentQuestion.options}
+            selectedAnswer={selectedAnswer}
+            correctAnswer={currentQuestion.correctAnswer}
+            questionId={currentQuestion.id}
+            responseTimeMs={currentResponseTimeMs}
+            selectionChanges={currentSelectionChanges}
+            consecutiveIncorrect={sessionMetrics.consecutiveIncorrect}
+            category={currentQuestion.category}
+            difficulty={currentQuestion.difficulty}
+          />
+        )}
+
+        {/* Socratic Dialogue Pane */}
+        {selectedAnswer && showSocratic && (
+          <SocraticDialogue
+            isOpen={showSocratic}
+            onClose={() => {
+              setShowSocratic(false);
+              setShowEvaluation(true);
+            }}
+            question={currentQuestion.question}
+            options={currentQuestion.options}
+            correctAnswer={currentQuestion.correctAnswer}
+            userAnswer={selectedAnswer}
+            onResolved={() => {
+              // Optionally show evaluation after resolution
+            }}
           />
         )}
       </div>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Clock, Brain, Trophy, Sparkles, FileText } from 'lucide-react';
+import { X, Clock, Brain, Trophy, Sparkles, FileText, MessageCircle } from 'lucide-react';
 
 interface ExamSetupModalProps {
   isOpen: boolean;
@@ -12,6 +12,8 @@ interface ExamSetupModalProps {
     useTimer: boolean;
     learnWithAI: boolean;
     reviewAnswers: boolean;
+    cognitiveCompanion: boolean;
+    socraticMode: boolean;
     examDuration: number;
   }) => void;
   questionSetTitle: string;
@@ -29,10 +31,12 @@ export default function ExamSetupModal({
   const [useTimer, setUseTimer] = useState(true);
   const [learnWithAI, setLearnWithAI] = useState(false);
   const [reviewAnswers, setReviewAnswers] = useState(false);
+  const [cognitiveCompanion, setCognitiveCompanion] = useState(false);
+  const [socraticMode, setSocraticMode] = useState(false);
   const [examDuration, setExamDuration] = useState(90);
 
   const handleStart = () => {
-    onStart({ mode, useTimer, learnWithAI, reviewAnswers, examDuration });
+    onStart({ mode, useTimer, learnWithAI, reviewAnswers, cognitiveCompanion, socraticMode, examDuration });
   };
 
   const durations = [30, 60, 90, 120];
@@ -219,6 +223,64 @@ export default function ExamSetupModal({
                     </div>
                   </div>
                 )}
+
+                {/* Cognitive Companion Toggle (Both Modes) */}
+                <div>
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Brain className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                      <div>
+                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
+                          Cognitive Companion
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                          AI diagnoses why you got it wrong
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setCognitiveCompanion(!cognitiveCompanion)}
+                      className={`relative w-14 h-8 rounded-full transition-colors ${
+                        cognitiveCompanion ? 'bg-amber-600 dark:bg-amber-500' : 'bg-gray-300 dark:bg-gray-600'
+                      }`}
+                    >
+                      <div
+                        className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                          cognitiveCompanion ? 'translate-x-6' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Socratic Dialogue Toggle (Both Modes) */}
+                <div>
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-200 dark:border-indigo-700 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <MessageCircle className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                      <div>
+                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
+                          Socratic Dialogue
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                          AI guides you to discover answers
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setSocraticMode(!socraticMode)}
+                      className={`relative w-14 h-8 rounded-full transition-colors ${
+                        socraticMode ? 'bg-indigo-600 dark:bg-indigo-500' : 'bg-gray-300 dark:bg-gray-600'
+                      }`}
+                    >
+                      <div
+                        className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                          socraticMode ? 'translate-x-6' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
 
                 {/* Exam Duration Selector (only if timer is enabled) */}
                 {useTimer && (
