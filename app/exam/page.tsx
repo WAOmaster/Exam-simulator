@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useExamStore } from '@/lib/store';
 import QuestionCard from '@/components/QuestionCard';
@@ -18,7 +18,6 @@ export default function ExamPage() {
     currentQuestionIndex,
     userAnswers,
     isExamStarted,
-    isExamCompleted,
     examStartTime,
     examDuration,
     useTimer,
@@ -191,10 +190,14 @@ export default function ExamPage() {
     }
   };
 
-  // Compute response time for current question
-  const currentResponseTimeMs = questionViewTimes.get(currentQuestion.id)
-    ? Date.now() - (questionViewTimes.get(currentQuestion.id) || Date.now())
-    : 0;
+  // Compute response time for current question (snapshot at submit time)
+  const currentResponseTimeMs = useMemo(() => {
+    const viewTime = questionViewTimes.get(currentQuestion.id);
+    if (!viewTime || !isAnswered) return 0;
+    const savedAnswer = userAnswers.get(currentQuestion.id);
+    // Use the saved answer timestamp if available, otherwise estimate
+    return savedAnswer?.timestamp ? savedAnswer.timestamp - viewTime : 15000;
+  }, [currentQuestion.id, isAnswered, questionViewTimes, userAnswers]);
   const currentSelectionChanges = selectionChanges.get(currentQuestion.id) || 0;
 
   // Check if the current answer is wrong (for showing Socratic button after CC dismissal)
@@ -256,7 +259,7 @@ export default function ExamPage() {
               <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg flex items-center gap-3 transition-colors">
                 <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
                 <p className="text-sm text-yellow-800 dark:text-yellow-300">
-                  You haven't answered this question yet. Select an answer and submit.
+                  You haven&apos;t answered this question yet. Select an answer and submit.
                 </p>
               </div>
             )}

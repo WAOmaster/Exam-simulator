@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
-  Loader2,
   Brain,
   Sparkles,
   CheckCircle,
@@ -72,16 +71,7 @@ export default function CognitiveCompanion({
   const [phase, setPhase] = useState<'thinking' | 'diagnosis' | 'remediation'>('thinking');
   const animationRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    if (isOpen && selectedAnswer) {
-      fetchDiagnosis();
-    }
-    return () => {
-      if (animationRef.current) clearTimeout(animationRef.current);
-    };
-  }, [isOpen, selectedAnswer]);
-
-  const fetchDiagnosis = async () => {
+  const fetchDiagnosis = useCallback(async () => {
     setLoading(true);
     setError('');
     setDiagnosis(null);
@@ -140,7 +130,17 @@ export default function CognitiveCompanion({
     } finally {
       setLoading(false);
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question, selectedAnswer, correctAnswer, responseTimeMs, selectionChanges, consecutiveIncorrect, category, difficulty]);
+
+  useEffect(() => {
+    if (isOpen && selectedAnswer) {
+      fetchDiagnosis();
+    }
+    return () => {
+      if (animationRef.current) clearTimeout(animationRef.current);
+    };
+  }, [isOpen, selectedAnswer, fetchDiagnosis]);
 
   const getConfidenceColor = (confidence: number) => {
     if (confidence > 0.7) return 'bg-red-500';

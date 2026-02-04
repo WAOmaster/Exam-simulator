@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useExamStore } from '@/lib/store';
 import Timer from '@/components/Timer';
@@ -157,10 +157,14 @@ export default function PracticePage() {
     setShowEvaluation(true);
   };
 
-  // Compute response time for current question
-  const currentResponseTimeMs = questionViewTimes.get(currentQuestion.id)
-    ? Date.now() - (questionViewTimes.get(currentQuestion.id) || Date.now())
-    : 0;
+  // Compute response time for current question (snapshot at submit time)
+  const isAnswered = userAnswers.has(currentQuestion.id);
+  const currentResponseTimeMs = useMemo(() => {
+    const viewTime = questionViewTimes.get(currentQuestion.id);
+    if (!viewTime || !isAnswered) return 0;
+    const savedAnswer = userAnswers.get(currentQuestion.id);
+    return savedAnswer?.timestamp ? savedAnswer.timestamp - viewTime : 15000;
+  }, [currentQuestion.id, isAnswered, questionViewTimes, userAnswers]);
   const currentSelectionChanges = selectionChanges.get(currentQuestion.id) || 0;
 
   // Check if the current answer is wrong (for showing Socratic button after CC dismissal)

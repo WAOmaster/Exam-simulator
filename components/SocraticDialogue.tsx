@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
-  Loader2,
   MessageCircle,
-  Send,
   Sparkles,
   Flag,
   CheckCircle,
@@ -46,19 +44,7 @@ export default function SocraticDialogue({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Start the dialogue when opened
-  useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      fetchTutorResponse([]);
-    }
-  }, [isOpen]);
-
-  // Auto-scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
-
-  const fetchTutorResponse = async (history: Message[]) => {
+  const fetchTutorResponse = useCallback(async (history: Message[]) => {
     setIsTyping(true);
     setError('');
 
@@ -97,7 +83,21 @@ export default function SocraticDialogue({
     } finally {
       setIsTyping(false);
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question, options, correctAnswer, userAnswer, onResolved]);
+
+  // Start the dialogue when opened
+  useEffect(() => {
+    if (isOpen && messages.length === 0) {
+      fetchTutorResponse([]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, fetchTutorResponse]);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isTyping]);
 
   const handleSend = (text?: string) => {
     const messageText = text || inputText.trim();
