@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { scrapeURL, scrapeMultipleURLs, combineScrapedContent } from '@/lib/scraper';
 import { ScrapeResponse } from '@/lib/types';
 
+export const maxDuration = 30;
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

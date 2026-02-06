@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { Question, QuestionSetMetadata } from '@/lib/types';
 
+export const maxDuration = 60;
+
 function getAI() {
   return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'missing' });
 }

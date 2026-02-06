@@ -305,7 +305,7 @@ export default function Home() {
               {/* Visual Solver */}
               <motion.button
                 variants={itemVariants}
-                onClick={() => router.push('/generate')}
+                onClick={() => router.push('/visual-solver')}
                 whileHover={{ y: -6, transition: { duration: 0.3 } }}
                 whileTap={{ scale: 0.97 }}
                 className="action-card-shine group relative p-6 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-amber-500/30"

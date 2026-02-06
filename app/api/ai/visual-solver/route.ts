@@ -1,6 +1,8 @@
 import { GoogleGenAI } from '@google/genai';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const maxDuration = 60;
+
 function getAI() {
   return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'missing' });
 }
@@ -145,10 +147,17 @@ Return ONLY valid JSON array.`;
         });
 
         const questionText = questionResponse.text || '';
-        const cleanedQuestionText = questionText
+        let cleanedQuestionText = questionText
           .replace(/```json\s*/g, '')
           .replace(/```\s*/g, '')
           .trim();
+
+        // Extract JSON array if surrounded by extra text
+        const firstBracket = cleanedQuestionText.indexOf('[');
+        const lastBracket = cleanedQuestionText.lastIndexOf(']');
+        if (firstBracket !== -1 && lastBracket !== -1 && firstBracket < lastBracket) {
+          cleanedQuestionText = cleanedQuestionText.substring(firstBracket, lastBracket + 1);
+        }
 
         generatedQuestions = JSON.parse(cleanedQuestionText).map(
           (q: any, index: number) => ({
