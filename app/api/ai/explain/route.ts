@@ -58,7 +58,7 @@ Use clear formatting with **bold** for key terms and numbered lists where approp
     }
 
     const response = await getAI().models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
         tools: [{ googleSearch: {} }],

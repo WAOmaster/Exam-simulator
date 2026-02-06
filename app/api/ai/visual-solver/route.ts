@@ -69,7 +69,7 @@ Important:
 - Return ONLY valid JSON, no markdown code blocks`;
 
     const response = await getAI().models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: [
         {
           role: 'user',
@@ -138,7 +138,7 @@ Return ONLY valid JSON array.`;
 
       try {
         const questionResponse = await getAI().models.generateContent({
-          model: 'gemini-2.5-flash',
+          model: 'gemini-3-flash-preview',
           contents: questionPrompt,
           config: {
             temperature: 0.5,

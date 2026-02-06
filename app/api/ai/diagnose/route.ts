@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const maxDuration = 30;
@@ -88,10 +88,11 @@ RULES:
 - Return ONLY the JSON object`;
 
     const response = await getAI().models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
         thinkingConfig: {
+          thinkingLevel: ThinkingLevel.HIGH,
           includeThoughts: true,
         },
       },

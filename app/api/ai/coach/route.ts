@@ -121,7 +121,7 @@ Be specific, constructive, and encouraging. Celebrate improvements while identif
     }
 
     const response = await getAI().models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
         temperature: 0.7,
