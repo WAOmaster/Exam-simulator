@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useExamStore } from '@/lib/store';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Clock,
   FileText,
@@ -12,8 +12,6 @@ import {
   Sparkles,
   Play,
   BarChart3,
-  Library,
-  Plus,
   Atom,
   Code,
   Cog,
@@ -25,17 +23,36 @@ import {
   Wand2,
   BookMarked,
   Zap,
+  ArrowRight,
+  Timer,
+  Eye,
+  GraduationCap,
+  Layers,
+  Star,
+  Camera,
 } from 'lucide-react';
 import subjects from '@/data/default-questions/subjects.json';
 
-// Icon mapping
 const iconMap: Record<string, any> = {
-  Atom,
-  Code,
-  Cog,
-  Palette,
-  Calculator,
-  Cloud,
+  Atom, Code, Cog, Palette, Calculator, Cloud,
+};
+
+// Stagger children animation
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
+  },
 };
 
 export default function Home() {
@@ -48,16 +65,27 @@ export default function Home() {
   const [reviewAnswers, setReviewAnswers] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [loadedQuestions, setLoadedQuestions] = useState<any[]>([]);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  // Load questions when subject is selected
+  // Subtle mouse tracking for hero parallax
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    setMousePos({
+      x: (e.clientX / window.innerWidth - 0.5) * 20,
+      y: (e.clientY / window.innerHeight - 0.5) * 20,
+    });
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [handleMouseMove]);
+
   useEffect(() => {
     if (selectedSubject) {
       const subject = subjects.find((s) => s.id === selectedSubject);
       if (subject) {
         import(`@/data/default-questions/${subject.file}`)
-          .then((module) => {
-            setLoadedQuestions(module.default);
-          })
+          .then((module) => setLoadedQuestions(module.default))
           .catch((err) => console.error('Failed to load questions:', err));
       }
     }
@@ -68,502 +96,582 @@ export default function Home() {
       alert('Please select a subject first!');
       return;
     }
-
     resetExam();
-
-    // Load the selected subject's questions into the store
     setQuestions(loadedQuestions);
-
     startExam(examDuration, mode, useTimer, learnWithAI, reviewAnswers);
     router.push(mode === 'practice' ? '/practice' : '/exam');
-  };
-
-  const handleViewResults = () => {
-    router.push('/results');
   };
 
   const score = isExamCompleted ? getScore() : null;
   const selectedSubjectData = subjects.find((s) => s.id === selectedSubject);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950 dark:via-purple-950 dark:to-pink-950">
-      <div className="min-h-screen overlay-bg backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
-          >
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Trophy className="w-12 h-12 text-yellow-500 dark:text-yellow-400" />
-              <h1 className="text-5xl font-bold text-gray-900 dark:text-white">
-                AI Exam Generator
-              </h1>
+    <div className="min-h-screen relative overflow-hidden bg-[#06070a] dark:bg-[#06070a] text-white">
+      {/* ===== Ambient Background ===== */}
+      <div className="fixed inset-0 pointer-events-none" aria-hidden="true">
+        {/* Primary orb */}
+        <div
+          className="absolute w-[700px] h-[700px] rounded-full animate-pulse-glow"
+          style={{
+            top: '-10%',
+            right: '-10%',
+            background: 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(99,102,241,0.05) 40%, transparent 70%)',
+            transform: `translate(${mousePos.x * 0.3}px, ${mousePos.y * 0.3}px)`,
+            transition: 'transform 0.8s ease-out',
+          }}
+        />
+        {/* Secondary orb */}
+        <div
+          className="absolute w-[500px] h-[500px] rounded-full animate-pulse-glow"
+          style={{
+            bottom: '5%',
+            left: '-8%',
+            background: 'radial-gradient(circle, rgba(236,72,153,0.12) 0%, rgba(168,85,247,0.06) 40%, transparent 70%)',
+            animationDelay: '2s',
+            transform: `translate(${mousePos.x * -0.2}px, ${mousePos.y * -0.2}px)`,
+            transition: 'transform 0.8s ease-out',
+          }}
+        />
+        {/* Accent orb */}
+        <div
+          className="absolute w-[400px] h-[400px] rounded-full"
+          style={{
+            top: '50%',
+            left: '50%',
+            background: 'radial-gradient(circle, rgba(34,211,238,0.06) 0%, transparent 60%)',
+            transform: `translate(-50%, -50%) translate(${mousePos.x * 0.15}px, ${mousePos.y * 0.15}px)`,
+            transition: 'transform 1s ease-out',
+          }}
+        />
+        {/* Grid pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px',
+          }}
+        />
+        {/* Top fade */}
+        <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#06070a] to-transparent" />
+      </div>
+
+      {/* Grain texture */}
+      <div className="fixed inset-0 pointer-events-none grain-overlay" aria-hidden="true" />
+
+      {/* ===== Main Content ===== */}
+      <div className="relative z-10">
+        {/* ===== HERO SECTION ===== */}
+        <section className="relative pt-20 pb-16 px-4">
+          <div className="max-w-6xl mx-auto text-center">
+            {/* Orbiting elements around logo */}
+            <div className="relative inline-block mb-8">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="animate-orbit">
+                  <Star className="w-4 h-4 text-indigo-400/60" />
+                </div>
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="animate-orbit-reverse">
+                  <Sparkles className="w-3 h-3 text-pink-400/50" />
+                </div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                transition={{ duration: 0.8, ease: [0.175, 0.885, 0.32, 1.275] }}
+                className="relative"
+              >
+                <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-[2px] animate-float">
+                  <div className="w-full h-full rounded-3xl bg-[#0c0d12] flex items-center justify-center">
+                    <GraduationCap className="w-12 h-12 text-indigo-400" />
+                  </div>
+                </div>
+                {/* Glow behind logo */}
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 blur-2xl opacity-30" />
+              </motion.div>
             </div>
-            <p className="text-xl text-theme-light">
-              Create Custom Practice Exams with AI
-            </p>
-            <p className="text-lg text-theme-light-muted mt-2">
-              Explore sample questions or generate your own from any subject
-            </p>
-          </motion.div>
 
-          {/* Quick Actions */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"
-          >
-            <button
-              onClick={() => router.push('/generate')}
-              className="group p-6 rounded-xl shadow-xl transition-all hover:scale-105 relative overflow-hidden bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            {/* Title */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
             >
-              <div className="absolute top-2 right-2 opacity-10">
-                <Sparkles className="w-16 h-16 text-white" />
-              </div>
-              <div className="flex items-center gap-4 relative z-10">
-                <div className="p-3 glass-bg rounded-lg backdrop-blur-sm">
-                  <Wand2 className="w-8 h-8 text-white" />
-                </div>
-                <div className="text-left">
-                  <h3 className="text-xl font-bold text-white mb-1">Generate Questions</h3>
-                  <p className="text-theme-light">Create custom exams from your content</p>
-                </div>
-              </div>
-            </button>
+              <h1 className="text-6xl md:text-7xl font-extrabold tracking-tight mb-4">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">
+                  Exam
+                </span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 animate-gradient-shift" style={{ backgroundSize: '200% 200%' }}>
+                  Simulator
+                </span>
+              </h1>
+            </motion.div>
 
-            <button
-              onClick={() => router.push('/library')}
-              className="group p-6 bg-gradient-to-br from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 rounded-xl shadow-xl transition-all hover:scale-105 relative overflow-hidden"
+            {/* Subtitle */}
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35, duration: 0.6 }}
+              className="text-lg md:text-xl text-white/50 max-w-xl mx-auto mb-3 font-light"
             >
-              <div className="absolute top-2 right-2 opacity-10">
-                <BookMarked className="w-16 h-16 text-white" />
-              </div>
-              <div className="flex items-center gap-4 relative z-10">
-                <div className="p-3 glass-bg rounded-lg backdrop-blur-sm">
-                  <BookMarked className="w-8 h-8 text-white" />
-                </div>
-                <div className="text-left">
-                  <h3 className="text-xl font-bold text-white mb-1">My Library</h3>
-                  <p className="text-green-100">Browse saved question sets</p>
-                </div>
-              </div>
-            </button>
-          </motion.div>
+              AI-powered practice exams that adapt to your learning
+            </motion.p>
 
-          {/* Subject Selection Section */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="mb-8"
-          >
-            <div className="bg-card dark:bg-gray-800 rounded-2xl shadow-2xl p-8 transition-colors">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
-                <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                Explore Sample Questions
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Try out the app with pre-built question sets before creating your own
+            {/* Powered by badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45, duration: 0.5 }}
+              className="flex items-center justify-center gap-2 mb-12"
+            >
+              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.06] bg-white/[0.03]">
+                <Zap className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-xs text-white/40 font-medium tracking-wide uppercase">Powered by Google Gemini</span>
+              </div>
+            </motion.div>
+
+            {/* ===== ACTION CARDS ===== */}
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-6"
+            >
+              {/* Generate Questions */}
+              <motion.button
+                variants={itemVariants}
+                onClick={() => router.push('/generate')}
+                whileHover={{ y: -6, transition: { duration: 0.3 } }}
+                whileTap={{ scale: 0.97 }}
+                className="action-card-shine group relative p-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm text-left transition-all duration-300 hover:border-indigo-500/30 hover:bg-indigo-500/[0.04]"
+              >
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/10 flex items-center justify-center mb-4 group-hover:border-indigo-500/30 transition-colors">
+                    <Wand2 className="w-6 h-6 text-indigo-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-1">Generate Questions</h3>
+                  <p className="text-sm text-white/40 leading-relaxed">Create custom exams from files, URLs, or any content</p>
+                  <div className="flex items-center gap-1.5 mt-4 text-indigo-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span>Get started</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              </motion.button>
+
+              {/* My Library */}
+              <motion.button
+                variants={itemVariants}
+                onClick={() => router.push('/library')}
+                whileHover={{ y: -6, transition: { duration: 0.3 } }}
+                whileTap={{ scale: 0.97 }}
+                className="action-card-shine group relative p-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm text-left transition-all duration-300 hover:border-emerald-500/30 hover:bg-emerald-500/[0.04]"
+              >
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/10 flex items-center justify-center mb-4 group-hover:border-emerald-500/30 transition-colors">
+                    <BookMarked className="w-6 h-6 text-emerald-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-1">My Library</h3>
+                  <p className="text-sm text-white/40 leading-relaxed">Browse and manage your saved question sets</p>
+                  <div className="flex items-center gap-1.5 mt-4 text-emerald-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span>Browse sets</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              </motion.button>
+
+              {/* Visual Solver */}
+              <motion.button
+                variants={itemVariants}
+                onClick={() => router.push('/generate')}
+                whileHover={{ y: -6, transition: { duration: 0.3 } }}
+                whileTap={{ scale: 0.97 }}
+                className="action-card-shine group relative p-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm text-left transition-all duration-300 hover:border-amber-500/30 hover:bg-amber-500/[0.04]"
+              >
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/10 flex items-center justify-center mb-4 group-hover:border-amber-500/30 transition-colors">
+                    <Camera className="w-6 h-6 text-amber-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-1">Visual Solver</h3>
+                  <p className="text-sm text-white/40 leading-relaxed">Upload images for AI-powered solutions</p>
+                  <div className="flex items-center gap-1.5 mt-4 text-amber-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span>Upload image</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              </motion.button>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ===== EXPLORE SUBJECTS ===== */}
+        <section className="relative px-4 pb-12">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.6 }}
+            >
+              {/* Section header */}
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/10 flex items-center justify-center">
+                  <Layers className="w-4 h-4 text-purple-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-white">Explore Subjects</h2>
+              </div>
+              <p className="text-white/40 mb-8 ml-11 text-sm">
+                Jump into pre-built question sets to experience the platform
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {subjects.map((subject) => {
+              {/* Subject Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {subjects.map((subject, i) => {
                   const Icon = iconMap[subject.icon] || FileText;
                   const isSelected = selectedSubject === subject.id;
 
+                  // Map gradient classes to actual color values for the glow
+                  const colorAccents: Record<string, { glow: string; text: string; border: string; bg: string }> = {
+                    science: { glow: 'rgba(16,185,129,0.15)', text: 'text-emerald-400', border: 'border-emerald-500/30', bg: 'from-emerald-500/20 to-green-500/20' },
+                    technology: { glow: 'rgba(59,130,246,0.15)', text: 'text-blue-400', border: 'border-blue-500/30', bg: 'from-blue-500/20 to-cyan-500/20' },
+                    engineering: { glow: 'rgba(249,115,22,0.15)', text: 'text-orange-400', border: 'border-orange-500/30', bg: 'from-orange-500/20 to-amber-500/20' },
+                    arts: { glow: 'rgba(168,85,247,0.15)', text: 'text-purple-400', border: 'border-purple-500/30', bg: 'from-purple-500/20 to-pink-500/20' },
+                    mathematics: { glow: 'rgba(244,63,94,0.15)', text: 'text-rose-400', border: 'border-rose-500/30', bg: 'from-rose-500/20 to-red-500/20' },
+                    oci: { glow: 'rgba(99,102,241,0.15)', text: 'text-indigo-400', border: 'border-indigo-500/30', bg: 'from-indigo-500/20 to-blue-500/20' },
+                  };
+
+                  const accent = colorAccents[subject.id] || colorAccents.technology;
+
                   return (
-                    <button
+                    <motion.button
                       key={subject.id}
+                      initial={{ opacity: 0, y: 16 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.06, duration: 0.4 }}
+                      whileHover={{ y: -3, transition: { duration: 0.25 } }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedSubject(subject.id)}
-                      className={`relative p-5 rounded-xl border-2 transition-all text-left group overflow-hidden ${
+                      className={`subject-card relative p-5 rounded-2xl text-left transition-all duration-300 ${
                         isSelected
-                          ? 'border-white dark:border-white bg-gradient-to-br ' + subject.color + ' shadow-2xl scale-105 ring-4 ring-white ring-opacity-30'
-                          : 'border-gray-300 dark:border-gray-600 bg-gradient-to-br ' + subject.color + ' bg-opacity-10 dark:bg-opacity-20 hover:border-opacity-50 hover:scale-102 hover:shadow-lg'
+                          ? `border-2 ${accent.border} bg-white/[0.05]`
+                          : 'border border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04]'
                       }`}
                     >
-                      {/* Background gradient overlay */}
-                      {!isSelected && (
-                        <div className="absolute inset-0 overlay-strong" />
-                      )}
-
+                      {/* Selected glow */}
                       {isSelected && (
-                        <div className="absolute top-3 right-3 z-10">
-                          <div className="glass-bg backdrop-blur-sm rounded-full p-1">
-                            <CheckCircle className="w-5 h-5 text-white" />
-                          </div>
-                        </div>
+                        <div
+                          className="absolute inset-0 rounded-2xl opacity-40 blur-xl pointer-events-none"
+                          style={{ background: accent.glow }}
+                        />
                       )}
 
-                      <div className={`flex items-start gap-3 relative z-10 ${isSelected ? 'text-white' : 'text-gray-800 dark:text-gray-100'}`}>
-                        <div className={`p-2 rounded-lg ${isSelected ? 'glass-bg backdrop-blur-sm' : `bg-gradient-to-br ${subject.color} bg-opacity-20`}`}>
-                          <Icon className={`w-6 h-6 ${isSelected ? 'text-white' : ''}`} style={!isSelected ? {color: 'inherit'} : {}} />
+                      <div className="relative z-10 flex items-start gap-4">
+                        <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${accent.bg} border ${isSelected ? accent.border : 'border-white/[0.06]'} flex items-center justify-center shrink-0 transition-colors`}>
+                          <Icon className={`w-5 h-5 ${accent.text}`} />
                         </div>
-                        <div className="flex-1">
-                          <h3 className="font-bold text-lg mb-1">{subject.name}</h3>
-                          <p className={`text-sm mb-2 ${isSelected ? 'text-white text-opacity-95' : 'text-gray-600 dark:text-gray-300'}`}>
-                            {subject.description}
-                          </p>
-                          <div className="flex items-center gap-3 text-xs">
-                            <span className={`font-medium ${isSelected ? 'text-white text-opacity-90' : 'text-gray-600 dark:text-gray-400'}`}>
-                              {subject.questionCount} questions
-                            </span>
-                            <span className={`px-2 py-1 rounded font-medium ${isSelected ? 'glass-bg backdrop-blur-sm text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <h3 className="font-semibold text-white text-[15px]">{subject.name}</h3>
+                            {isSelected && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                              >
+                                <CheckCircle className={`w-5 h-5 ${accent.text}`} />
+                              </motion.div>
+                            )}
+                          </div>
+                          <p className="text-sm text-white/35 mb-3 leading-relaxed">{subject.description}</p>
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-xs text-white/30 font-medium">{subject.questionCount} questions</span>
+                            <span className="w-1 h-1 rounded-full bg-white/15" />
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${isSelected ? 'bg-white/10 text-white/60' : 'bg-white/[0.04] text-white/30'}`}>
                               {subject.difficulty}
                             </span>
                           </div>
                         </div>
                       </div>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
+        </section>
 
-          {/* Configuration Card (Only show if subject is selected) */}
+        {/* ===== CONFIGURATION PANEL ===== */}
+        <AnimatePresence>
           {selectedSubject && selectedSubjectData && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
+            <motion.section
+              initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-card dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden transition-colors"
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="relative px-4 pb-20"
             >
-              {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
-                <div className="flex items-center gap-4 p-4 bg-card dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
-                  <FileText className="w-10 h-10 text-blue-600 dark:text-blue-400" />
-                  <div>
-                    <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">
-                      {loadedQuestions.length}
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Questions</p>
-                  </div>
-                </div>
+              <div className="max-w-4xl mx-auto">
+                <div className="relative rounded-3xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm overflow-hidden">
+                  {/* Top gradient line */}
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
 
-                <div className="flex items-center gap-4 p-4 bg-card dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
-                  <div className={`p-2 rounded-lg bg-gradient-to-br ${selectedSubjectData.color}`}>
-                    {(() => {
-                      const Icon = iconMap[selectedSubjectData.icon] || FileText;
-                      return <Icon className="w-6 h-6 text-white" />;
-                    })()}
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-gray-800 dark:text-gray-100">
-                      {selectedSubjectData.name}
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Selected</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 p-4 bg-card dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
-                  <Brain className="w-10 h-10 text-theme-accent" />
-                  <div>
-                    <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">AI</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Explanations</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-8">
-                {/* Previous Score */}
-                {isExamCompleted && score && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-8 p-6 rounded-lg border-2 border-green-200 dark:border-green-700"
-                    style={{
-                      backgroundImage: 'linear-gradient(to right, color-mix(in srgb, #10b981 15%, white), color-mix(in srgb, var(--primary) 15%, white))'
-                    }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <BarChart3 className="w-8 h-8 text-green-600 dark:text-green-400" />
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">
-                            Your Last Score
-                          </p>
-                          <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">
-                            {score.correct} / {score.total}
-                            <span className="text-xl ml-2 text-green-600 dark:text-green-400">
-                              ({score.percentage}%)
-                            </span>
-                          </p>
+                  {/* Stats bar */}
+                  <div className="grid grid-cols-3 gap-0 border-b border-white/[0.06]">
+                    {[
+                      { icon: FileText, label: 'Questions', value: loadedQuestions.length.toString(), color: 'text-indigo-400' },
+                      { icon: iconMap[selectedSubjectData.icon] || FileText, label: 'Subject', value: selectedSubjectData.name, color: 'text-emerald-400' },
+                      { icon: Brain, label: 'AI Powered', value: 'Gemini', color: 'text-purple-400' },
+                    ].map((stat, i) => (
+                      <div key={i} className={`p-5 flex items-center gap-3 ${i < 2 ? 'border-r border-white/[0.06]' : ''}`}>
+                        <stat.icon className={`w-5 h-5 ${stat.color} shrink-0`} />
+                        <div className="min-w-0">
+                          <p className="text-lg font-bold text-white truncate">{stat.value}</p>
+                          <p className="text-xs text-white/30">{stat.label}</p>
                         </div>
                       </div>
-                      <button
-                        onClick={handleViewResults}
-                        className="px-6 py-3 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white font-medium rounded-lg transition-colors"
+                    ))}
+                  </div>
+
+                  <div className="p-8 space-y-8">
+                    {/* Previous Score */}
+                    {isExamCompleted && score && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex items-center justify-between p-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.05]"
                       >
-                        View Results
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Features */}
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-                    Features
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
-                      <Sparkles className="w-6 h-6 text-theme-secondary mt-1" />
-                      <div>
-                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                          AI Explanations
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          Get detailed explanations powered by Google Gemini AI
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
-                      <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400 mt-1" />
-                      <div>
-                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">Timed Mode</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          Practice under real exam conditions with a timer
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
-                      <Trophy className="w-6 h-6 text-yellow-600 dark:text-yellow-400 mt-1" />
-                      <div>
-                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                          Track Progress
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          Monitor your performance and identify weak areas
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
-                      <FileText className="w-6 h-6 text-green-600 dark:text-green-400 mt-1" />
-                      <div>
-                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                          Practice Questions
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          Test your knowledge with {selectedSubjectData.name} questions
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mode Selector */}
-                <div className="mb-8">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    Select Mode
-                  </label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button
-                      onClick={() => setMode('practice')}
-                      className={`p-4 rounded-lg border-2 transition-all ${
-                        mode === 'practice'
-                          ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30'
-                          : 'border-gray-300 dark:border-gray-600 bg-card dark:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Brain className={`w-6 h-6 ${mode === 'practice' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`} />
-                        <div className="text-left">
-                          <h3 className={`font-semibold ${mode === 'practice' ? 'text-gray-900 dark:text-white' : 'text-gray-800 dark:text-gray-100'}`}>
-                            Practice Mode
-                          </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Instant AI feedback for each answer
-                          </p>
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                            <BarChart3 className="w-5 h-5 text-emerald-400" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-white/40 font-medium mb-0.5">Previous Score</p>
+                            <p className="text-2xl font-bold text-white">
+                              {score.correct}/{score.total}
+                              <span className="text-base ml-2 text-emerald-400">({score.percentage}%)</span>
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => setMode('exam')}
-                      className={`p-4 rounded-lg border-2 transition-all ${
-                        mode === 'exam'
-                          ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30'
-                          : 'border-gray-300 dark:border-gray-600 bg-card dark:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Trophy className={`w-6 h-6 ${mode === 'exam' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`} />
-                        <div className="text-left">
-                          <h3 className={`font-semibold ${mode === 'exam' ? 'text-gray-900 dark:text-white' : 'text-gray-800 dark:text-gray-100'}`}>
-                            Exam Mode
-                          </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Simulate real exam conditions
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Timer Toggle */}
-                <div className="mb-8">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                      <div>
-                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                          Use Timer
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          {useTimer ? `${examDuration} minutes countdown` : 'No time limit'}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setUseTimer(!useTimer)}
-                      className={`relative w-14 h-8 rounded-full transition-colors ${
-                        useTimer ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
-                      }`}
-                    >
-                      <div
-                        className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
-                          useTimer ? 'translate-x-6' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Learn with AI Toggle (Practice Mode Only) */}
-                {mode === 'practice' && (
-                  <div className="mb-8">
-                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-700 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                        <div>
-                          <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                            Learn with AI
-                          </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Get AI-guided learning for each question
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setLearnWithAI(!learnWithAI)}
-                        className={`relative w-14 h-8 rounded-full transition-colors ${
-                          learnWithAI ? 'bg-purple-600 dark:bg-purple-500' : 'bg-gray-300 dark:bg-gray-600'
-                        }`}
-                      >
-                        <div
-                          className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
-                            learnWithAI ? 'translate-x-6' : 'translate-x-0'
-                          }`}
-                        />
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Review Answers Toggle (Exam Mode Only) */}
-                {mode === 'exam' && (
-                  <div className="mb-8">
-                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 border border-green-200 dark:border-green-700 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <FileText className="w-6 h-6 text-green-600 dark:text-green-400" />
-                        <div>
-                          <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                            Review Answers
-                          </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Review answers during exam (optional)
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setReviewAnswers(!reviewAnswers)}
-                        className={`relative w-14 h-8 rounded-full transition-colors ${
-                          reviewAnswers ? 'bg-green-600 dark:bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
-                        }`}
-                      >
-                        <div
-                          className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
-                            reviewAnswers ? 'translate-x-6' : 'translate-x-0'
-                          }`}
-                        />
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Exam Duration Selector (only if timer is enabled) */}
-                {useTimer && (
-                  <div className="mb-8">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                      Exam Duration
-                    </label>
-                    <div className="flex gap-3 flex-wrap">
-                      {[30, 60, 90, 120].map((duration) => (
                         <button
-                          key={duration}
-                          onClick={() => setExamDuration(duration)}
-                          className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                            examDuration === duration
-                              ? 'bg-blue-600 dark:bg-blue-700 text-white shadow-lg scale-105'
-                              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                          onClick={() => router.push('/results')}
+                          className="px-5 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium hover:bg-emerald-500/20 transition-colors"
+                        >
+                          View Results
+                        </button>
+                      </motion.div>
+                    )}
+
+                    {/* Mode Selector */}
+                    <div>
+                      <label className="block text-sm font-medium text-white/50 mb-3 tracking-wide uppercase">Mode</label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          { key: 'practice' as const, icon: Brain, title: 'Practice', desc: 'Instant AI feedback', color: 'indigo' },
+                          { key: 'exam' as const, icon: Trophy, title: 'Exam', desc: 'Timed simulation', color: 'amber' },
+                        ].map((m) => (
+                          <button
+                            key={m.key}
+                            onClick={() => setMode(m.key)}
+                            className={`relative p-4 rounded-xl border text-left transition-all duration-300 ${
+                              mode === m.key
+                                ? `border-${m.color}-500/30 bg-${m.color}-500/[0.06]`
+                                : 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <m.icon className={`w-5 h-5 ${mode === m.key ? `text-${m.color}-400` : 'text-white/30'}`} />
+                              <div>
+                                <h3 className={`font-semibold text-sm ${mode === m.key ? 'text-white' : 'text-white/60'}`}>
+                                  {m.title} Mode
+                                </h3>
+                                <p className="text-xs text-white/30 mt-0.5">{m.desc}</p>
+                              </div>
+                            </div>
+                            {mode === m.key && (
+                              <motion.div
+                                layoutId="mode-indicator"
+                                className={`absolute top-3 right-3 w-2 h-2 rounded-full bg-${m.color}-400`}
+                                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                              />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Toggle Group */}
+                    <div className="space-y-3">
+                      {/* Timer Toggle */}
+                      <div className="flex items-center justify-between p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                        <div className="flex items-center gap-3">
+                          <Timer className="w-5 h-5 text-cyan-400" />
+                          <div>
+                            <h3 className="text-sm font-semibold text-white">Countdown Timer</h3>
+                            <p className="text-xs text-white/30 mt-0.5">
+                              {useTimer ? `${examDuration} minute limit` : 'No time limit'}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setUseTimer(!useTimer)}
+                          className={`toggle-switch relative w-12 h-7 rounded-full transition-colors ${
+                            useTimer ? 'bg-cyan-500' : 'bg-white/10'
                           }`}
                         >
-                          {duration} min
+                          <div
+                            className={`toggle-knob absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-lg ${
+                              useTimer ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
                         </button>
-                      ))}
+                      </div>
+
+                      {/* Learn with AI (Practice only) */}
+                      <AnimatePresence>
+                        {mode === 'practice' && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <div className="flex items-center justify-between p-4 rounded-xl border border-purple-500/15 bg-purple-500/[0.03]">
+                              <div className="flex items-center gap-3">
+                                <Sparkles className="w-5 h-5 text-purple-400" />
+                                <div>
+                                  <h3 className="text-sm font-semibold text-white">Learn with AI</h3>
+                                  <p className="text-xs text-white/30 mt-0.5">Deep learning guides for each question</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => setLearnWithAI(!learnWithAI)}
+                                className={`toggle-switch relative w-12 h-7 rounded-full transition-colors ${
+                                  learnWithAI ? 'bg-purple-500' : 'bg-white/10'
+                                }`}
+                              >
+                                <div
+                                  className={`toggle-knob absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-lg ${
+                                    learnWithAI ? 'translate-x-5' : 'translate-x-0'
+                                  }`}
+                                />
+                              </button>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Review Answers (Exam only) */}
+                      <AnimatePresence>
+                        {mode === 'exam' && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <div className="flex items-center justify-between p-4 rounded-xl border border-emerald-500/15 bg-emerald-500/[0.03]">
+                              <div className="flex items-center gap-3">
+                                <Eye className="w-5 h-5 text-emerald-400" />
+                                <div>
+                                  <h3 className="text-sm font-semibold text-white">Review Answers</h3>
+                                  <p className="text-xs text-white/30 mt-0.5">See explanations during exam</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => setReviewAnswers(!reviewAnswers)}
+                                className={`toggle-switch relative w-12 h-7 rounded-full transition-colors ${
+                                  reviewAnswers ? 'bg-emerald-500' : 'bg-white/10'
+                                }`}
+                              >
+                                <div
+                                  className={`toggle-knob absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-lg ${
+                                    reviewAnswers ? 'translate-x-5' : 'translate-x-0'
+                                  }`}
+                                />
+                              </button>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
-                  </div>
-                )}
 
-                {/* Start Button */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleStart}
-                  className={`w-full py-4 bg-gradient-to-r ${selectedSubjectData.color} text-white text-xl font-bold rounded-lg shadow-xl transition-all flex items-center justify-center gap-3`}
-                >
-                  <Play className="w-6 h-6" />
-                  {mode === 'practice' ? 'Start Practice' : 'Start Exam'}
-                  <ChevronRight className="w-6 h-6" />
-                </motion.button>
-              </div>
-            </motion.div>
-          )}
+                    {/* Duration Selector */}
+                    <AnimatePresence>
+                      {useTimer && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <label className="block text-sm font-medium text-white/50 mb-3 tracking-wide uppercase">Duration</label>
+                          <div className="flex gap-2">
+                            {[30, 60, 90, 120].map((d) => (
+                              <button
+                                key={d}
+                                onClick={() => setExamDuration(d)}
+                                className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                                  examDuration === d
+                                    ? 'bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 shadow-lg shadow-indigo-500/5'
+                                    : 'bg-white/[0.02] border border-white/[0.06] text-white/40 hover:text-white/60 hover:border-white/[0.12]'
+                                }`}
+                              >
+                                {d} min
+                              </button>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
-          {/* Footer with Gemini Branding */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="mt-8"
-          >
-            <div className="flex items-center justify-center gap-3 p-4 glass-bg backdrop-blur-md rounded-xl border border-glass">
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <Zap className="w-5 h-5 text-yellow-300 fill-yellow-300 animate-pulse" />
-                  <div className="absolute inset-0 blur-sm">
-                    <Zap className="w-5 h-5 text-yellow-300 fill-yellow-300" />
+                    {/* Start Button */}
+                    <motion.button
+                      whileHover={{ scale: 1.01, y: -1 }}
+                      whileTap={{ scale: 0.99 }}
+                      onClick={handleStart}
+                      className="group w-full relative py-4 rounded-2xl font-semibold text-lg overflow-hidden transition-all"
+                    >
+                      {/* Button gradient background */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 opacity-90 group-hover:opacity-100 transition-opacity" />
+                      {/* Shimmer overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer opacity-0 group-hover:opacity-100" />
+                      {/* Button content */}
+                      <div className="relative z-10 flex items-center justify-center gap-3 text-white">
+                        <Play className="w-5 h-5" />
+                        <span>{mode === 'practice' ? 'Start Practice' : 'Start Exam'}</span>
+                        <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </motion.button>
                   </div>
                 </div>
-                <span className="text-gray-900 dark:text-white font-semibold">Powered by</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500">
-                <Sparkles className="w-4 h-4 text-white" />
-                <span className="text-white font-bold">Google Gemini AI</span>
-              </div>
-              <span className="text-theme-light hidden sm:inline">•</span>
-              <span className="text-theme-light hidden sm:inline">Generate questions from any subject</span>
+            </motion.section>
+          )}
+        </AnimatePresence>
+
+        {/* ===== FOOTER ===== */}
+        <footer className="relative px-4 pb-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-center">
+              <p className="text-xs text-white/20">
+                Built for learners who demand more from their study tools
+              </p>
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </footer>
       </div>
+
+      {/* Light mode override - force dark aesthetic on homepage */}
+      <style jsx global>{`
+        .light body:has(.homepage-dark-force) {
+          /* Homepage always uses dark theme */
+        }
+      `}</style>
     </div>
   );
 }
