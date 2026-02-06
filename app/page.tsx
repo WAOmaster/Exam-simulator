@@ -26,6 +26,7 @@ import {
   BookMarked,
   Zap,
   MessageCircle,
+  Camera,
 } from 'lucide-react';
 import subjects from '@/data/default-questions/subjects.json';
 
@@ -126,7 +127,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"
+            className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
           >
             <motion.button
               whileHover={{ scale: 1.03, y: -3 }}
@@ -168,6 +169,28 @@ export default function Home() {
                 <div className="text-left">
                   <h3 className="text-2xl font-bold text-white mb-1 drop-shadow-md">My Library</h3>
                   <p className="text-white/90 text-base">Browse saved question sets</p>
+                </div>
+              </div>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.03, y: -3 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => router.push('/visual-solver')}
+              className="group p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all relative overflow-hidden"
+              style={{ background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #0e7490 100%)' }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+              <div className="absolute top-4 right-4 opacity-30">
+                <Camera className="w-20 h-20 text-white" />
+              </div>
+              <div className="flex items-center gap-5 relative z-10">
+                <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm border border-white/30">
+                  <Camera className="w-9 h-9 text-white drop-shadow-lg" />
+                </div>
+                <div className="text-left">
+                  <h3 className="text-2xl font-bold text-white mb-1 drop-shadow-md">Visual Solver</h3>
+                  <p className="text-white/90 text-base">Upload images for AI solutions</p>
                 </div>
               </div>
             </motion.button>

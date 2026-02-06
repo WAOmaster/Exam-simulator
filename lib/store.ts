@@ -32,6 +32,7 @@ interface ExamState {
   reviewAnswers: boolean; // Review answers during exam (exam mode only)
   cognitiveCompanion: boolean; // AI diagnostic reasoning (both modes)
   socraticMode: boolean; // Socratic dialogue (both modes)
+  showLiveStats: boolean; // Show live stats overlay during exam/practice
 
   // Enhanced tracking for Cognitive Companion
   sessionMetrics: SessionMetrics;
@@ -59,6 +60,7 @@ interface ExamState {
   // Enhanced tracking actions
   recordQuestionView: (questionId: number) => void;
   recordSelectionChange: (questionId: number) => void;
+  toggleLiveStats: () => void;
 
   // Question set actions
   setCurrentQuestionSet: (questionSetId: string) => void;
@@ -82,6 +84,7 @@ export const useExamStore = create<ExamState>()(
       reviewAnswers: false,
       cognitiveCompanion: false,
       socraticMode: false,
+      showLiveStats: true, // Default to showing live stats
 
       // Enhanced tracking
       sessionMetrics: { ...defaultSessionMetrics },
@@ -110,6 +113,9 @@ export const useExamStore = create<ExamState>()(
           newChanges.set(questionId, (newChanges.get(questionId) || 0) + 1);
           return { selectionChanges: newChanges };
         }),
+
+      toggleLiveStats: () =>
+        set((state) => ({ showLiveStats: !state.showLiveStats })),
 
       submitAnswer: (questionId, selectedAnswer, isCorrect) =>
         set((state) => {

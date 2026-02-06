@@ -9,7 +9,8 @@ import ProgressBar from '@/components/ProgressBar';
 import EvaluationPane from '@/components/EvaluationPane';
 import CognitiveCompanion from '@/components/CognitiveCompanion';
 import SocraticDialogue from '@/components/SocraticDialogue';
-import { ChevronLeft, ChevronRight, Trophy, AlertCircle, MessageCircle } from 'lucide-react';
+import LiveStatsOverlay from '@/components/LiveStatsOverlay';
+import { ChevronLeft, ChevronRight, Trophy, AlertCircle, MessageCircle, BarChart3 } from 'lucide-react';
 
 export default function ExamPage() {
   const router = useRouter();
@@ -33,6 +34,8 @@ export default function ExamPage() {
     completeExam,
     recordQuestionView,
     recordSelectionChange,
+    showLiveStats,
+    toggleLiveStats,
   } = useExamStore();
 
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -207,6 +210,42 @@ export default function ExamPage() {
 
   const anySidePaneOpen = showExplanation || showCognitiveCompanion || showSocratic;
 
+  // Compute max streak from streak history
+  const maxStreak = useMemo(() => {
+    let max = 0;
+    let current = 0;
+    sessionMetrics.streakHistory.forEach((result) => {
+      if (result === 'correct') {
+        current++;
+        max = Math.max(max, current);
+      } else {
+        current = 0;
+      }
+    });
+    return max;
+  }, [sessionMetrics.streakHistory]);
+
+  // Live stats data for overlay
+  const liveStatsData = useMemo(() => ({
+    currentStreak: sessionMetrics.consecutiveCorrect,
+    maxStreak,
+    responseTimeMs: currentResponseTimeMs,
+    averageResponseTimeMs: sessionMetrics.averageResponseTime,
+    selectionChanges: currentSelectionChanges,
+    questionsAnswered: answeredCount,
+    totalQuestions: questions.length,
+    categoryAccuracy: sessionMetrics.categoryPerformance,
+  }), [
+    sessionMetrics.consecutiveCorrect,
+    maxStreak,
+    currentResponseTimeMs,
+    sessionMetrics.averageResponseTime,
+    currentSelectionChanges,
+    answeredCount,
+    questions.length,
+    sessionMetrics.categoryPerformance,
+  ]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
@@ -230,6 +269,18 @@ export default function ExamPage() {
               )}
 
               <button
+                onClick={toggleLiveStats}
+                className={`p-2 rounded-lg transition-colors ${
+                  showLiveStats
+                    ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                }`}
+                title={showLiveStats ? 'Hide Live Stats' : 'Show Live Stats'}
+              >
+                <BarChart3 className="w-5 h-5" />
+              </button>
+
+              <button
                 onClick={handleFinishExam}
                 className="px-4 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
               >
@@ -248,6 +299,14 @@ export default function ExamPage() {
           </div>
         </div>
       </div>
+
+      {/* Live Stats Overlay */}
+      {showLiveStats && (
+        <LiveStatsOverlay
+          stats={liveStatsData}
+          onToggleMinimize={toggleLiveStats}
+        />
+      )}
 
       {/* Main Content - Split Layout */}
       <div className="flex">
