@@ -264,6 +264,129 @@ body {
   border-color: var(--card-border);
 }
 
+/* ===== Homepage Surface Tokens ===== */
+/* Light mode: warm, luminous surfaces with soft shadows */
+/* Dark mode: deep, rich surfaces with subtle glow */
+
+:root, .light {
+  --hp-bg: #f8f9fc;
+  --hp-bg-secondary: #f0f2f8;
+  --hp-surface: rgba(255, 255, 255, 0.8);
+  --hp-surface-hover: rgba(255, 255, 255, 0.95);
+  --hp-surface-border: rgba(0, 0, 0, 0.06);
+  --hp-surface-border-hover: rgba(0, 0, 0, 0.12);
+  --hp-text-primary: #111827;
+  --hp-text-secondary: #4b5563;
+  --hp-text-tertiary: #9ca3af;
+  --hp-text-quaternary: #d1d5db;
+  --hp-logo-inner: #f0f2f8;
+  --hp-top-fade: #f8f9fc;
+  --hp-grid-line: rgba(0, 0, 0, 0.04);
+  --hp-card-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+  --hp-card-shadow-hover: 0 4px 16px rgba(0,0,0,0.08), 0 8px 32px rgba(0,0,0,0.04);
+  --hp-toggle-off: rgba(0, 0, 0, 0.08);
+  --hp-grain-opacity: 0.02;
+  --hp-shine-light: rgba(255, 255, 255, 0.6);
+  --hp-shine-mid: rgba(255, 255, 255, 0.9);
+  --hp-orb-indigo: rgba(99,102,241,0.08);
+  --hp-orb-indigo-outer: rgba(99,102,241,0.03);
+  --hp-orb-pink: rgba(236,72,153,0.06);
+  --hp-orb-pink-outer: rgba(168,85,247,0.03);
+  --hp-orb-cyan: rgba(34,211,238,0.04);
+}
+
+.dark {
+  --hp-bg: #06070a;
+  --hp-bg-secondary: #0c0d12;
+  --hp-surface: rgba(255, 255, 255, 0.02);
+  --hp-surface-hover: rgba(255, 255, 255, 0.04);
+  --hp-surface-border: rgba(255, 255, 255, 0.06);
+  --hp-surface-border-hover: rgba(255, 255, 255, 0.12);
+  --hp-text-primary: #ffffff;
+  --hp-text-secondary: rgba(255, 255, 255, 0.6);
+  --hp-text-tertiary: rgba(255, 255, 255, 0.4);
+  --hp-text-quaternary: rgba(255, 255, 255, 0.2);
+  --hp-logo-inner: #0c0d12;
+  --hp-top-fade: #06070a;
+  --hp-grid-line: rgba(255, 255, 255, 0.03);
+  --hp-card-shadow: none;
+  --hp-card-shadow-hover: none;
+  --hp-toggle-off: rgba(255, 255, 255, 0.1);
+  --hp-grain-opacity: 0.03;
+  --hp-shine-light: rgba(255, 255, 255, 0.03);
+  --hp-shine-mid: rgba(255, 255, 255, 0.08);
+  --hp-orb-indigo: rgba(99,102,241,0.15);
+  --hp-orb-indigo-outer: rgba(99,102,241,0.05);
+  --hp-orb-pink: rgba(236,72,153,0.12);
+  --hp-orb-pink-outer: rgba(168,85,247,0.06);
+  --hp-orb-cyan: rgba(34,211,238,0.06);
+}
+
+/* Homepage surface utilities */
+.hp-bg {
+  background-color: var(--hp-bg);
+  transition: background-color 0.3s ease;
+}
+
+.hp-surface {
+  background-color: var(--hp-surface);
+  border-color: var(--hp-surface-border);
+  box-shadow: var(--hp-card-shadow);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hp-surface:hover {
+  box-shadow: var(--hp-card-shadow-hover);
+}
+
+.hp-text-primary { color: var(--hp-text-primary); transition: color 0.3s ease; }
+.hp-text-secondary { color: var(--hp-text-secondary); transition: color 0.3s ease; }
+.hp-text-tertiary { color: var(--hp-text-tertiary); transition: color 0.3s ease; }
+.hp-text-quaternary { color: var(--hp-text-quaternary); transition: color 0.3s ease; }
+
+/* Light mode icon color adjustments - deeper colors for contrast */
+:root .hp-icon-indigo, .light .hp-icon-indigo { color: #4f46e5; }
+.dark .hp-icon-indigo { color: #818cf8; }
+:root .hp-icon-emerald, .light .hp-icon-emerald { color: #059669; }
+.dark .hp-icon-emerald { color: #34d399; }
+:root .hp-icon-amber, .light .hp-icon-amber { color: #d97706; }
+.dark .hp-icon-amber { color: #fbbf24; }
+:root .hp-icon-purple, .light .hp-icon-purple { color: #7c3aed; }
+.dark .hp-icon-purple { color: #a78bfa; }
+:root .hp-icon-rose, .light .hp-icon-rose { color: #e11d48; }
+.dark .hp-icon-rose { color: #fb7185; }
+:root .hp-icon-orange, .light .hp-icon-orange { color: #ea580c; }
+.dark .hp-icon-orange { color: #fb923c; }
+:root .hp-icon-cyan, .light .hp-icon-cyan { color: #0891b2; }
+.dark .hp-icon-cyan { color: #22d3ee; }
+:root .hp-icon-blue, .light .hp-icon-blue { color: #2563eb; }
+.dark .hp-icon-blue { color: #60a5fa; }
+
+/* Light mode grain is more subtle */
+.light .grain-overlay::before,
+:root .grain-overlay::before {
+  opacity: 0.015;
+}
+
+/* Light mode action card shine uses darker tones */
+.light .action-card-shine::before,
+:root:not(.dark) .action-card-shine::before {
+  background: linear-gradient(
+    45deg,
+    transparent 40%,
+    rgba(0, 0, 0, 0.01) 45%,
+    rgba(0, 0, 0, 0.03) 50%,
+    rgba(0, 0, 0, 0.01) 55%,
+    transparent 60%
+  );
+}
+
+/* Light mode subject card hover has shadow instead of glow */
+.light .subject-card::after,
+:root:not(.dark) .subject-card::after {
+  background: linear-gradient(135deg, rgba(0,0,0,0.02), transparent);
+}
+
 /* ===== Homepage Premium Animations ===== */
 
 @keyframes float {
