@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+function getAI() {
+  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'missing' });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,16 +62,16 @@ IMPORTANT:
 - Focus on understanding, not memorization
 - Be encouraging and educational in tone`;
 
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp',
-      generationConfig: {
+    const response = await getAI().models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
         temperature: 0.7,
         maxOutputTokens: 2048,
-      }
+      },
     });
 
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    const text = response.text || '';
 
     // Parse the JSON response
     let learningData;

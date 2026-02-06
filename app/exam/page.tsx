@@ -1,13 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useExamStore } from '@/lib/store';
 import QuestionCard from '@/components/QuestionCard';
 import Timer from '@/components/Timer';
 import ProgressBar from '@/components/ProgressBar';
 import EvaluationPane from '@/components/EvaluationPane';
-import { ChevronLeft, ChevronRight, Trophy, AlertCircle } from 'lucide-react';
+import CognitiveCompanion from '@/components/CognitiveCompanion';
+import SocraticDialogue from '@/components/SocraticDialogue';
+import LiveStatsOverlay from '@/components/LiveStatsOverlay';
+import { ChevronLeft, ChevronRight, Trophy, AlertCircle, MessageCircle, BarChart3 } from 'lucide-react';
 
 export default function ExamPage() {
   const router = useRouter();
@@ -16,19 +19,30 @@ export default function ExamPage() {
     currentQuestionIndex,
     userAnswers,
     isExamStarted,
-    isExamCompleted,
     examStartTime,
     examDuration,
     useTimer,
     reviewAnswers,
+    cognitiveCompanion,
+    socraticMode,
+    sessionMetrics,
+    questionViewTimes,
+    selectionChanges,
     submitAnswer,
     nextQuestion,
     previousQuestion,
     completeExam,
+    recordQuestionView,
+    recordSelectionChange,
+    showLiveStats,
+    toggleLiveStats,
   } = useExamStore();
 
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [showCognitiveCompanion, setShowCognitiveCompanion] = useState(false);
+  const [showSocratic, setShowSocratic] = useState(false);
+  const [ccDismissed, setCcDismissed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -43,12 +57,26 @@ export default function ExamPage() {
     }
   }, [isExamStarted, questions.length, router]);
 
+  // Track question view time
+  useEffect(() => {
+    const currentQuestion = questions[currentQuestionIndex];
+    if (currentQuestion) {
+      recordQuestionView(currentQuestion.id);
+    }
+  }, [currentQuestionIndex]);
+
   useEffect(() => {
     // Load saved answer for current question
     const currentQuestion = questions[currentQuestionIndex];
     if (currentQuestion) {
       const savedAnswer = userAnswers.get(currentQuestion.id);
       setSelectedAnswer(savedAnswer?.selectedAnswer || null);
+      if (!savedAnswer) {
+        setShowExplanation(false);
+        setShowCognitiveCompanion(false);
+        setShowSocratic(false);
+        setCcDismissed(false);
+      }
     }
   }, [currentQuestionIndex, userAnswers]);
 
@@ -66,6 +94,10 @@ export default function ExamPage() {
 
   const handleAnswerSelect = (answerId: string) => {
     if (!isAnswered) {
+      // Track selection changes
+      if (selectedAnswer && selectedAnswer !== answerId) {
+        recordSelectionChange(currentQuestion.id);
+      }
       setSelectedAnswer(answerId);
     }
   };
@@ -95,11 +127,39 @@ export default function ExamPage() {
 
   const handleReviewAnswer = () => {
     // User explicitly wants to review their answer
+    const savedAnswer = userAnswers.get(currentQuestion.id);
+    const isWrong = savedAnswer && savedAnswer.selectedAnswer !== currentQuestion.correctAnswer;
+
+    if (isWrong && cognitiveCompanion) {
+      // Show Cognitive Companion for wrong answers when enabled
+      setShowCognitiveCompanion(true);
+      setShowExplanation(false);
+      setShowSocratic(false);
+    } else if (isWrong && socraticMode && !cognitiveCompanion) {
+      // Show Socratic Dialogue for wrong answers when Socratic enabled (and CC not enabled)
+      setShowSocratic(true);
+      setShowExplanation(false);
+      setShowCognitiveCompanion(false);
+    } else {
+      // Standard evaluation pane
+      setShowExplanation(true);
+      setShowCognitiveCompanion(false);
+      setShowSocratic(false);
+    }
+  };
+
+  const handleCloseCognitiveCompanion = () => {
+    setShowCognitiveCompanion(false);
+    setCcDismissed(true);
+    // Show standard evaluation pane after CC is closed
     setShowExplanation(true);
   };
 
   const handleNext = () => {
     setShowExplanation(false);
+    setShowCognitiveCompanion(false);
+    setShowSocratic(false);
+    setCcDismissed(false);
     if (currentQuestionIndex < questions.length - 1) {
       nextQuestion();
     } else {
@@ -111,6 +171,9 @@ export default function ExamPage() {
 
   const handlePrevious = () => {
     setShowExplanation(false);
+    setShowCognitiveCompanion(false);
+    setShowSocratic(false);
+    setCcDismissed(false);
     previousQuestion();
   };
 
@@ -129,6 +192,59 @@ export default function ExamPage() {
       router.push('/results');
     }
   };
+
+  // Compute response time for current question (snapshot at submit time)
+  const currentResponseTimeMs = useMemo(() => {
+    const viewTime = questionViewTimes.get(currentQuestion.id);
+    if (!viewTime || !isAnswered) return 0;
+    const savedAnswer = userAnswers.get(currentQuestion.id);
+    // Use the saved answer timestamp if available, otherwise estimate
+    return savedAnswer?.timestamp ? savedAnswer.timestamp - viewTime : 15000;
+  }, [currentQuestion.id, isAnswered, questionViewTimes, userAnswers]);
+  const currentSelectionChanges = selectionChanges.get(currentQuestion.id) || 0;
+
+  // Check if the current answer is wrong (for showing Socratic button after CC dismissal)
+  const savedUserAnswer = userAnswers.get(currentQuestion.id);
+  const isCurrentAnswerWrong = savedUserAnswer && savedUserAnswer.selectedAnswer !== currentQuestion.correctAnswer;
+  const showSocraticButton = ccDismissed && socraticMode && isCurrentAnswerWrong && !showSocratic && reviewAnswers;
+
+  const anySidePaneOpen = showExplanation || showCognitiveCompanion || showSocratic;
+
+  // Compute max streak from streak history
+  const maxStreak = useMemo(() => {
+    let max = 0;
+    let current = 0;
+    sessionMetrics.streakHistory.forEach((result) => {
+      if (result === 'correct') {
+        current++;
+        max = Math.max(max, current);
+      } else {
+        current = 0;
+      }
+    });
+    return max;
+  }, [sessionMetrics.streakHistory]);
+
+  // Live stats data for overlay
+  const liveStatsData = useMemo(() => ({
+    currentStreak: sessionMetrics.consecutiveCorrect,
+    maxStreak,
+    responseTimeMs: currentResponseTimeMs,
+    averageResponseTimeMs: sessionMetrics.averageResponseTime,
+    selectionChanges: currentSelectionChanges,
+    questionsAnswered: answeredCount,
+    totalQuestions: questions.length,
+    categoryAccuracy: sessionMetrics.categoryPerformance,
+  }), [
+    sessionMetrics.consecutiveCorrect,
+    maxStreak,
+    currentResponseTimeMs,
+    sessionMetrics.averageResponseTime,
+    currentSelectionChanges,
+    answeredCount,
+    questions.length,
+    sessionMetrics.categoryPerformance,
+  ]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -153,6 +269,18 @@ export default function ExamPage() {
               )}
 
               <button
+                onClick={toggleLiveStats}
+                className={`p-2 rounded-lg transition-colors ${
+                  showLiveStats
+                    ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                }`}
+                title={showLiveStats ? 'Hide Live Stats' : 'Show Live Stats'}
+              >
+                <BarChart3 className="w-5 h-5" />
+              </button>
+
+              <button
                 onClick={handleFinishExam}
                 className="px-4 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
               >
@@ -172,17 +300,25 @@ export default function ExamPage() {
         </div>
       </div>
 
+      {/* Live Stats Overlay */}
+      {showLiveStats && (
+        <LiveStatsOverlay
+          stats={liveStatsData}
+          onToggleMinimize={toggleLiveStats}
+        />
+      )}
+
       {/* Main Content - Split Layout */}
       <div className="flex">
         {/* Question Section */}
-        <div className={`transition-all duration-300 ${showExplanation ? 'lg:w-2/3' : 'w-full'} px-4 py-8`}>
+        <div className={`transition-all duration-300 ${anySidePaneOpen ? 'lg:w-2/3' : 'w-full'} px-4 py-8`}>
           <div className="max-w-4xl mx-auto">
             {/* Warning if unanswered */}
             {!isAnswered && answeredCount > 0 && (
               <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg flex items-center gap-3 transition-colors">
                 <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
                 <p className="text-sm text-yellow-800 dark:text-yellow-300">
-                  You haven't answered this question yet. Select an answer and submit.
+                  You haven&apos;t answered this question yet. Select an answer and submit.
                 </p>
               </div>
             )}
@@ -215,12 +351,25 @@ export default function ExamPage() {
               </button>
 
               <div className="flex gap-3">
-                {isAnswered && !showExplanation && reviewAnswers && (
+                {isAnswered && !anySidePaneOpen && reviewAnswers && (
                   <button
                     onClick={handleReviewAnswer}
                     className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
                   >
                     Review Answer
+                  </button>
+                )}
+
+                {showSocraticButton && (
+                  <button
+                    onClick={() => {
+                      setShowSocratic(true);
+                      setShowExplanation(false);
+                    }}
+                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    Try Socratic Dialogue
                   </button>
                 )}
 
@@ -259,6 +408,42 @@ export default function ExamPage() {
             isCorrect={selectedAnswer === currentQuestion.correctAnswer}
             explanation={currentQuestion.explanation}
             questionId={currentQuestion.id}
+          />
+        )}
+
+        {/* Cognitive Companion Pane */}
+        {selectedAnswer && showCognitiveCompanion && reviewAnswers && (
+          <CognitiveCompanion
+            isOpen={showCognitiveCompanion}
+            onClose={handleCloseCognitiveCompanion}
+            question={currentQuestion.question}
+            options={currentQuestion.options}
+            selectedAnswer={selectedAnswer}
+            correctAnswer={currentQuestion.correctAnswer}
+            questionId={currentQuestion.id}
+            responseTimeMs={currentResponseTimeMs}
+            selectionChanges={currentSelectionChanges}
+            consecutiveIncorrect={sessionMetrics.consecutiveIncorrect}
+            category={currentQuestion.category}
+            difficulty={currentQuestion.difficulty}
+          />
+        )}
+
+        {/* Socratic Dialogue Pane */}
+        {selectedAnswer && showSocratic && reviewAnswers && (
+          <SocraticDialogue
+            isOpen={showSocratic}
+            onClose={() => {
+              setShowSocratic(false);
+              setShowExplanation(true);
+            }}
+            question={currentQuestion.question}
+            options={currentQuestion.options}
+            correctAnswer={currentQuestion.correctAnswer}
+            userAnswer={selectedAnswer}
+            onResolved={() => {
+              // Optionally show evaluation after resolution
+            }}
           />
         )}
       </div>

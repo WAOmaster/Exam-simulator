@@ -1,14 +1,9 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import { NextRequest, NextResponse } from 'next/server';
 
-// Initialize Gemini AI
-const getGeminiClient = () => {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error('GEMINI_API_KEY is not configured');
-  }
-  return new GoogleGenerativeAI(apiKey);
-};
+function getAI() {
+  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'missing' });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,9 +16,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    const genAI = getGeminiClient();
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     // Create the prompt based on whether the answer was correct or not
     let prompt: string;
@@ -63,14 +55,28 @@ Provide a clear explanation (150-200 words) that:
 Use clear formatting with **bold** for key terms and numbered lists where appropriate. Be encouraging but educational.`;
     }
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const explanation = response.text();
+    const response = await getAI().models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        tools: [{ googleSearch: {} }],
+      },
+    });
+
+    const explanation = response.text || '';
+
+    // Extract grounding sources if available
+    const groundingMetadata = response.candidates?.[0]?.groundingMetadata;
+    const sources = (groundingMetadata as any)?.groundingChunks?.map((chunk: any) => ({
+      title: chunk.web?.title || '',
+      url: chunk.web?.uri || '',
+    })).filter((s: any) => s.url) || [];
 
     return NextResponse.json({
       explanation,
       isCorrect,
       correctAnswer,
+      sources,
     });
   } catch (error: any) {
     console.error('Gemini API Error:', error);

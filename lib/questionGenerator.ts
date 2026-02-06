@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import { Question, GenerationConfig, QuestionSetMetadata } from './types';
 
 // Initialize Gemini AI
@@ -7,7 +7,7 @@ const getGeminiClient = () => {
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY is not configured');
   }
-  return new GoogleGenerativeAI(apiKey);
+  return new GoogleGenAI({ apiKey });
 };
 
 /**
@@ -179,19 +179,10 @@ async function extractBatch(
   config: GenerationConfig,
   retryCount = 0
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
-  const genAI = getGeminiClient();
+  const ai = getGeminiClient();
 
-  // Try gemini-2.5-flash first, fallback to gemini-1.5-pro if overloaded
-  const modelName = retryCount > 0 ? 'gemini-1.5-pro' : 'gemini-2.5-flash';
-
-  const model = genAI.getGenerativeModel({
-    model: modelName,
-    generationConfig: {
-      temperature: 0.3, // Lower temperature for more accurate extraction
-      topP: 0.95,
-      maxOutputTokens: 8192, // Reduced from 16384
-    },
-  });
+  // Try gemini-2.5-flash first, fallback to gemini-2.0-flash if overloaded
+  const modelName = retryCount > 0 ? 'gemini-2.0-flash' : 'gemini-2.5-flash';
 
   const prompt = `You are an expert at extracting and completing exam questions. Extract EXACTLY ${expectedQuestions} questions from the content below.
 
@@ -245,9 +236,17 @@ CRITICAL RULES - STRICTLY ENFORCE:
 Return ONLY the JSON object. No markdown formatting, no text before or after.`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const response = await ai.models.generateContent({
+      model: modelName,
+      contents: prompt,
+      config: {
+        temperature: 0.3, // Lower temperature for more accurate extraction
+        topP: 0.95,
+        maxOutputTokens: 8192, // Reduced from 16384
+      },
+    });
+
+    const text = response.text || '';
 
     return parseGeneratedQuestions(text, config);
   } catch (error: any) {
@@ -258,7 +257,7 @@ Return ONLY the JSON object. No markdown formatting, no text before or after.`;
 
     // Retry once with different model if overloaded and haven't retried yet
     if (isOverloadedError && retryCount === 0) {
-      console.log('Model overloaded, retrying with gemini-1.5-pro...');
+      console.log('Model overloaded, retrying with gemini-2.0-flash...');
       await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
       return extractBatch(content, expectedQuestions, config, 1);
     }
@@ -344,27 +343,26 @@ export async function generateQuestions(
   config: GenerationConfig,
   retryCount = 0
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
-  const genAI = getGeminiClient();
+  const ai = getGeminiClient();
 
-  // Try gemini-2.5-flash first, fallback to gemini-1.5-pro if overloaded
-  const modelName = retryCount > 0 ? 'gemini-1.5-pro' : 'gemini-2.5-flash';
-
-  const model = genAI.getGenerativeModel({
-    model: modelName,
-    generationConfig: {
-      temperature: 0.7,
-      topP: 0.95,
-      maxOutputTokens: 8192,
-    },
-  });
+  // Try gemini-2.5-flash first, fallback to gemini-2.0-flash if overloaded
+  const modelName = retryCount > 0 ? 'gemini-2.0-flash' : 'gemini-2.5-flash';
 
   // Build the prompt based on configuration
   const prompt = buildPrompt(content, config);
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const response = await ai.models.generateContent({
+      model: modelName,
+      contents: prompt,
+      config: {
+        temperature: 0.7,
+        topP: 0.95,
+        maxOutputTokens: 8192,
+      },
+    });
+
+    const text = response.text || '';
 
     // Parse the JSON response
     const parsedResponse = parseGeneratedQuestions(text, config);
@@ -378,7 +376,7 @@ export async function generateQuestions(
 
     // Retry once with different model if overloaded and haven't retried yet
     if (isOverloadedError && retryCount === 0) {
-      console.log('Model overloaded, retrying with gemini-1.5-pro...');
+      console.log('Model overloaded, retrying with gemini-2.0-flash...');
       await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
       return generateQuestions(content, config, 1);
     }
@@ -395,15 +393,7 @@ export async function generateQuestionsFromSearch(
   searchQuery: string,
   config: GenerationConfig
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
-  const genAI = getGeminiClient();
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
-    generationConfig: {
-      temperature: 0.7,
-      topP: 0.95,
-      maxOutputTokens: 8192,
-    },
-  });
+  const ai = getGeminiClient();
 
   // Enhance search query with STEM-focused source preferences
   const stemSources = getSTEMSourceGuidance(config.subject);
@@ -461,9 +451,18 @@ QUALITY REQUIREMENTS:
 Return ONLY the JSON object, no additional text.`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        temperature: 0.7,
+        topP: 0.95,
+        maxOutputTokens: 8192,
+        tools: [{ googleSearch: {} }],
+      },
+    });
+
+    const text = response.text || '';
 
     return parseGeneratedQuestions(text, config);
   } catch (error) {

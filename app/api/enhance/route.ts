@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import { Question, QuestionSetMetadata } from '@/lib/types';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+function getAI() {
+  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'missing' });
+}
 
 // Batch configuration
 const QUESTIONS_PER_BATCH = 10; // Reduce from 15 to ensure token limits
@@ -18,14 +20,6 @@ async function enhanceBatch(
   totalBatches: number
 ): Promise<Question[]> {
   console.log(`Processing batch ${batchIndex + 1}/${totalBatches} (${questions.length} questions)`);
-
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash-exp',
-    generationConfig: {
-      temperature: 0.3, // Lower temperature for more consistent output
-      maxOutputTokens: 8192,
-    }
-  });
 
   const prompt = `You are an expert educator reviewing and enhancing exam questions.
 
@@ -64,9 +58,16 @@ OUTPUT FORMAT (JSON only):
 Return ONLY the JSON object, no additional text.`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
+    const response = await getAI().models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        temperature: 0.3, // Lower temperature for more consistent output
+        maxOutputTokens: 8192,
+      },
+    });
+
+    const text = response.text || '';
 
     console.log(`Batch ${batchIndex + 1} response length: ${text.length} characters`);
 
@@ -117,27 +118,32 @@ Return ONLY the JSON object, no additional text.`;
   } catch (error: any) {
     console.error(`Error enhancing batch ${batchIndex + 1}:`, error.message);
 
-    // If 503 (overloaded), retry with gemini-1.5-pro
+    // If 503 (overloaded), retry with fallback model
     if (error.message?.includes('503') || error.message?.includes('overloaded')) {
-      console.log(`Retrying batch ${batchIndex + 1} with gemini-1.5-pro...`);
+      console.log(`Retrying batch ${batchIndex + 1} with fallback model...`);
 
       try {
-        const fallbackModel = genAI.getGenerativeModel({
-          model: 'gemini-1.5-pro',
-          generationConfig: {
+        const fallbackResponse = await getAI().models.generateContent({
+          model: 'gemini-2.0-flash',
+          contents: prompt,
+          config: {
             temperature: 0.3,
             maxOutputTokens: 8192,
-          }
+          },
         });
 
-        const result = await fallbackModel.generateContent(prompt);
-        const response = result.response;
-        let text = response.text().trim();
+        let text = (fallbackResponse.text || '').trim();
 
         // Extract JSON
         const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
         if (jsonMatch) {
           text = jsonMatch[1].trim();
+        }
+
+        const jsonStart = text.indexOf('{');
+        const jsonEnd = text.lastIndexOf('}');
+        if (jsonStart !== -1 && jsonEnd !== -1) {
+          text = text.substring(jsonStart, jsonEnd + 1);
         }
 
         const data = JSON.parse(text);

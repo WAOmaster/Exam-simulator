@@ -11,14 +11,23 @@ import {
   XCircle,
   BarChart3,
   TrendingUp,
-  Clock,
   Target,
 } from 'lucide-react';
-import questions from '@/data/questions.json';
+import SessionSummary from '@/components/SessionSummary';
 
 export default function ResultsPage() {
   const router = useRouter();
-  const { userAnswers, isExamCompleted, getScore, resetExam } = useExamStore();
+  const {
+    userAnswers,
+    isExamCompleted,
+    getScore,
+    resetExam,
+    questions,
+    sessionMetrics,
+    questionViewTimes,
+    selectionChanges,
+    examDuration,
+  } = useExamStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -225,6 +234,39 @@ export default function ResultsPage() {
               <p className="text-sm text-gray-600 dark:text-gray-400">Score</p>
             </div>
           </div>
+        </motion.div>
+
+        {/* Session Summary */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mb-8"
+        >
+          <SessionSummary
+            sessionMetrics={{
+              correctAnswers: score.correct,
+              incorrectAnswers: score.total - score.correct,
+              currentStreak: sessionMetrics.consecutiveCorrect,
+              maxStreak: sessionMetrics.streakHistory.reduce(
+                (acc, result, i, arr) => {
+                  if (result === 'correct') {
+                    const streak = arr.slice(0, i + 1).reverse().findIndex(r => r !== 'correct');
+                    return Math.max(acc, streak === -1 ? i + 1 : streak);
+                  }
+                  return acc;
+                },
+                0
+              ),
+              averageResponseTime: sessionMetrics.averageResponseTime,
+              categoryPerformance: sessionMetrics.categoryPerformance,
+              consecutiveIncorrect: sessionMetrics.consecutiveIncorrect,
+            }}
+            questionViewTimes={questionViewTimes}
+            selectionChanges={selectionChanges}
+            examDuration={examDuration}
+            totalQuestions={questions.length}
+          />
         </motion.div>
 
         {/* Actions */}

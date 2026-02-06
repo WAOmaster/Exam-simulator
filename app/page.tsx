@@ -28,6 +28,7 @@ import {
   GraduationCap,
   Layers,
   Star,
+  MessageCircle,
   Camera,
 } from 'lucide-react';
 import subjects from '@/data/default-questions/subjects.json';
@@ -78,6 +79,8 @@ export default function Home() {
   const [useTimer, setUseTimer] = useState(true);
   const [learnWithAI, setLearnWithAI] = useState(false);
   const [reviewAnswers, setReviewAnswers] = useState(false);
+  const [cognitiveCompanion, setCognitiveCompanion] = useState(false);
+  const [socraticMode, setSocraticMode] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [loadedQuestions, setLoadedQuestions] = useState<any[]>([]);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -112,7 +115,7 @@ export default function Home() {
     }
     resetExam();
     setQuestions(loadedQuestions);
-    startExam(examDuration, mode, useTimer, learnWithAI, reviewAnswers);
+    startExam(examDuration, mode, useTimer, learnWithAI, reviewAnswers, cognitiveCompanion, socraticMode);
     router.push(mode === 'practice' ? '/practice' : '/exam');
   };
 
@@ -616,6 +619,54 @@ export default function Home() {
                           </motion.div>
                         )}
                       </AnimatePresence>
+
+                      {/* Cognitive Companion (Both Modes) */}
+                      <div className="flex items-center justify-between p-4 rounded-xl border border-amber-500/15 bg-amber-50/30 dark:bg-amber-500/[0.03]">
+                        <div className="flex items-center gap-3">
+                          <Brain className="w-5 h-5 hp-icon-amber" />
+                          <div>
+                            <h3 className="text-sm font-semibold hp-text-primary">Cognitive Companion</h3>
+                            <p className="text-xs hp-text-quaternary mt-0.5">AI diagnoses why you got it wrong</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setCognitiveCompanion(!cognitiveCompanion)}
+                          className={`toggle-switch relative w-12 h-7 rounded-full transition-colors ${
+                            cognitiveCompanion ? 'bg-amber-500' : ''
+                          }`}
+                          style={!cognitiveCompanion ? { backgroundColor: 'var(--hp-toggle-off)' } : {}}
+                        >
+                          <div
+                            className={`toggle-knob absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-lg ${
+                              cognitiveCompanion ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+
+                      {/* Socratic Dialogue (Both Modes) */}
+                      <div className="flex items-center justify-between p-4 rounded-xl border border-indigo-500/15 bg-indigo-50/30 dark:bg-indigo-500/[0.03]">
+                        <div className="flex items-center gap-3">
+                          <MessageCircle className="w-5 h-5 hp-icon-indigo" />
+                          <div>
+                            <h3 className="text-sm font-semibold hp-text-primary">Socratic Dialogue</h3>
+                            <p className="text-xs hp-text-quaternary mt-0.5">AI guides you to discover answers</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setSocraticMode(!socraticMode)}
+                          className={`toggle-switch relative w-12 h-7 rounded-full transition-colors ${
+                            socraticMode ? 'bg-indigo-500' : ''
+                          }`}
+                          style={!socraticMode ? { backgroundColor: 'var(--hp-toggle-off)' } : {}}
+                        >
+                          <div
+                            className={`toggle-knob absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-lg ${
+                              socraticMode ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
                     </div>
 
                     {/* Duration Selector */}

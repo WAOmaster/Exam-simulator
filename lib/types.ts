@@ -135,3 +135,13 @@ export interface ScrapeResponse {
   title?: string;
   error?: string;
 }
+
+// Session metrics for enhanced tracking (Cognitive Companion, Socratic Mode)
+export interface SessionMetrics {
+  totalTimeSpent: number;
+  averageResponseTime: number;
+  consecutiveCorrect: number;
+  consecutiveIncorrect: number;
+  streakHistory: ('correct' | 'incorrect')[];
+  categoryPerformance: Record<string, { correct: number; total: number }>;
+}

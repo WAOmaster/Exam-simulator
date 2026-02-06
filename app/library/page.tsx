@@ -76,6 +76,8 @@ export default function LibraryPage() {
     useTimer: boolean;
     learnWithAI: boolean;
     reviewAnswers: boolean;
+    cognitiveCompanion: boolean;
+    socraticMode: boolean;
     examDuration: number;
   }) => {
     if (!selectedQuestionSet) return;
@@ -88,7 +90,7 @@ export default function LibraryPage() {
     setCurrentQuestionSet(selectedQuestionSet.id); // Set questions from the set
 
     // Now start the exam with the configured settings
-    startExam(config.examDuration, config.mode, config.useTimer, config.learnWithAI, config.reviewAnswers);
+    startExam(config.examDuration, config.mode, config.useTimer, config.learnWithAI, config.reviewAnswers, config.cognitiveCompanion, config.socraticMode);
 
     // Close modal
     setShowSetupModal(false);
