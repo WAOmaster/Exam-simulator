@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { Question, QuestionSetMetadata } from '@/lib/types';
 
+export const maxDuration = 60;
+
 function getAI() {
   return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'missing' });
 }
@@ -59,7 +61,7 @@ Return ONLY the JSON object, no additional text.`;
 
   try {
     const response = await getAI().models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
         temperature: 0.3, // Lower temperature for more consistent output
@@ -124,7 +126,7 @@ Return ONLY the JSON object, no additional text.`;
 
       try {
         const fallbackResponse = await getAI().models.generateContent({
-          model: 'gemini-2.0-flash',
+          model: 'gemini-3-flash-preview',
           contents: prompt,
           config: {
             temperature: 0.3,

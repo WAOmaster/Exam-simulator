@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import { Question, GenerationConfig, QuestionSetMetadata } from './types';
 
 // Initialize Gemini AI
@@ -181,8 +181,8 @@ async function extractBatch(
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
   const ai = getGeminiClient();
 
-  // Try gemini-2.5-flash first, fallback to gemini-2.0-flash if overloaded
-  const modelName = retryCount > 0 ? 'gemini-2.0-flash' : 'gemini-2.5-flash';
+  // Try gemini-3-flash-preview first, fallback to gemini-3-flash-preview if overloaded
+  const modelName = retryCount > 0 ? 'gemini-3-flash-preview' : 'gemini-3-flash-preview';
 
   const prompt = `You are an expert at extracting and completing exam questions. Extract EXACTLY ${expectedQuestions} questions from the content below.
 
@@ -240,13 +240,13 @@ Return ONLY the JSON object. No markdown formatting, no text before or after.`;
       model: modelName,
       contents: prompt,
       config: {
-        temperature: 0.3, // Lower temperature for more accurate extraction
-        topP: 0.95,
-        maxOutputTokens: 8192, // Reduced from 16384
+        maxOutputTokens: 8192,
+        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
       },
     });
 
     const text = response.text || '';
+    console.log('Extraction response length:', text.length);
 
     return parseGeneratedQuestions(text, config);
   } catch (error: any) {
@@ -257,7 +257,7 @@ Return ONLY the JSON object. No markdown formatting, no text before or after.`;
 
     // Retry once with different model if overloaded and haven't retried yet
     if (isOverloadedError && retryCount === 0) {
-      console.log('Model overloaded, retrying with gemini-2.0-flash...');
+      console.log('Model overloaded, retrying with gemini-3-flash-preview...');
       await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
       return extractBatch(content, expectedQuestions, config, 1);
     }
@@ -345,8 +345,8 @@ export async function generateQuestions(
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
   const ai = getGeminiClient();
 
-  // Try gemini-2.5-flash first, fallback to gemini-2.0-flash if overloaded
-  const modelName = retryCount > 0 ? 'gemini-2.0-flash' : 'gemini-2.5-flash';
+  // Try gemini-3-flash-preview first, fallback to gemini-3-flash-preview if overloaded
+  const modelName = retryCount > 0 ? 'gemini-3-flash-preview' : 'gemini-3-flash-preview';
 
   // Build the prompt based on configuration
   const prompt = buildPrompt(content, config);
@@ -356,13 +356,13 @@ export async function generateQuestions(
       model: modelName,
       contents: prompt,
       config: {
-        temperature: 0.7,
-        topP: 0.95,
         maxOutputTokens: 8192,
+        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
       },
     });
 
     const text = response.text || '';
+    console.log('Generation response length:', text.length);
 
     // Parse the JSON response
     const parsedResponse = parseGeneratedQuestions(text, config);
@@ -376,7 +376,7 @@ export async function generateQuestions(
 
     // Retry once with different model if overloaded and haven't retried yet
     if (isOverloadedError && retryCount === 0) {
-      console.log('Model overloaded, retrying with gemini-2.0-flash...');
+      console.log('Model overloaded, retrying with gemini-3-flash-preview...');
       await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
       return generateQuestions(content, config, 1);
     }
@@ -452,17 +452,17 @@ Return ONLY the JSON object, no additional text.`;
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
-        temperature: 0.7,
-        topP: 0.95,
         maxOutputTokens: 8192,
         tools: [{ googleSearch: {} }],
+        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
       },
     });
 
     const text = response.text || '';
+    console.log('Search generation response length:', text.length);
 
     return parseGeneratedQuestions(text, config);
   } catch (error) {
@@ -636,14 +636,10 @@ function parseGeneratedQuestions(
     // Extract JSON from the response (remove markdown code blocks if present)
     let jsonText = text.trim();
 
-    // Remove markdown code blocks
-    if (jsonText.startsWith('```json')) {
-      jsonText = jsonText.replace(/```json\n?/, '').replace(/\n?```$/, '');
-    } else if (jsonText.startsWith('```')) {
-      jsonText = jsonText.replace(/```\n?/, '').replace(/\n?```$/, '');
-    }
+    // Remove markdown code blocks (handle all variations)
+    jsonText = jsonText.replace(/```json\s*/gi, '').replace(/```\s*$/gm, '').replace(/^```\s*/gm, '');
 
-    // Try to extract JSON object if there's extra text
+    // Try to extract JSON object if there's extra text (thinking tokens, explanations, etc.)
     const firstBrace = jsonText.indexOf('{');
     const lastBrace = jsonText.lastIndexOf('}');
 
@@ -654,6 +650,11 @@ function parseGeneratedQuestions(
     // Clean up common JSON issues before parsing
     jsonText = jsonText
       .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
+      .replace(/[\x00-\x1F\x7F]/g, (match) => {
+        // Preserve newlines and tabs inside strings, remove other control chars
+        if (match === '\n' || match === '\r' || match === '\t') return match;
+        return '';
+      })
       .trim();
 
     let parsed;
@@ -662,36 +663,43 @@ function parseGeneratedQuestions(
     } catch (parseError) {
       // Try to fix truncated JSON
       console.error('Initial parse failed, attempting to fix JSON...');
-      console.error('Failed to parse JSON. First 500 chars:', jsonText.substring(0, 500));
+      console.error('JSON length:', jsonText.length);
+      console.error('First 500 chars:', jsonText.substring(0, 500));
       console.error('Last 500 chars:', jsonText.substring(Math.max(0, jsonText.length - 500)));
 
-      // Check if JSON was truncated (missing closing brackets)
-      const openBraces = (jsonText.match(/{/g) || []).length;
-      const closeBraces = (jsonText.match(/}/g) || []).length;
-      const openBrackets = (jsonText.match(/\[/g) || []).length;
-      const closeBrackets = (jsonText.match(/\]/g) || []).length;
+      // Attempt 1: Fix unescaped control characters in string values
+      try {
+        const fixedNewlines = jsonText.replace(/(?<=:\s*"[^"]*)\n(?=[^"]*")/g, '\\n');
+        parsed = JSON.parse(fixedNewlines);
+      } catch {
+        // Attempt 2: Fix truncated JSON (missing closing brackets)
+        const openBraces = (jsonText.match(/{/g) || []).length;
+        const closeBraces = (jsonText.match(/}/g) || []).length;
+        const openBrackets = (jsonText.match(/\[/g) || []).length;
+        const closeBrackets = (jsonText.match(/\]/g) || []).length;
 
-      if (openBraces > closeBraces || openBrackets > closeBrackets) {
-        console.log('Detected truncated JSON, attempting to close...');
+        if (openBraces > closeBraces || openBrackets > closeBrackets) {
+          console.log('Detected truncated JSON, attempting to close...');
 
-        // Remove any incomplete question at the end
-        const lastCompleteQuestion = jsonText.lastIndexOf('},');
-        if (lastCompleteQuestion > 0) {
-          jsonText = jsonText.substring(0, lastCompleteQuestion + 1);
+          // Remove any incomplete question at the end
+          const lastCompleteQuestion = jsonText.lastIndexOf('},');
+          if (lastCompleteQuestion > 0) {
+            jsonText = jsonText.substring(0, lastCompleteQuestion + 1);
+          }
+
+          // Add missing closing brackets
+          for (let i = 0; i < (openBrackets - closeBrackets); i++) {
+            jsonText += ']';
+          }
+          for (let i = 0; i < (openBraces - closeBraces); i++) {
+            jsonText += '}';
+          }
+
+          console.log('Attempting to parse fixed JSON...');
+          parsed = JSON.parse(jsonText);
+        } else {
+          throw parseError;
         }
-
-        // Add missing closing brackets
-        for (let i = 0; i < (openBrackets - closeBrackets); i++) {
-          jsonText += ']';
-        }
-        for (let i = 0; i < (openBraces - closeBraces); i++) {
-          jsonText += '}';
-        }
-
-        console.log('Attempting to parse fixed JSON...');
-        parsed = JSON.parse(jsonText);
-      } else {
-        throw parseError;
       }
     }
 

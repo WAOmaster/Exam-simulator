@@ -1,19 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useExamStore } from '@/lib/store';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Clock,
   FileText,
   Trophy,
   Brain,
   Sparkles,
   Play,
   BarChart3,
-  Library,
-  Plus,
   Atom,
   Code,
   Cog,
@@ -25,19 +22,53 @@ import {
   Wand2,
   BookMarked,
   Zap,
+  ArrowRight,
+  Timer,
+  Eye,
+  GraduationCap,
+  Layers,
+  Star,
   MessageCircle,
   Camera,
 } from 'lucide-react';
 import subjects from '@/data/default-questions/subjects.json';
 
-// Icon mapping
 const iconMap: Record<string, any> = {
-  Atom,
-  Code,
-  Cog,
-  Palette,
-  Calculator,
-  Cloud,
+  Atom, Code, Cog, Palette, Calculator, Cloud,
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
+  },
+};
+
+// Color accent config for subject cards (light/dark adaptive via CSS classes)
+const subjectAccents: Record<string, {
+  glowDark: string;
+  glowLight: string;
+  iconClass: string;
+  borderSelected: string;
+  bgIcon: string;
+  checkClass: string;
+}> = {
+  science: { glowDark: 'rgba(16,185,129,0.15)', glowLight: 'rgba(16,185,129,0.08)', iconClass: 'hp-icon-emerald', borderSelected: 'border-emerald-500/30 dark:border-emerald-500/30', bgIcon: 'from-emerald-500/10 to-green-500/10 dark:from-emerald-500/20 dark:to-green-500/20', checkClass: 'text-emerald-600 dark:text-emerald-400' },
+  technology: { glowDark: 'rgba(59,130,246,0.15)', glowLight: 'rgba(59,130,246,0.08)', iconClass: 'hp-icon-blue', borderSelected: 'border-blue-500/30 dark:border-blue-500/30', bgIcon: 'from-blue-500/10 to-cyan-500/10 dark:from-blue-500/20 dark:to-cyan-500/20', checkClass: 'text-blue-600 dark:text-blue-400' },
+  engineering: { glowDark: 'rgba(249,115,22,0.15)', glowLight: 'rgba(249,115,22,0.08)', iconClass: 'hp-icon-orange', borderSelected: 'border-orange-500/30 dark:border-orange-500/30', bgIcon: 'from-orange-500/10 to-amber-500/10 dark:from-orange-500/20 dark:to-amber-500/20', checkClass: 'text-orange-600 dark:text-orange-400' },
+  arts: { glowDark: 'rgba(168,85,247,0.15)', glowLight: 'rgba(168,85,247,0.08)', iconClass: 'hp-icon-purple', borderSelected: 'border-purple-500/30 dark:border-purple-500/30', bgIcon: 'from-purple-500/10 to-pink-500/10 dark:from-purple-500/20 dark:to-pink-500/20', checkClass: 'text-purple-600 dark:text-purple-400' },
+  mathematics: { glowDark: 'rgba(244,63,94,0.15)', glowLight: 'rgba(244,63,94,0.08)', iconClass: 'hp-icon-rose', borderSelected: 'border-rose-500/30 dark:border-rose-500/30', bgIcon: 'from-rose-500/10 to-red-500/10 dark:from-rose-500/20 dark:to-red-500/20', checkClass: 'text-rose-600 dark:text-rose-400' },
+  oci: { glowDark: 'rgba(99,102,241,0.15)', glowLight: 'rgba(99,102,241,0.08)', iconClass: 'hp-icon-indigo', borderSelected: 'border-indigo-500/30 dark:border-indigo-500/30', bgIcon: 'from-indigo-500/10 to-blue-500/10 dark:from-indigo-500/20 dark:to-blue-500/20', checkClass: 'text-indigo-600 dark:text-indigo-400' },
 };
 
 export default function Home() {
@@ -52,16 +83,26 @@ export default function Home() {
   const [socraticMode, setSocraticMode] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [loadedQuestions, setLoadedQuestions] = useState<any[]>([]);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  // Load questions when subject is selected
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    setMousePos({
+      x: (e.clientX / window.innerWidth - 0.5) * 20,
+      y: (e.clientY / window.innerHeight - 0.5) * 20,
+    });
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [handleMouseMove]);
+
   useEffect(() => {
     if (selectedSubject) {
       const subject = subjects.find((s) => s.id === selectedSubject);
       if (subject) {
         import(`@/data/default-questions/${subject.file}`)
-          .then((module) => {
-            setLoadedQuestions(module.default);
-          })
+          .then((module) => setLoadedQuestions(module.default))
           .catch((err) => console.error('Failed to load questions:', err));
       }
     }
@@ -72,586 +113,624 @@ export default function Home() {
       alert('Please select a subject first!');
       return;
     }
-
     resetExam();
-
-    // Load the selected subject's questions into the store
     setQuestions(loadedQuestions);
-
     startExam(examDuration, mode, useTimer, learnWithAI, reviewAnswers, cognitiveCompanion, socraticMode);
     router.push(mode === 'practice' ? '/practice' : '/exam');
-  };
-
-  const handleViewResults = () => {
-    router.push('/results');
   };
 
   const score = isExamCompleted ? getScore() : null;
   const selectedSubjectData = subjects.find((s) => s.id === selectedSubject);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50 dark:from-slate-950 dark:via-indigo-950 dark:to-purple-950">
-      <div className="min-h-screen relative">
-        {/* Decorative gradient orbs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-purple-400/20 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 -left-40 w-80 h-80 bg-gradient-to-br from-emerald-400/15 to-teal-400/15 rounded-full blur-3xl" />
-          <div className="absolute -bottom-40 right-1/3 w-80 h-80 bg-gradient-to-br from-amber-400/15 to-orange-400/15 rounded-full blur-3xl" />
-        </div>
-        <div className="max-w-7xl mx-auto px-4 py-12 relative z-10">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-center mb-14"
-          >
-            <div className="flex items-center justify-center gap-5 mb-6">
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/25">
-                <Trophy className="w-12 h-12 text-white drop-shadow-md" />
+    <div className="min-h-screen relative overflow-hidden hp-bg">
+      {/* ===== Ambient Background ===== */}
+      <div className="fixed inset-0 pointer-events-none" aria-hidden="true">
+        {/* Primary orb - indigo */}
+        <div
+          className="absolute w-[700px] h-[700px] rounded-full animate-pulse-glow"
+          style={{
+            top: '-10%',
+            right: '-10%',
+            background: 'radial-gradient(circle, var(--hp-orb-indigo) 0%, var(--hp-orb-indigo-outer) 40%, transparent 70%)',
+            transform: `translate(${mousePos.x * 0.3}px, ${mousePos.y * 0.3}px)`,
+            transition: 'transform 0.8s ease-out',
+          }}
+        />
+        {/* Secondary orb - pink */}
+        <div
+          className="absolute w-[500px] h-[500px] rounded-full animate-pulse-glow"
+          style={{
+            bottom: '5%',
+            left: '-8%',
+            background: 'radial-gradient(circle, var(--hp-orb-pink) 0%, var(--hp-orb-pink-outer) 40%, transparent 70%)',
+            animationDelay: '2s',
+            transform: `translate(${mousePos.x * -0.2}px, ${mousePos.y * -0.2}px)`,
+            transition: 'transform 0.8s ease-out',
+          }}
+        />
+        {/* Accent orb - cyan */}
+        <div
+          className="absolute w-[400px] h-[400px] rounded-full"
+          style={{
+            top: '50%',
+            left: '50%',
+            background: 'radial-gradient(circle, var(--hp-orb-cyan) 0%, transparent 60%)',
+            transform: `translate(-50%, -50%) translate(${mousePos.x * 0.15}px, ${mousePos.y * 0.15}px)`,
+            transition: 'transform 1s ease-out',
+          }}
+        />
+        {/* Grid pattern */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `linear-gradient(var(--hp-grid-line) 1px, transparent 1px),
+                              linear-gradient(90deg, var(--hp-grid-line) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px',
+          }}
+        />
+        {/* Top fade */}
+        <div className="absolute top-0 left-0 right-0 h-40" style={{ background: `linear-gradient(to bottom, var(--hp-bg), transparent)` }} />
+      </div>
+
+      {/* Grain texture */}
+      <div className="fixed inset-0 pointer-events-none grain-overlay" aria-hidden="true" />
+
+      {/* ===== Main Content ===== */}
+      <div className="relative z-10">
+        {/* ===== HERO SECTION ===== */}
+        <section className="relative pt-20 pb-16 px-4">
+          <div className="max-w-6xl mx-auto text-center">
+            {/* Orbiting elements around logo */}
+            <div className="relative inline-block mb-8">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="animate-orbit">
+                  <Star className="w-4 h-4 text-indigo-400/60 dark:text-indigo-400/60" />
+                </div>
               </div>
-              <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-slate-900 via-indigo-900 to-purple-900 dark:from-white dark:via-indigo-200 dark:to-purple-200 bg-clip-text text-transparent">
-                ExamSimulator
-              </h1>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="animate-orbit-reverse">
+                  <Sparkles className="w-3 h-3 text-pink-400/50 dark:text-pink-400/50" />
+                </div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                transition={{ duration: 0.8, ease: [0.175, 0.885, 0.32, 1.275] }}
+                className="relative"
+              >
+                <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-[2px] animate-float">
+                  <div className="w-full h-full rounded-3xl flex items-center justify-center" style={{ backgroundColor: 'var(--hp-logo-inner)' }}>
+                    <GraduationCap className="w-12 h-12 hp-icon-indigo" />
+                  </div>
+                </div>
+                {/* Glow behind logo */}
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 blur-2xl opacity-20 dark:opacity-30" />
+              </motion.div>
             </div>
-            <p className="text-2xl text-slate-700 dark:text-slate-300 font-semibold">
-              AI-Powered Practice Exams
-            </p>
-            <p className="text-lg text-slate-500 dark:text-slate-400 mt-3 max-w-2xl mx-auto">
-              Master any subject with custom-generated questions and intelligent feedback
-            </p>
-          </motion.div>
 
-          {/* Quick Actions */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
-          >
-            <motion.button
-              whileHover={{ scale: 1.03, y: -3 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => router.push('/generate')}
-              className="group p-6 rounded-2xl shadow-xl transition-all relative overflow-hidden hover:shadow-2xl"
-              style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%)' }}
+            {/* Title */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-              <div className="absolute top-4 right-4 opacity-30">
-                <Sparkles className="w-20 h-20 text-white" />
-              </div>
-              <div className="flex items-center gap-5 relative z-10">
-                <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm border border-white/30">
-                  <Wand2 className="w-9 h-9 text-white drop-shadow-lg" />
-                </div>
-                <div className="text-left">
-                  <h3 className="text-2xl font-bold text-white mb-1 drop-shadow-md">Generate Questions</h3>
-                  <p className="text-white/90 text-base">Create custom exams from your content</p>
-                </div>
-              </div>
-            </motion.button>
+              <h1 className="text-6xl md:text-7xl font-extrabold tracking-tight mb-4">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-900 to-gray-700 dark:from-white dark:via-white dark:to-white/70">
+                  Exam
+                </span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400 animate-gradient-shift" style={{ backgroundSize: '200% 200%' }}>
+                  Simulator
+                </span>
+              </h1>
+            </motion.div>
 
-            <motion.button
-              whileHover={{ scale: 1.03, y: -3 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => router.push('/library')}
-              className="group p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all relative overflow-hidden"
-              style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)' }}
+            {/* Subtitle */}
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35, duration: 0.6 }}
+              className="text-lg md:text-xl hp-text-tertiary max-w-xl mx-auto mb-3 font-light"
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-              <div className="absolute top-4 right-4 opacity-30">
-                <BookMarked className="w-20 h-20 text-white" />
-              </div>
-              <div className="flex items-center gap-5 relative z-10">
-                <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm border border-white/30">
-                  <BookMarked className="w-9 h-9 text-white drop-shadow-lg" />
-                </div>
-                <div className="text-left">
-                  <h3 className="text-2xl font-bold text-white mb-1 drop-shadow-md">My Library</h3>
-                  <p className="text-white/90 text-base">Browse saved question sets</p>
-                </div>
-              </div>
-            </motion.button>
+              AI-powered practice exams that adapt to your learning
+            </motion.p>
 
-            <motion.button
-              whileHover={{ scale: 1.03, y: -3 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => router.push('/visual-solver')}
-              className="group p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all relative overflow-hidden"
-              style={{ background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #0e7490 100%)' }}
+            {/* Powered by badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45, duration: 0.5 }}
+              className="flex items-center justify-center gap-2 mb-12"
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-              <div className="absolute top-4 right-4 opacity-30">
-                <Camera className="w-20 h-20 text-white" />
+              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border" style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)' }}>
+                <Zap className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
+                <span className="text-xs hp-text-tertiary font-medium tracking-wide uppercase">Powered by Google Gemini</span>
               </div>
-              <div className="flex items-center gap-5 relative z-10">
-                <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm border border-white/30">
-                  <Camera className="w-9 h-9 text-white drop-shadow-lg" />
-                </div>
-                <div className="text-left">
-                  <h3 className="text-2xl font-bold text-white mb-1 drop-shadow-md">Visual Solver</h3>
-                  <p className="text-white/90 text-base">Upload images for AI solutions</p>
-                </div>
-              </div>
-            </motion.button>
-          </motion.div>
+            </motion.div>
 
-          {/* Subject Selection Section */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="mb-8"
-          >
-            <div className="bg-white dark:bg-slate-800/50 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-8 backdrop-blur-sm">
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-md shadow-amber-500/20">
-                  <Sparkles className="w-5 h-5 text-white" />
+            {/* ===== ACTION CARDS ===== */}
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-6"
+            >
+              {/* Generate Questions */}
+              <motion.button
+                variants={itemVariants}
+                onClick={() => router.push('/generate')}
+                whileHover={{ y: -6, transition: { duration: 0.3 } }}
+                whileTap={{ scale: 0.97 }}
+                className="action-card-shine group relative p-6 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-indigo-500/30"
+                style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)', boxShadow: 'var(--hp-card-shadow)' }}
+              >
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500/5 dark:from-indigo-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 border border-indigo-500/10 flex items-center justify-center mb-4 group-hover:border-indigo-500/30 transition-colors">
+                    <Wand2 className="w-6 h-6 hp-icon-indigo" />
+                  </div>
+                  <h3 className="text-lg font-semibold hp-text-primary mb-1">Generate Questions</h3>
+                  <p className="text-sm hp-text-tertiary leading-relaxed">Create custom exams from files, URLs, or any content</p>
+                  <div className="flex items-center gap-1.5 mt-4 text-indigo-600 dark:text-indigo-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span>Get started</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
                 </div>
-                Explore Sample Questions
-              </h2>
-              <p className="text-slate-600 dark:text-slate-400 mb-8">
-                Try out the app with pre-built question sets before creating your own
+              </motion.button>
+
+              {/* My Library */}
+              <motion.button
+                variants={itemVariants}
+                onClick={() => router.push('/library')}
+                whileHover={{ y: -6, transition: { duration: 0.3 } }}
+                whileTap={{ scale: 0.97 }}
+                className="action-card-shine group relative p-6 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-emerald-500/30"
+                style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)', boxShadow: 'var(--hp-card-shadow)' }}
+              >
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/5 dark:from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20 border border-emerald-500/10 flex items-center justify-center mb-4 group-hover:border-emerald-500/30 transition-colors">
+                    <BookMarked className="w-6 h-6 hp-icon-emerald" />
+                  </div>
+                  <h3 className="text-lg font-semibold hp-text-primary mb-1">My Library</h3>
+                  <p className="text-sm hp-text-tertiary leading-relaxed">Browse and manage your saved question sets</p>
+                  <div className="flex items-center gap-1.5 mt-4 text-emerald-600 dark:text-emerald-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span>Browse sets</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              </motion.button>
+
+              {/* Visual Solver */}
+              <motion.button
+                variants={itemVariants}
+                onClick={() => router.push('/visual-solver')}
+                whileHover={{ y: -6, transition: { duration: 0.3 } }}
+                whileTap={{ scale: 0.97 }}
+                className="action-card-shine group relative p-6 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-amber-500/30"
+                style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)', boxShadow: 'var(--hp-card-shadow)' }}
+              >
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-500/5 dark:from-amber-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 dark:from-amber-500/20 dark:to-orange-500/20 border border-amber-500/10 flex items-center justify-center mb-4 group-hover:border-amber-500/30 transition-colors">
+                    <Camera className="w-6 h-6 hp-icon-amber" />
+                  </div>
+                  <h3 className="text-lg font-semibold hp-text-primary mb-1">Visual Solver</h3>
+                  <p className="text-sm hp-text-tertiary leading-relaxed">Upload images for AI-powered solutions</p>
+                  <div className="flex items-center gap-1.5 mt-4 text-amber-600 dark:text-amber-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span>Upload image</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              </motion.button>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ===== EXPLORE SUBJECTS ===== */}
+        <section className="relative px-4 pb-12">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.6 }}
+            >
+              {/* Section header */}
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/20 dark:to-pink-500/20 border border-purple-500/10 flex items-center justify-center">
+                  <Layers className="w-4 h-4 hp-icon-purple" />
+                </div>
+                <h2 className="text-2xl font-bold hp-text-primary">Explore Subjects</h2>
+              </div>
+              <p className="hp-text-tertiary mb-8 ml-11 text-sm">
+                Jump into pre-built question sets to experience the platform
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {subjects.map((subject) => {
+              {/* Subject Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {subjects.map((subject, i) => {
                   const Icon = iconMap[subject.icon] || FileText;
                   const isSelected = selectedSubject === subject.id;
+                  const accent = subjectAccents[subject.id] || subjectAccents.technology;
 
                   return (
-                    <button
+                    <motion.button
                       key={subject.id}
+                      initial={{ opacity: 0, y: 16 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.06, duration: 0.4 }}
+                      whileHover={{ y: -3, transition: { duration: 0.25 } }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedSubject(subject.id)}
-                      className={`relative p-5 rounded-xl border-2 transition-all text-left group overflow-hidden ${isSelected
-                        ? 'border-white dark:border-white bg-gradient-to-br ' + subject.color + ' shadow-2xl scale-105 ring-4 ring-white ring-opacity-30'
-                        : 'border-gray-300 dark:border-gray-600 bg-gradient-to-br ' + subject.color + ' bg-opacity-10 dark:bg-opacity-20 hover:border-opacity-50 hover:scale-102 hover:shadow-lg'
-                        }`}
+                      className={`subject-card relative p-5 rounded-2xl text-left transition-all duration-300 ${
+                        isSelected
+                          ? `border-2 ${accent.borderSelected}`
+                          : 'border'
+                      }`}
+                      style={isSelected ? {
+                        backgroundColor: 'var(--hp-surface-hover)',
+                        boxShadow: 'var(--hp-card-shadow-hover)',
+                      } : {
+                        borderColor: 'var(--hp-surface-border)',
+                        backgroundColor: 'var(--hp-surface)',
+                        boxShadow: 'var(--hp-card-shadow)',
+                      }}
                     >
-                      {/* Background gradient overlay */}
-                      {!isSelected && (
-                        <div className="absolute inset-0 overlay-strong" />
-                      )}
-
+                      {/* Selected glow (dark mode only, light mode uses shadow instead) */}
                       {isSelected && (
-                        <div className="absolute top-3 right-3 z-10">
-                          <div className="glass-bg backdrop-blur-sm rounded-full p-1">
-                            <CheckCircle className="w-5 h-5 text-white" />
-                          </div>
-                        </div>
+                        <div
+                          className="absolute inset-0 rounded-2xl opacity-0 dark:opacity-40 blur-xl pointer-events-none"
+                          style={{ background: accent.glowDark }}
+                        />
                       )}
 
-                      <div className={`flex items-start gap-3 relative z-10 ${isSelected ? 'text-white' : 'text-gray-800 dark:text-gray-100'}`}>
-                        <div className={`p-2 rounded-lg ${isSelected ? 'glass-bg backdrop-blur-sm' : `bg-gradient-to-br ${subject.color} bg-opacity-20`}`}>
-                          <Icon className={`w-6 h-6 ${isSelected ? 'text-white' : ''}`} style={!isSelected ? { color: 'inherit' } : {}} />
+                      <div className="relative z-10 flex items-start gap-4">
+                        <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${accent.bgIcon} border ${isSelected ? accent.borderSelected : ''} flex items-center justify-center shrink-0 transition-colors`} style={!isSelected ? { borderColor: 'var(--hp-surface-border)' } : {}}>
+                          <Icon className={`w-5 h-5 ${accent.iconClass}`} />
                         </div>
-                        <div className="flex-1">
-                          <h3 className="font-bold text-lg mb-1">{subject.name}</h3>
-                          <p className={`text-sm mb-2 ${isSelected ? 'text-white text-opacity-95' : 'text-gray-600 dark:text-gray-300'}`}>
-                            {subject.description}
-                          </p>
-                          <div className="flex items-center gap-3 text-xs">
-                            <span className={`font-medium ${isSelected ? 'text-white text-opacity-90' : 'text-gray-600 dark:text-gray-400'}`}>
-                              {subject.questionCount} questions
-                            </span>
-                            <span className={`px-2 py-1 rounded font-medium ${isSelected ? 'glass-bg backdrop-blur-sm text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <h3 className="font-semibold hp-text-primary text-[15px]">{subject.name}</h3>
+                            {isSelected && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                              >
+                                <CheckCircle className={`w-5 h-5 ${accent.checkClass}`} />
+                              </motion.div>
+                            )}
+                          </div>
+                          <p className="text-sm hp-text-tertiary mb-3 leading-relaxed">{subject.description}</p>
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-xs hp-text-quaternary font-medium">{subject.questionCount} questions</span>
+                            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: 'var(--hp-text-quaternary)' }} />
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${isSelected ? 'bg-black/5 dark:bg-white/10 hp-text-secondary' : 'hp-text-quaternary'}`} style={!isSelected ? { backgroundColor: 'var(--hp-surface)' } : {}}>
                               {subject.difficulty}
                             </span>
                           </div>
                         </div>
                       </div>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>
-            </div>
-          </motion.div>
-
-          {/* Configuration Card (Only show if subject is selected) */}
-          {selectedSubject && selectedSubjectData && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-card dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden transition-colors"
-            >
-              {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
-                <div className="flex items-center gap-4 p-4 bg-card dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
-                  <FileText className="w-10 h-10 text-blue-600 dark:text-blue-400" />
-                  <div>
-                    <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">
-                      {loadedQuestions.length}
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Questions</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 p-4 bg-card dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
-                  <div className={`p-2 rounded-lg bg-gradient-to-br ${selectedSubjectData.color}`}>
-                    {(() => {
-                      const Icon = iconMap[selectedSubjectData.icon] || FileText;
-                      return <Icon className="w-6 h-6 text-white" />;
-                    })()}
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-gray-800 dark:text-gray-100">
-                      {selectedSubjectData.name}
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Selected</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 p-4 bg-card dark:bg-gray-700 rounded-lg shadow-sm transition-colors">
-                  <Brain className="w-10 h-10 text-theme-accent" />
-                  <div>
-                    <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">AI</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Explanations</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-8">
-                {/* Previous Score */}
-                {isExamCompleted && score && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-8 p-6 rounded-lg border-2 border-green-200 dark:border-green-700"
-                    style={{
-                      backgroundImage: 'linear-gradient(to right, color-mix(in srgb, #10b981 15%, white), color-mix(in srgb, var(--primary) 15%, white))'
-                    }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <BarChart3 className="w-8 h-8 text-green-600 dark:text-green-400" />
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">
-                            Your Last Score
-                          </p>
-                          <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">
-                            {score.correct} / {score.total}
-                            <span className="text-xl ml-2 text-green-600 dark:text-green-400">
-                              ({score.percentage}%)
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={handleViewResults}
-                        className="px-6 py-3 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white font-medium rounded-lg transition-colors"
-                      >
-                        View Results
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Features */}
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-                    Features
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
-                      <Sparkles className="w-6 h-6 text-theme-secondary mt-1" />
-                      <div>
-                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                          AI Explanations
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          Get detailed explanations powered by Google Gemini AI
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
-                      <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400 mt-1" />
-                      <div>
-                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">Timed Mode</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          Practice under real exam conditions with a timer
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
-                      <Trophy className="w-6 h-6 text-yellow-600 dark:text-yellow-400 mt-1" />
-                      <div>
-                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                          Track Progress
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          Monitor your performance and identify weak areas
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-colors">
-                      <FileText className="w-6 h-6 text-green-600 dark:text-green-400 mt-1" />
-                      <div>
-                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                          Practice Questions
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          Test your knowledge with {selectedSubjectData.name} questions
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mode Selector */}
-                <div className="mb-8">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    Select Mode
-                  </label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button
-                      onClick={() => setMode('practice')}
-                      className={`p-4 rounded-lg border-2 transition-all ${mode === 'practice'
-                        ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30'
-                        : 'border-gray-300 dark:border-gray-600 bg-card dark:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500'
-                        }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Brain className={`w-6 h-6 ${mode === 'practice' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`} />
-                        <div className="text-left">
-                          <h3 className={`font-semibold ${mode === 'practice' ? 'text-gray-900 dark:text-white' : 'text-gray-800 dark:text-gray-100'}`}>
-                            Practice Mode
-                          </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Instant AI feedback for each answer
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => setMode('exam')}
-                      className={`p-4 rounded-lg border-2 transition-all ${mode === 'exam'
-                        ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30'
-                        : 'border-gray-300 dark:border-gray-600 bg-card dark:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500'
-                        }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Trophy className={`w-6 h-6 ${mode === 'exam' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`} />
-                        <div className="text-left">
-                          <h3 className={`font-semibold ${mode === 'exam' ? 'text-gray-900 dark:text-white' : 'text-gray-800 dark:text-gray-100'}`}>
-                            Exam Mode
-                          </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Simulate real exam conditions
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Timer Toggle */}
-                <div className="mb-8">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                      <div>
-                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                          Use Timer
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          {useTimer ? `${examDuration} minutes countdown` : 'No time limit'}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setUseTimer(!useTimer)}
-                      className={`relative w-14 h-8 rounded-full transition-colors ${useTimer ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
-                        }`}
-                    >
-                      <div
-                        className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${useTimer ? 'translate-x-6' : 'translate-x-0'
-                          }`}
-                      />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Learn with AI Toggle (Practice Mode Only) */}
-                {mode === 'practice' && (
-                  <div className="mb-8">
-                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-700 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                        <div>
-                          <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                            Learn with AI
-                          </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Get AI-guided learning for each question
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setLearnWithAI(!learnWithAI)}
-                        className={`relative w-14 h-8 rounded-full transition-colors ${learnWithAI ? 'bg-purple-600 dark:bg-purple-500' : 'bg-gray-300 dark:bg-gray-600'
-                          }`}
-                      >
-                        <div
-                          className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${learnWithAI ? 'translate-x-6' : 'translate-x-0'
-                            }`}
-                        />
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Review Answers Toggle (Exam Mode Only) */}
-                {mode === 'exam' && (
-                  <div className="mb-8">
-                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 border border-green-200 dark:border-green-700 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <FileText className="w-6 h-6 text-green-600 dark:text-green-400" />
-                        <div>
-                          <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                            Review Answers
-                          </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Review answers during exam (optional)
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setReviewAnswers(!reviewAnswers)}
-                        className={`relative w-14 h-8 rounded-full transition-colors ${reviewAnswers ? 'bg-green-600 dark:bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
-                          }`}
-                      >
-                        <div
-                          className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${reviewAnswers ? 'translate-x-6' : 'translate-x-0'
-                            }`}
-                        />
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Cognitive Companion Toggle (Both Modes) */}
-                <div className="mb-8">
-                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Brain className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-                      <div>
-                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                          Cognitive Companion
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          AI diagnoses why you got it wrong with visible reasoning
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setCognitiveCompanion(!cognitiveCompanion)}
-                      className={`relative w-14 h-8 rounded-full transition-colors ${cognitiveCompanion ? 'bg-amber-600 dark:bg-amber-500' : 'bg-gray-300 dark:bg-gray-600'
-                        }`}
-                    >
-                      <div
-                        className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${cognitiveCompanion ? 'translate-x-6' : 'translate-x-0'
-                          }`}
-                      />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Socratic Dialogue Toggle (Both Modes) */}
-                <div className="mb-8">
-                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-200 dark:border-indigo-700 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <MessageCircle className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                      <div>
-                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                          Socratic Dialogue
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          AI guides you to discover answers through questions
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setSocraticMode(!socraticMode)}
-                      className={`relative w-14 h-8 rounded-full transition-colors ${socraticMode ? 'bg-indigo-600 dark:bg-indigo-500' : 'bg-gray-300 dark:bg-gray-600'
-                        }`}
-                    >
-                      <div
-                        className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${socraticMode ? 'translate-x-6' : 'translate-x-0'
-                          }`}
-                      />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Exam Duration Selector (only if timer is enabled) */}
-                {useTimer && (
-                  <div className="mb-8">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                      Exam Duration
-                    </label>
-                    <div className="flex gap-3 flex-wrap">
-                      {[30, 60, 90, 120].map((duration) => (
-                        <button
-                          key={duration}
-                          onClick={() => setExamDuration(duration)}
-                          className={`px-6 py-3 rounded-lg font-medium transition-all ${examDuration === duration
-                            ? 'bg-blue-600 dark:bg-blue-700 text-white shadow-lg scale-105'
-                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                            }`}
-                        >
-                          {duration} min
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Start Button */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleStart}
-                  className={`w-full py-4 bg-gradient-to-r ${selectedSubjectData.color} text-white text-xl font-bold rounded-lg shadow-xl transition-all flex items-center justify-center gap-3`}
-                >
-                  <Play className="w-6 h-6" />
-                  {mode === 'practice' ? 'Start Practice' : 'Start Exam'}
-                  <ChevronRight className="w-6 h-6" />
-                </motion.button>
-              </div>
             </motion.div>
-          )}
+          </div>
+        </section>
 
-          {/* Footer with Gemini Branding */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="mt-8"
-          >
-            <div className="flex items-center justify-center gap-3 p-4 glass-bg backdrop-blur-md rounded-xl border border-glass">
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <Zap className="w-5 h-5 text-yellow-300 fill-yellow-300 animate-pulse" />
-                  <div className="absolute inset-0 blur-sm">
-                    <Zap className="w-5 h-5 text-yellow-300 fill-yellow-300" />
+        {/* ===== CONFIGURATION PANEL ===== */}
+        <AnimatePresence>
+          {selectedSubject && selectedSubjectData && (
+            <motion.section
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="relative px-4 pb-20"
+            >
+              <div className="max-w-4xl mx-auto">
+                <div className="relative rounded-3xl border backdrop-blur-sm overflow-hidden" style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)', boxShadow: 'var(--hp-card-shadow)' }}>
+                  {/* Top gradient line */}
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
+
+                  {/* Stats bar */}
+                  <div className="grid grid-cols-3 gap-0 border-b" style={{ borderColor: 'var(--hp-surface-border)' }}>
+                    {[
+                      { icon: FileText, label: 'Questions', value: loadedQuestions.length.toString(), iconClass: 'hp-icon-indigo' },
+                      { icon: iconMap[selectedSubjectData.icon] || FileText, label: 'Subject', value: selectedSubjectData.name, iconClass: 'hp-icon-emerald' },
+                      { icon: Brain, label: 'AI Powered', value: 'Gemini', iconClass: 'hp-icon-purple' },
+                    ].map((stat, i) => (
+                      <div key={i} className={`p-5 flex items-center gap-3 ${i < 2 ? 'border-r' : ''}`} style={i < 2 ? { borderColor: 'var(--hp-surface-border)' } : {}}>
+                        <stat.icon className={`w-5 h-5 ${stat.iconClass} shrink-0`} />
+                        <div className="min-w-0">
+                          <p className="text-lg font-bold hp-text-primary truncate">{stat.value}</p>
+                          <p className="text-xs hp-text-quaternary">{stat.label}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="p-8 space-y-8">
+                    {/* Previous Score */}
+                    {isExamCompleted && score && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex items-center justify-between p-5 rounded-2xl border border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-500/[0.05]"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                            <BarChart3 className="w-5 h-5 hp-icon-emerald" />
+                          </div>
+                          <div>
+                            <p className="text-xs hp-text-tertiary font-medium mb-0.5">Previous Score</p>
+                            <p className="text-2xl font-bold hp-text-primary">
+                              {score.correct}/{score.total}
+                              <span className="text-base ml-2 text-emerald-600 dark:text-emerald-400">({score.percentage}%)</span>
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => router.push('/results')}
+                          className="px-5 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm font-medium hover:bg-emerald-500/20 transition-colors"
+                        >
+                          View Results
+                        </button>
+                      </motion.div>
+                    )}
+
+                    {/* Mode Selector */}
+                    <div>
+                      <label className="block text-sm font-medium hp-text-tertiary mb-3 tracking-wide uppercase">Mode</label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          { key: 'practice' as const, icon: Brain, title: 'Practice', desc: 'Instant AI feedback', iconClass: 'hp-icon-indigo', activeClasses: 'border-indigo-500/30 bg-indigo-50/50 dark:bg-indigo-500/[0.06]', dotClass: 'bg-indigo-500 dark:bg-indigo-400' },
+                          { key: 'exam' as const, icon: Trophy, title: 'Exam', desc: 'Timed simulation', iconClass: 'hp-icon-amber', activeClasses: 'border-amber-500/30 bg-amber-50/50 dark:bg-amber-500/[0.06]', dotClass: 'bg-amber-500 dark:bg-amber-400' },
+                        ].map((m) => (
+                          <button
+                            key={m.key}
+                            onClick={() => setMode(m.key)}
+                            className={`relative p-4 rounded-xl border text-left transition-all duration-300 ${
+                              mode === m.key
+                                ? m.activeClasses
+                                : ''
+                            }`}
+                            style={mode !== m.key ? { borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)' } : {}}
+                          >
+                            <div className="flex items-center gap-3">
+                              <m.icon className={`w-5 h-5 ${mode === m.key ? m.iconClass : 'hp-text-quaternary'}`} />
+                              <div>
+                                <h3 className={`font-semibold text-sm ${mode === m.key ? 'hp-text-primary' : 'hp-text-secondary'}`}>
+                                  {m.title} Mode
+                                </h3>
+                                <p className="text-xs hp-text-quaternary mt-0.5">{m.desc}</p>
+                              </div>
+                            </div>
+                            {mode === m.key && (
+                              <motion.div
+                                layoutId="mode-indicator"
+                                className={`absolute top-3 right-3 w-2 h-2 rounded-full ${m.dotClass}`}
+                                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                              />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Toggle Group */}
+                    <div className="space-y-3">
+                      {/* Timer Toggle */}
+                      <div className="flex items-center justify-between p-4 rounded-xl border" style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)' }}>
+                        <div className="flex items-center gap-3">
+                          <Timer className="w-5 h-5 hp-icon-cyan" />
+                          <div>
+                            <h3 className="text-sm font-semibold hp-text-primary">Countdown Timer</h3>
+                            <p className="text-xs hp-text-quaternary mt-0.5">
+                              {useTimer ? `${examDuration} minute limit` : 'No time limit'}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setUseTimer(!useTimer)}
+                          className={`toggle-switch relative w-12 h-7 rounded-full transition-colors ${
+                            useTimer ? 'bg-cyan-500' : ''
+                          }`}
+                          style={!useTimer ? { backgroundColor: 'var(--hp-toggle-off)' } : {}}
+                        >
+                          <div
+                            className={`toggle-knob absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-lg ${
+                              useTimer ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+
+                      {/* Learn with AI (Practice only) */}
+                      <AnimatePresence>
+                        {mode === 'practice' && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <div className="flex items-center justify-between p-4 rounded-xl border border-purple-500/15 bg-purple-50/30 dark:bg-purple-500/[0.03]">
+                              <div className="flex items-center gap-3">
+                                <Sparkles className="w-5 h-5 hp-icon-purple" />
+                                <div>
+                                  <h3 className="text-sm font-semibold hp-text-primary">Learn with AI</h3>
+                                  <p className="text-xs hp-text-quaternary mt-0.5">Deep learning guides for each question</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => setLearnWithAI(!learnWithAI)}
+                                className={`toggle-switch relative w-12 h-7 rounded-full transition-colors ${
+                                  learnWithAI ? 'bg-purple-500' : ''
+                                }`}
+                                style={!learnWithAI ? { backgroundColor: 'var(--hp-toggle-off)' } : {}}
+                              >
+                                <div
+                                  className={`toggle-knob absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-lg ${
+                                    learnWithAI ? 'translate-x-5' : 'translate-x-0'
+                                  }`}
+                                />
+                              </button>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Review Answers (Exam only) */}
+                      <AnimatePresence>
+                        {mode === 'exam' && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <div className="flex items-center justify-between p-4 rounded-xl border border-emerald-500/15 bg-emerald-50/30 dark:bg-emerald-500/[0.03]">
+                              <div className="flex items-center gap-3">
+                                <Eye className="w-5 h-5 hp-icon-emerald" />
+                                <div>
+                                  <h3 className="text-sm font-semibold hp-text-primary">Review Answers</h3>
+                                  <p className="text-xs hp-text-quaternary mt-0.5">See explanations during exam</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => setReviewAnswers(!reviewAnswers)}
+                                className={`toggle-switch relative w-12 h-7 rounded-full transition-colors ${
+                                  reviewAnswers ? 'bg-emerald-500' : ''
+                                }`}
+                                style={!reviewAnswers ? { backgroundColor: 'var(--hp-toggle-off)' } : {}}
+                              >
+                                <div
+                                  className={`toggle-knob absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-lg ${
+                                    reviewAnswers ? 'translate-x-5' : 'translate-x-0'
+                                  }`}
+                                />
+                              </button>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Cognitive Companion (Both Modes) */}
+                      <div className="flex items-center justify-between p-4 rounded-xl border border-amber-500/15 bg-amber-50/30 dark:bg-amber-500/[0.03]">
+                        <div className="flex items-center gap-3">
+                          <Brain className="w-5 h-5 hp-icon-amber" />
+                          <div>
+                            <h3 className="text-sm font-semibold hp-text-primary">Cognitive Companion</h3>
+                            <p className="text-xs hp-text-quaternary mt-0.5">AI diagnoses why you got it wrong</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setCognitiveCompanion(!cognitiveCompanion)}
+                          className={`toggle-switch relative w-12 h-7 rounded-full transition-colors ${
+                            cognitiveCompanion ? 'bg-amber-500' : ''
+                          }`}
+                          style={!cognitiveCompanion ? { backgroundColor: 'var(--hp-toggle-off)' } : {}}
+                        >
+                          <div
+                            className={`toggle-knob absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-lg ${
+                              cognitiveCompanion ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+
+                      {/* Socratic Dialogue (Both Modes) */}
+                      <div className="flex items-center justify-between p-4 rounded-xl border border-indigo-500/15 bg-indigo-50/30 dark:bg-indigo-500/[0.03]">
+                        <div className="flex items-center gap-3">
+                          <MessageCircle className="w-5 h-5 hp-icon-indigo" />
+                          <div>
+                            <h3 className="text-sm font-semibold hp-text-primary">Socratic Dialogue</h3>
+                            <p className="text-xs hp-text-quaternary mt-0.5">AI guides you to discover answers</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setSocraticMode(!socraticMode)}
+                          className={`toggle-switch relative w-12 h-7 rounded-full transition-colors ${
+                            socraticMode ? 'bg-indigo-500' : ''
+                          }`}
+                          style={!socraticMode ? { backgroundColor: 'var(--hp-toggle-off)' } : {}}
+                        >
+                          <div
+                            className={`toggle-knob absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-lg ${
+                              socraticMode ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Duration Selector */}
+                    <AnimatePresence>
+                      {useTimer && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <label className="block text-sm font-medium hp-text-tertiary mb-3 tracking-wide uppercase">Duration</label>
+                          <div className="flex gap-2">
+                            {[30, 60, 90, 120].map((d) => (
+                              <button
+                                key={d}
+                                onClick={() => setExamDuration(d)}
+                                className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all duration-300 border ${
+                                  examDuration === d
+                                    ? 'bg-indigo-50 dark:bg-indigo-500/15 border-indigo-500/30 text-indigo-600 dark:text-indigo-300 shadow-lg shadow-indigo-500/5'
+                                    : 'hp-text-tertiary'
+                                }`}
+                                style={examDuration !== d ? { borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)' } : {}}
+                              >
+                                {d} min
+                              </button>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {/* Start Button */}
+                    <motion.button
+                      whileHover={{ scale: 1.01, y: -1 }}
+                      whileTap={{ scale: 0.99 }}
+                      onClick={handleStart}
+                      className="group w-full relative py-4 rounded-2xl font-semibold text-lg overflow-hidden transition-all"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 opacity-90 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer opacity-0 group-hover:opacity-100" />
+                      <div className="relative z-10 flex items-center justify-center gap-3 text-white">
+                        <Play className="w-5 h-5" />
+                        <span>{mode === 'practice' ? 'Start Practice' : 'Start Exam'}</span>
+                        <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </motion.button>
                   </div>
                 </div>
-                <span className="text-gray-900 dark:text-white font-semibold">Powered by</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500">
-                <Sparkles className="w-4 h-4 text-white" />
-                <span className="text-white font-bold">Google Gemini AI</span>
-              </div>
-              <span className="text-theme-light hidden sm:inline">•</span>
-              <span className="text-theme-light hidden sm:inline">Generate questions from any subject</span>
+            </motion.section>
+          )}
+        </AnimatePresence>
+
+        {/* ===== FOOTER ===== */}
+        <footer className="relative px-4 pb-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-center">
+              <p className="text-xs hp-text-quaternary">
+                Built for learners who demand more from their study tools
+              </p>
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </footer>
       </div>
     </div>
   );
