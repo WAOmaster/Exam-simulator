@@ -250,15 +250,13 @@ Return ONLY the JSON object. No markdown formatting, no text before or after.`;
 
     return parseGeneratedQuestions(text, config);
   } catch (error: any) {
-    // Check if it's a 503 (service overloaded) or rate limit error
-    const isOverloadedError = error.message?.includes('503') ||
-                              error.message?.includes('overloaded') ||
-                              error.message?.includes('quota');
+    // Only retry on transient 503 errors, NOT quota/rate limit errors
+    const is503 = error.message?.includes('503') || error.message?.includes('overloaded');
+    const isQuotaError = error.message?.includes('quota') || error.message?.includes('rate');
 
-    // Retry once with different model if overloaded and haven't retried yet
-    if (isOverloadedError && retryCount === 0) {
-      console.log('Model overloaded, retrying with gemini-3-flash-preview...');
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+    if (is503 && !isQuotaError && retryCount === 0) {
+      console.log('Model overloaded (503), retrying after delay...');
+      await new Promise(resolve => setTimeout(resolve, 5000));
       return extractBatch(content, expectedQuestions, config, 1);
     }
 
@@ -285,35 +283,23 @@ async function batchExtractAndCompleteQuestions(
   const allQuestions: Question[] = [];
   const batchResults: Array<{ batchIndex: number; result: { questions: Question[]; metadata: QuestionSetMetadata } | null; error?: any }> = [];
 
-  // Process batches in parallel (but with controlled concurrency)
-  const CONCURRENT_BATCHES = 3; // Process 3 batches at a time to avoid rate limits
+  // Process batches sequentially to avoid rate limits
+  for (let batchIndex = 0; batchIndex < contentBatches.length; batchIndex++) {
+    const batchContent = contentBatches[batchIndex];
 
-  for (let i = 0; i < contentBatches.length; i += CONCURRENT_BATCHES) {
-    const batchPromises = [];
+    console.log(`Processing batch ${batchIndex + 1}/${contentBatches.length}...`);
 
-    for (let j = 0; j < CONCURRENT_BATCHES && i + j < contentBatches.length; j++) {
-      const batchIndex = i + j;
-      const batchContent = contentBatches[batchIndex];
-
-      console.log(`Processing batch ${batchIndex + 1}/${contentBatches.length}...`);
-
-      batchPromises.push(
-        extractBatch(batchContent, QUESTIONS_PER_BATCH, config)
-          .then(result => ({ batchIndex, result, error: undefined }))
-          .catch(error => {
-            console.error(`Batch ${batchIndex + 1} failed:`, error);
-            return { batchIndex, result: null, error };
-          })
-      );
+    try {
+      const result = await extractBatch(batchContent, QUESTIONS_PER_BATCH, config);
+      batchResults.push({ batchIndex, result, error: undefined });
+    } catch (error) {
+      console.error(`Batch ${batchIndex + 1} failed:`, error);
+      batchResults.push({ batchIndex, result: null, error });
     }
 
-    // Wait for this set of concurrent batches to complete
-    const results = await Promise.all(batchPromises);
-    batchResults.push(...results);
-
-    // Small delay between batch groups to avoid rate limiting
-    if (i + CONCURRENT_BATCHES < contentBatches.length) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    // Delay between batches to stay within rate limits
+    if (batchIndex < contentBatches.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 3000));
     }
   }
 
@@ -369,15 +355,13 @@ export async function generateQuestions(
 
     return parsedResponse;
   } catch (error: any) {
-    // Check if it's a 503 (service overloaded) or rate limit error
-    const isOverloadedError = error.message?.includes('503') ||
-                              error.message?.includes('overloaded') ||
-                              error.message?.includes('quota');
+    // Only retry on transient 503 errors, NOT quota/rate limit errors
+    const is503 = error.message?.includes('503') || error.message?.includes('overloaded');
+    const isQuotaError = error.message?.includes('quota') || error.message?.includes('rate');
 
-    // Retry once with different model if overloaded and haven't retried yet
-    if (isOverloadedError && retryCount === 0) {
-      console.log('Model overloaded, retrying with gemini-3-flash-preview...');
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+    if (is503 && !isQuotaError && retryCount === 0) {
+      console.log('Model overloaded (503), retrying after delay...');
+      await new Promise(resolve => setTimeout(resolve, 5000));
       return generateQuestions(content, config, 1);
     }
 
