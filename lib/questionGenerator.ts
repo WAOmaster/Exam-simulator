@@ -1,4 +1,4 @@
-import { GoogleGenAI, ThinkingLevel } from '@google/genai';
+import { GoogleGenAI } from '@google/genai';
 import { Question, GenerationConfig, QuestionSetMetadata } from './types';
 
 // Initialize Gemini AI
@@ -241,7 +241,6 @@ Return ONLY the JSON object. No markdown formatting, no text before or after.`;
       contents: prompt,
       config: {
         maxOutputTokens: 8192,
-        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
       },
     });
 
@@ -346,7 +345,6 @@ export async function generateQuestions(
       contents: prompt,
       config: {
         maxOutputTokens: 8192,
-        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
       },
     });
 
@@ -446,7 +444,6 @@ Return ONLY the JSON object, no additional text.`;
       config: {
         maxOutputTokens: 8192,
         tools: [{ googleSearch: {} }],
-        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
       },
     });
 
