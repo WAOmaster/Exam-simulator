@@ -9,6 +9,7 @@ import EvaluationPane from '@/components/EvaluationPane';
 import LearnWithAI from '@/components/LearnWithAI';
 import CognitiveCompanion from '@/components/CognitiveCompanion';
 import SocraticDialogue from '@/components/SocraticDialogue';
+import InteractiveLearningPlan from '@/components/InteractiveLearningPlan';
 import LiveStatsOverlay from '@/components/LiveStatsOverlay';
 import { ChevronLeft, ChevronRight, Home, AlertCircle, MessageCircle, BarChart3 } from 'lucide-react';
 
@@ -42,6 +43,8 @@ export default function PracticePage() {
   const [showCognitiveCompanion, setShowCognitiveCompanion] = useState(false);
   const [showSocratic, setShowSocratic] = useState(false);
   const [ccDismissed, setCcDismissed] = useState(false); // Track if CC was dismissed for this question
+  const [showLearningPlan, setShowLearningPlan] = useState(false);
+  const [learningPlanDiagnosis, setLearningPlanDiagnosis] = useState<any>(null);
 
   useEffect(() => {
     if (!isExamStarted) {
@@ -158,6 +161,20 @@ export default function PracticePage() {
     setCcDismissed(true);
     // Show standard evaluation pane after CC is closed
     setShowEvaluation(true);
+  };
+
+  const handleStartLearningPlan = (diagnosis: any) => {
+    setLearningPlanDiagnosis({
+      primaryDiagnosis: diagnosis.primaryDiagnosis,
+      diagnosticExplanation: diagnosis.diagnosticExplanation,
+      remediation: diagnosis.remediation,
+    });
+    setShowLearningPlan(true);
+  };
+
+  const handleCloseLearningPlan = () => {
+    setShowLearningPlan(false);
+    setLearningPlanDiagnosis(null);
   };
 
   // Compute response time for current question (snapshot at submit time)
@@ -444,6 +461,7 @@ export default function PracticePage() {
             consecutiveIncorrect={sessionMetrics.consecutiveIncorrect}
             category={currentQuestion.category}
             difficulty={currentQuestion.difficulty}
+            onStartLearningPlan={handleStartLearningPlan}
           />
         )}
 
@@ -462,6 +480,20 @@ export default function PracticePage() {
             onResolved={() => {
               // Optionally show evaluation after resolution
             }}
+          />
+        )}
+
+        {/* Interactive Learning Plan Modal */}
+        {showLearningPlan && selectedAnswer && (
+          <InteractiveLearningPlan
+            isOpen={showLearningPlan}
+            onClose={handleCloseLearningPlan}
+            diagnosis={learningPlanDiagnosis}
+            question={currentQuestion.question}
+            options={currentQuestion.options}
+            correctAnswer={currentQuestion.correctAnswer}
+            userAnswer={selectedAnswer}
+            category={currentQuestion.category}
           />
         )}
       </div>

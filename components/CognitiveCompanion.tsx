@@ -14,6 +14,8 @@ import {
   Target,
   BookOpen,
   Zap,
+  GraduationCap,
+  ChevronRight,
 } from 'lucide-react';
 
 interface Hypothesis {
@@ -47,6 +49,7 @@ interface CognitiveCompanionProps {
   consecutiveIncorrect: number;
   category: string;
   difficulty: string;
+  onStartLearningPlan?: (diagnosis: Diagnosis) => void;
 }
 
 export default function CognitiveCompanion({
@@ -61,6 +64,7 @@ export default function CognitiveCompanion({
   consecutiveIncorrect,
   category,
   difficulty,
+  onStartLearningPlan,
 }: CognitiveCompanionProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -357,6 +361,18 @@ export default function CognitiveCompanion({
                           </p>
                         </div>
                       </div>
+
+                      {/* Start Learning Plan button */}
+                      {onStartLearningPlan && (
+                        <button
+                          onClick={() => onStartLearningPlan(diagnosis)}
+                          className="mt-4 w-full py-3 px-4 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 dark:from-cyan-700 dark:to-teal-700 dark:hover:from-cyan-600 dark:hover:to-teal-600 text-white font-bold rounded-lg flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all"
+                        >
+                          <GraduationCap className="w-5 h-5" />
+                          Start Learning Plan
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      )}
                     </motion.div>
                   )}
 
