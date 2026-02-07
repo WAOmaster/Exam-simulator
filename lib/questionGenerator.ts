@@ -250,17 +250,20 @@ Return ONLY the JSON object. No markdown formatting, no text before or after.`;
 
     return parseGeneratedQuestions(text, config);
   } catch (error: any) {
-    // Only retry on transient 503 errors, NOT quota/rate limit errors
-    const is503 = error.message?.includes('503') || error.message?.includes('overloaded');
-    const isQuotaError = error.message?.includes('quota') || error.message?.includes('rate');
+    console.error('extractBatch error:', error?.message, error?.status, error?.code);
 
-    if (is503 && !isQuotaError && retryCount === 0) {
+    // Only retry on transient 503 errors, NOT quota/rate limit errors
+    const msg = error.message || '';
+    const is503 = msg.includes('503') || msg.includes('overloaded');
+    const isQuotaOrRate = msg.includes('quota') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('rateLimitExceeded');
+
+    if (is503 && !isQuotaOrRate && retryCount === 0) {
       console.log('Model overloaded (503), retrying after delay...');
       await new Promise(resolve => setTimeout(resolve, 5000));
       return extractBatch(content, expectedQuestions, config, 1);
     }
 
-    throw new Error(`Failed to extract/complete questions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(`Failed to extract/complete questions: ${msg || 'Unknown error'}`);
   }
 }
 
@@ -355,17 +358,19 @@ export async function generateQuestions(
 
     return parsedResponse;
   } catch (error: any) {
-    // Only retry on transient 503 errors, NOT quota/rate limit errors
-    const is503 = error.message?.includes('503') || error.message?.includes('overloaded');
-    const isQuotaError = error.message?.includes('quota') || error.message?.includes('rate');
+    console.error('generateQuestions error:', error?.message, error?.status, error?.code);
 
-    if (is503 && !isQuotaError && retryCount === 0) {
+    const msg = error.message || '';
+    const is503 = msg.includes('503') || msg.includes('overloaded');
+    const isQuotaOrRate = msg.includes('quota') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('rateLimitExceeded');
+
+    if (is503 && !isQuotaOrRate && retryCount === 0) {
       console.log('Model overloaded (503), retrying after delay...');
       await new Promise(resolve => setTimeout(resolve, 5000));
       return generateQuestions(content, config, 1);
     }
 
-    throw new Error(`Failed to generate questions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(`Failed to generate questions: ${msg || 'Unknown error'}`);
   }
 }
 

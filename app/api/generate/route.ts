@@ -99,17 +99,29 @@ export async function POST(request: NextRequest) {
       },
     } as GenerateQuestionsResponse);
   } catch (error: any) {
-    console.error('Question generation error:', error);
+    console.error('Question generation error:', error?.message, error?.status, error?.statusCode, JSON.stringify(error?.errorDetails || error?.details || '').substring(0, 500));
 
-    // Provide helpful error messages
+    // Provide helpful error messages while preserving original for debugging
     let errorMessage = error.message || 'Failed to generate questions';
+    const originalError = error.message || '';
 
-    if (error.message?.includes('API key')) {
+    if (originalError.includes('GEMINI_API_KEY is not configured')) {
       errorMessage = 'Gemini API key not configured. Please add GEMINI_API_KEY to your environment.';
-    } else if (error.message?.includes('quota')) {
-      errorMessage = 'API quota exceeded. Please try again later or use fewer questions.';
-    } else if (error.message?.includes('parse')) {
+    } else if (originalError.includes('API_KEY_INVALID') || originalError.includes('API key not valid')) {
+      errorMessage = 'Gemini API key is invalid. Please check your GEMINI_API_KEY.';
+    } else if (originalError.includes('RESOURCE_EXHAUSTED') || originalError.includes('rateLimitExceeded')) {
+      errorMessage = 'API rate limit reached. Please wait a moment and try again.';
+    } else if (originalError.includes('quota') && originalError.includes('billing')) {
+      errorMessage = 'API quota exceeded. You may need to enable billing on your Google Cloud project.';
+    } else if (originalError.includes('quota')) {
+      errorMessage = `API quota issue: ${originalError.substring(0, 150)}`;
+    } else if (originalError.includes('404') || originalError.includes('not found')) {
+      errorMessage = `Model not found. The model may not be available for your API key. Details: ${originalError.substring(0, 150)}`;
+    } else if (originalError.includes('parse')) {
       errorMessage = 'Failed to parse AI response. Please try again.';
+    } else {
+      // Pass through the actual error for visibility
+      errorMessage = `Generation failed: ${originalError.substring(0, 200)}`;
     }
 
     return NextResponse.json(
