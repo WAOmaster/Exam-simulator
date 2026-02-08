@@ -1,4 +1,4 @@
-import { GoogleGenAI, ThinkingLevel } from '@google/genai';
+import { GoogleGenAI } from '@google/genai';
 import { Question, GenerationConfig, QuestionSetMetadata } from './types';
 
 // Initialize Gemini AI
@@ -241,7 +241,6 @@ Return ONLY the JSON object. No markdown formatting, no text before or after.`;
       contents: prompt,
       config: {
         maxOutputTokens: 8192,
-        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
       },
     });
 
@@ -250,19 +249,20 @@ Return ONLY the JSON object. No markdown formatting, no text before or after.`;
 
     return parseGeneratedQuestions(text, config);
   } catch (error: any) {
-    // Check if it's a 503 (service overloaded) or rate limit error
-    const isOverloadedError = error.message?.includes('503') ||
-                              error.message?.includes('overloaded') ||
-                              error.message?.includes('quota');
+    console.error('extractBatch error:', error?.message, error?.status, error?.code);
 
-    // Retry once with different model if overloaded and haven't retried yet
-    if (isOverloadedError && retryCount === 0) {
-      console.log('Model overloaded, retrying with gemini-3-flash-preview...');
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+    // Only retry on transient 503 errors, NOT quota/rate limit errors
+    const msg = error.message || '';
+    const is503 = msg.includes('503') || msg.includes('overloaded');
+    const isQuotaOrRate = msg.includes('quota') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('rateLimitExceeded');
+
+    if (is503 && !isQuotaOrRate && retryCount === 0) {
+      console.log('Model overloaded (503), retrying after delay...');
+      await new Promise(resolve => setTimeout(resolve, 5000));
       return extractBatch(content, expectedQuestions, config, 1);
     }
 
-    throw new Error(`Failed to extract/complete questions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(`Failed to extract/complete questions: ${msg || 'Unknown error'}`);
   }
 }
 
@@ -285,35 +285,23 @@ async function batchExtractAndCompleteQuestions(
   const allQuestions: Question[] = [];
   const batchResults: Array<{ batchIndex: number; result: { questions: Question[]; metadata: QuestionSetMetadata } | null; error?: any }> = [];
 
-  // Process batches in parallel (but with controlled concurrency)
-  const CONCURRENT_BATCHES = 3; // Process 3 batches at a time to avoid rate limits
+  // Process batches sequentially to avoid rate limits
+  for (let batchIndex = 0; batchIndex < contentBatches.length; batchIndex++) {
+    const batchContent = contentBatches[batchIndex];
 
-  for (let i = 0; i < contentBatches.length; i += CONCURRENT_BATCHES) {
-    const batchPromises = [];
+    console.log(`Processing batch ${batchIndex + 1}/${contentBatches.length}...`);
 
-    for (let j = 0; j < CONCURRENT_BATCHES && i + j < contentBatches.length; j++) {
-      const batchIndex = i + j;
-      const batchContent = contentBatches[batchIndex];
-
-      console.log(`Processing batch ${batchIndex + 1}/${contentBatches.length}...`);
-
-      batchPromises.push(
-        extractBatch(batchContent, QUESTIONS_PER_BATCH, config)
-          .then(result => ({ batchIndex, result, error: undefined }))
-          .catch(error => {
-            console.error(`Batch ${batchIndex + 1} failed:`, error);
-            return { batchIndex, result: null, error };
-          })
-      );
+    try {
+      const result = await extractBatch(batchContent, QUESTIONS_PER_BATCH, config);
+      batchResults.push({ batchIndex, result, error: undefined });
+    } catch (error) {
+      console.error(`Batch ${batchIndex + 1} failed:`, error);
+      batchResults.push({ batchIndex, result: null, error });
     }
 
-    // Wait for this set of concurrent batches to complete
-    const results = await Promise.all(batchPromises);
-    batchResults.push(...results);
-
-    // Small delay between batch groups to avoid rate limiting
-    if (i + CONCURRENT_BATCHES < contentBatches.length) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    // Delay between batches to stay within rate limits
+    if (batchIndex < contentBatches.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 3000));
     }
   }
 
@@ -357,7 +345,6 @@ export async function generateQuestions(
       contents: prompt,
       config: {
         maxOutputTokens: 8192,
-        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
       },
     });
 
@@ -369,19 +356,19 @@ export async function generateQuestions(
 
     return parsedResponse;
   } catch (error: any) {
-    // Check if it's a 503 (service overloaded) or rate limit error
-    const isOverloadedError = error.message?.includes('503') ||
-                              error.message?.includes('overloaded') ||
-                              error.message?.includes('quota');
+    console.error('generateQuestions error:', error?.message, error?.status, error?.code);
 
-    // Retry once with different model if overloaded and haven't retried yet
-    if (isOverloadedError && retryCount === 0) {
-      console.log('Model overloaded, retrying with gemini-3-flash-preview...');
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+    const msg = error.message || '';
+    const is503 = msg.includes('503') || msg.includes('overloaded');
+    const isQuotaOrRate = msg.includes('quota') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('rateLimitExceeded');
+
+    if (is503 && !isQuotaOrRate && retryCount === 0) {
+      console.log('Model overloaded (503), retrying after delay...');
+      await new Promise(resolve => setTimeout(resolve, 5000));
       return generateQuestions(content, config, 1);
     }
 
-    throw new Error(`Failed to generate questions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(`Failed to generate questions: ${msg || 'Unknown error'}`);
   }
 }
 
@@ -457,7 +444,6 @@ Return ONLY the JSON object, no additional text.`;
       config: {
         maxOutputTokens: 8192,
         tools: [{ googleSearch: {} }],
-        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
       },
     });
 

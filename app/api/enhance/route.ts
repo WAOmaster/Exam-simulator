@@ -9,9 +9,8 @@ function getAI() {
 }
 
 // Batch configuration
-const QUESTIONS_PER_BATCH = 10; // Reduce from 15 to ensure token limits
-const CONCURRENT_BATCHES = 3;
-const BATCH_DELAY_MS = 1000;
+const QUESTIONS_PER_BATCH = 10;
+const BATCH_DELAY_MS = 3000;
 
 /**
  * Enhance a batch of questions with AI-generated explanations and difficulty levels
@@ -186,29 +185,17 @@ function splitIntoBatches(questions: Question[]): Question[][] {
 }
 
 /**
- * Process batches with controlled concurrency
+ * Process batches sequentially to avoid rate limits
  */
 async function processBatchesConcurrently(batches: Question[][]): Promise<Question[]> {
   const allResults: Question[] = [];
 
-  // Process in groups of CONCURRENT_BATCHES
-  for (let i = 0; i < batches.length; i += CONCURRENT_BATCHES) {
-    const batchGroup = batches.slice(i, i + CONCURRENT_BATCHES);
+  for (let i = 0; i < batches.length; i++) {
+    const result = await enhanceBatch(batches[i], i, batches.length);
+    allResults.push(...result);
 
-    // Process this group in parallel
-    const groupPromises = batchGroup.map((batch, idx) =>
-      enhanceBatch(batch, i + idx, batches.length)
-    );
-
-    const groupResults = await Promise.all(groupPromises);
-
-    // Combine results
-    for (const result of groupResults) {
-      allResults.push(...result);
-    }
-
-    // Delay before next group (except for the last group)
-    if (i + CONCURRENT_BATCHES < batches.length) {
+    // Delay between batches (except for the last)
+    if (i < batches.length - 1) {
       await new Promise(resolve => setTimeout(resolve, BATCH_DELAY_MS));
     }
   }

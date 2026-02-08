@@ -145,3 +145,49 @@ export interface SessionMetrics {
   streakHistory: ('correct' | 'incorrect')[];
   categoryPerformance: Record<string, { correct: number; total: number }>;
 }
+
+// Interactive Learning Plan types
+export interface LearningPlan {
+  module_title: string;
+  estimated_minutes: number;
+  socratic_opener: {
+    question: string;
+    expected_insight: string;
+    hint_if_stuck: string;
+    options: string[];
+    correct_index: number;
+  };
+  visual_explanation: {
+    description: string;
+    key_concepts: string[];
+    key_takeaway: string;
+  };
+  practice_questions: Array<{
+    question: string;
+    options: string[];
+    correct_index: number;
+    explanation: string;
+    difficulty: 'easy' | 'medium' | 'hard';
+  }>;
+  verification: {
+    question: string;
+    options: string[];
+    correct_index: number;
+    success_message: string;
+    retry_message: string;
+  };
+  grounded_sources: Array<{
+    title: string;
+    url: string;
+  }>;
+}
+
+export interface LearningPlanDiagnosis {
+  primaryDiagnosis: string;
+  diagnosticExplanation: string;
+  remediation: {
+    immediateAction: string;
+    conceptToReview: string;
+    practiceHint: string;
+  };
+}

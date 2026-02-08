@@ -44,3 +44,5 @@ next-env.d.ts
 
 #skills/rules
 /.agent/rules
+
+/project_plan

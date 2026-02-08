@@ -21,7 +21,8 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(vercel logs:*)",
-      "Bash(vercel ls:*)"
+      "Bash(vercel ls:*)",
+      "mcp__d07e7649-2285-443f-80c8-b2f6d05a4073__get_runtime_logs"
     ],
     "deny": [],
     "ask": []
