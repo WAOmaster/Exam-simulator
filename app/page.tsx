@@ -30,6 +30,7 @@ import {
   Star,
   MessageCircle,
   Camera,
+  BookOpen,
 } from 'lucide-react';
 import subjects from '@/data/default-questions/subjects.json';
 
@@ -254,7 +255,7 @@ export default function Home() {
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-6"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto mb-6"
             >
               {/* Generate Questions */}
               <motion.button
@@ -320,6 +321,29 @@ export default function Home() {
                   <p className="text-sm hp-text-tertiary leading-relaxed">Upload images for AI-powered solutions</p>
                   <div className="flex items-center gap-1.5 mt-4 text-amber-600 dark:text-amber-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                     <span>Upload image</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              </motion.button>
+
+              {/* Study Guide */}
+              <motion.button
+                variants={itemVariants}
+                onClick={() => router.push('/study-guide')}
+                whileHover={{ y: -6, transition: { duration: 0.3 } }}
+                whileTap={{ scale: 0.97 }}
+                className="action-card-shine group relative p-6 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-cyan-500/30"
+                style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)', boxShadow: 'var(--hp-card-shadow)' }}
+              >
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 dark:from-cyan-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/10 to-teal-500/10 dark:from-cyan-500/20 dark:to-teal-500/20 border border-cyan-500/10 flex items-center justify-center mb-4 group-hover:border-cyan-500/30 transition-colors">
+                    <BookOpen className="w-6 h-6 hp-icon-cyan" />
+                  </div>
+                  <h3 className="text-lg font-semibold hp-text-primary mb-1">Study Guide</h3>
+                  <p className="text-sm hp-text-tertiary leading-relaxed">Personalized plans based on your performance</p>
+                  <div className="flex items-center gap-1.5 mt-4 text-cyan-600 dark:text-cyan-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span>View guide</span>
                     <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>

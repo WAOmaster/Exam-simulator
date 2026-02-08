@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { saveDiagnosisRecord, generateDiagnosisId } from '@/lib/diagnosisHistory';
 import {
   X,
   Brain,
@@ -108,6 +109,22 @@ export default function CognitiveCompanion({
 
       setDiagnosis(data.diagnosis);
       setThinkingSteps(data.thinkingProcess || []);
+
+      // Save diagnosis to history for Study Guide
+      try {
+        saveDiagnosisRecord({
+          id: generateDiagnosisId(),
+          timestamp: Date.now(),
+          questionId: typeof question === 'string' ? 0 : 0,
+          category: category || 'General',
+          primaryDiagnosis: data.diagnosis.primaryDiagnosis || 'unknown',
+          diagnosticExplanation: data.diagnosis.diagnosticExplanation || '',
+          conceptToReview: data.diagnosis.remediation?.conceptToReview || '',
+          practiceHint: data.diagnosis.remediation?.practiceHint || '',
+        });
+      } catch {
+        // Non-critical, don't block the UI
+      }
 
       // Animate thinking steps
       const steps = data.thinkingProcess || [];
