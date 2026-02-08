@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Question, QuestionSet, SessionMetrics } from './types';
+import { DiagnosisResult } from './cognitiveQueue';
 
 export interface UserAnswer {
   questionId: number;
@@ -38,6 +39,7 @@ interface ExamState {
   sessionMetrics: SessionMetrics;
   questionViewTimes: Map<number, number>; // questionId → timestamp when first viewed
   selectionChanges: Map<number, number>; // questionId → count of answer changes
+  diagnosisResults: Map<number, DiagnosisResult>; // questionId → diagnosis result from background queue
 
   // Question set management
   currentQuestionSetId: string | null;
@@ -61,6 +63,7 @@ interface ExamState {
   recordQuestionView: (questionId: number) => void;
   recordSelectionChange: (questionId: number) => void;
   toggleLiveStats: () => void;
+  updateDiagnosisResults: (results: Map<number, DiagnosisResult>) => void;
 
   // Question set actions
   setCurrentQuestionSet: (questionSetId: string) => void;
@@ -90,6 +93,7 @@ export const useExamStore = create<ExamState>()(
       sessionMetrics: { ...defaultSessionMetrics },
       questionViewTimes: new Map(),
       selectionChanges: new Map(),
+      diagnosisResults: new Map(),
 
       // Question set management
       currentQuestionSetId: null,
@@ -116,6 +120,9 @@ export const useExamStore = create<ExamState>()(
 
       toggleLiveStats: () =>
         set((state) => ({ showLiveStats: !state.showLiveStats })),
+
+      updateDiagnosisResults: (results) =>
+        set({ diagnosisResults: new Map(results) }),
 
       submitAnswer: (questionId, selectedAnswer, isCorrect) =>
         set((state) => {
@@ -182,6 +189,7 @@ export const useExamStore = create<ExamState>()(
           sessionMetrics: { ...defaultSessionMetrics },
           questionViewTimes: new Map(),
           selectionChanges: new Map(),
+          diagnosisResults: new Map(),
         }),
 
       completeExam: () => set({ isExamCompleted: true }),
@@ -196,6 +204,7 @@ export const useExamStore = create<ExamState>()(
           sessionMetrics: { ...defaultSessionMetrics },
           questionViewTimes: new Map(),
           selectionChanges: new Map(),
+          diagnosisResults: new Map(),
         }),
 
       nextQuestion: () =>
@@ -325,6 +334,7 @@ export const useExamStore = create<ExamState>()(
         sessionMetrics: state.sessionMetrics,
         questionViewTimes: Array.from(state.questionViewTimes.entries()),
         selectionChanges: Array.from(state.selectionChanges.entries()),
+        diagnosisResults: Array.from(state.diagnosisResults.entries()),
       }),
       onRehydrateStorage: () => (state) => {
         if (state && Array.isArray(state.userAnswers)) {
@@ -335,6 +345,9 @@ export const useExamStore = create<ExamState>()(
         }
         if (state && Array.isArray(state.selectionChanges)) {
           state.selectionChanges = new Map(state.selectionChanges as any);
+        }
+        if (state && Array.isArray(state.diagnosisResults)) {
+          state.diagnosisResults = new Map(state.diagnosisResults as any);
         }
       },
     }

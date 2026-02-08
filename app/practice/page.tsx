@@ -7,11 +7,12 @@ import Timer from '@/components/Timer';
 import ProgressBar from '@/components/ProgressBar';
 import EvaluationPane from '@/components/EvaluationPane';
 import LearnWithAI from '@/components/LearnWithAI';
-import CognitiveCompanion from '@/components/CognitiveCompanion';
+import CognitiveCompanionIndicator from '@/components/CognitiveCompanionIndicator';
 import SocraticDialogue from '@/components/SocraticDialogue';
 import InteractiveLearningPlan from '@/components/InteractiveLearningPlan';
 import LiveStatsOverlay from '@/components/LiveStatsOverlay';
-import { ChevronLeft, ChevronRight, Home, AlertCircle, MessageCircle, BarChart3 } from 'lucide-react';
+import { cognitiveQueue } from '@/lib/cognitiveQueue';
+import { ChevronLeft, ChevronRight, Home, AlertCircle, MessageCircle, BarChart3, Brain } from 'lucide-react';
 
 export default function PracticePage() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export default function PracticePage() {
     sessionMetrics,
     questionViewTimes,
     selectionChanges,
+    diagnosisResults,
     submitAnswer,
     nextQuestion,
     previousQuestion,
@@ -36,15 +38,31 @@ export default function PracticePage() {
     recordSelectionChange,
     showLiveStats,
     toggleLiveStats,
+    updateDiagnosisResults,
   } = useExamStore();
 
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showEvaluation, setShowEvaluation] = useState(false);
-  const [showCognitiveCompanion, setShowCognitiveCompanion] = useState(false);
   const [showSocratic, setShowSocratic] = useState(false);
-  const [ccDismissed, setCcDismissed] = useState(false); // Track if CC was dismissed for this question
   const [showLearningPlan, setShowLearningPlan] = useState(false);
   const [learningPlanDiagnosis, setLearningPlanDiagnosis] = useState<any>(null);
+  const [queueSummary, setQueueSummary] = useState({ total: 0, completed: 0, processing: 0 });
+
+  // Subscribe to cognitive queue updates
+  useEffect(() => {
+    if (!cognitiveCompanion) return;
+
+    // Reset queue for new session
+    cognitiveQueue.reset();
+
+    const unsubscribe = cognitiveQueue.subscribe((results) => {
+      updateDiagnosisResults(results);
+      const summary = cognitiveQueue.getSummary();
+      setQueueSummary({ total: summary.total, completed: summary.completed, processing: summary.processing + summary.pending });
+    });
+
+    return () => unsubscribe();
+  }, [cognitiveCompanion, updateDiagnosisResults]);
 
   useEffect(() => {
     if (!isExamStarted) {
@@ -76,9 +94,7 @@ export default function PracticePage() {
       } else {
         setSelectedAnswer(null);
         setShowEvaluation(false);
-        setShowCognitiveCompanion(false);
         setShowSocratic(false);
-        setCcDismissed(false);
       }
     }
   }, [currentQuestionIndex, userAnswers]);
@@ -107,30 +123,40 @@ export default function PracticePage() {
     // Auto-submit answer in practice mode
     submitAnswer(currentQuestion.id, answerId, isCorrect);
 
-    // Determine which pane to show
+    // Enqueue background diagnosis for wrong answers
     if (!isCorrect && cognitiveCompanion) {
-      // Show Cognitive Companion for wrong answers when enabled
-      setShowCognitiveCompanion(true);
-      setShowEvaluation(false);
-      setShowSocratic(false);
-    } else if (!isCorrect && socraticMode && !cognitiveCompanion) {
-      // Show Socratic Dialogue for wrong answers when enabled (and CC not enabled)
+      const viewTime = questionViewTimes.get(currentQuestion.id);
+      const responseTimeMs = viewTime ? Date.now() - viewTime : 15000;
+      const selChanges = selectionChanges.get(currentQuestion.id) || 0;
+
+      cognitiveQueue.enqueue({
+        questionId: currentQuestion.id,
+        question: currentQuestion.question,
+        options: currentQuestion.options,
+        selectedAnswer: answerId,
+        correctAnswer: currentQuestion.correctAnswer,
+        responseTimeMs,
+        selectionChanges: selChanges,
+        consecutiveIncorrect: sessionMetrics.consecutiveIncorrect,
+        category: currentQuestion.category,
+        difficulty: currentQuestion.difficulty,
+      });
+    }
+
+    // Determine which pane to show
+    if (!isCorrect && socraticMode && !cognitiveCompanion) {
       setShowSocratic(true);
       setShowEvaluation(false);
-      setShowCognitiveCompanion(false);
     } else {
-      // Standard evaluation pane
+      // Always show evaluation pane (CC works in background now)
       setShowEvaluation(true);
-      setShowCognitiveCompanion(false);
       setShowSocratic(false);
     }
   };
 
   const handleNext = () => {
     setShowEvaluation(false);
-    setShowCognitiveCompanion(false);
     setShowSocratic(false);
-    setCcDismissed(false);
     setSelectedAnswer(null);
     if (currentQuestionIndex < questions.length - 1) {
       nextQuestion();
@@ -139,9 +165,7 @@ export default function PracticePage() {
 
   const handlePrevious = () => {
     setShowEvaluation(false);
-    setShowCognitiveCompanion(false);
     setShowSocratic(false);
-    setCcDismissed(false);
     setSelectedAnswer(null);
     previousQuestion();
   };
@@ -154,13 +178,6 @@ export default function PracticePage() {
 
   const handleTimeUp = () => {
     alert('Time is up! You can continue practicing or go back to home.');
-  };
-
-  const handleCloseCognitiveCompanion = () => {
-    setShowCognitiveCompanion(false);
-    setCcDismissed(true);
-    // Show standard evaluation pane after CC is closed
-    setShowEvaluation(true);
   };
 
   const handleStartLearningPlan = (diagnosis: any) => {
@@ -187,11 +204,16 @@ export default function PracticePage() {
   }, [currentQuestion.id, isAnswered, questionViewTimes, userAnswers]);
   const currentSelectionChanges = selectionChanges.get(currentQuestion.id) || 0;
 
-  // Check if the current answer is wrong (for showing Socratic button after CC dismissal)
+  // Check current answer state
   const isCurrentAnswerWrong = selectedAnswer !== null && selectedAnswer !== currentQuestion.correctAnswer;
-  const showSocraticButton = ccDismissed && socraticMode && isCurrentAnswerWrong && !showSocratic;
 
-  const anySidePaneOpen = showEvaluation || showCognitiveCompanion || showSocratic;
+  // Get diagnosis result for current question
+  const currentDiagnosisResult = diagnosisResults.get(currentQuestion.id);
+
+  // Show Socratic button if CC has no Socratic (CC now background, so check socratic separately)
+  const showSocraticButton = isCurrentAnswerWrong && socraticMode && !showSocratic && isAnswered;
+
+  const anySidePaneOpen = showEvaluation || showSocratic;
 
   // Compute max streak from streak history
   const maxStreak = useMemo(() => {
@@ -245,6 +267,19 @@ export default function PracticePage() {
             </div>
 
             <div className="flex items-center gap-4">
+              {/* CC Queue Status */}
+              {cognitiveCompanion && queueSummary.total > 0 && (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
+                  <Brain className="w-4 h-4 text-amber-500" />
+                  <span className="text-xs font-medium text-amber-700 dark:text-amber-300">
+                    {queueSummary.completed}/{queueSummary.total}
+                  </span>
+                  {queueSummary.processing > 0 && (
+                    <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+                  )}
+                </div>
+              )}
+
               {useTimer && examStartTime && (
                 <Timer
                   startTime={examStartTime}
@@ -369,8 +404,17 @@ export default function PracticePage() {
                 })}
               </div>
 
-              {/* Try Socratic Dialogue button (after CC is dismissed) */}
-              {showSocraticButton && (
+              {/* CC Indicator - inline below options when answered wrong */}
+              {isAnswered && isCurrentAnswerWrong && cognitiveCompanion && (
+                <CognitiveCompanionIndicator
+                  result={currentDiagnosisResult}
+                  questionId={currentQuestion.id}
+                  onStartLearningPlan={handleStartLearningPlan}
+                />
+              )}
+
+              {/* Try Socratic Dialogue button */}
+              {showSocraticButton && !cognitiveCompanion && (
                 <button
                   onClick={() => {
                     setShowSocratic(true);
@@ -446,25 +490,6 @@ export default function PracticePage() {
           />
         )}
 
-        {/* Cognitive Companion Pane */}
-        {selectedAnswer && showCognitiveCompanion && (
-          <CognitiveCompanion
-            isOpen={showCognitiveCompanion}
-            onClose={handleCloseCognitiveCompanion}
-            question={currentQuestion.question}
-            options={currentQuestion.options}
-            selectedAnswer={selectedAnswer}
-            correctAnswer={currentQuestion.correctAnswer}
-            questionId={currentQuestion.id}
-            responseTimeMs={currentResponseTimeMs}
-            selectionChanges={currentSelectionChanges}
-            consecutiveIncorrect={sessionMetrics.consecutiveIncorrect}
-            category={currentQuestion.category}
-            difficulty={currentQuestion.difficulty}
-            onStartLearningPlan={handleStartLearningPlan}
-          />
-        )}
-
         {/* Socratic Dialogue Pane */}
         {selectedAnswer && showSocratic && (
           <SocraticDialogue
@@ -477,9 +502,7 @@ export default function PracticePage() {
             options={currentQuestion.options}
             correctAnswer={currentQuestion.correctAnswer}
             userAnswer={selectedAnswer}
-            onResolved={() => {
-              // Optionally show evaluation after resolution
-            }}
+            onResolved={() => {}}
           />
         )}
 

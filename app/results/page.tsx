@@ -14,6 +14,7 @@ import {
   Target,
 } from 'lucide-react';
 import SessionSummary from '@/components/SessionSummary';
+import CognitiveCompanionSummary from '@/components/CognitiveCompanionSummary';
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -27,6 +28,8 @@ export default function ResultsPage() {
     questionViewTimes,
     selectionChanges,
     examDuration,
+    diagnosisResults,
+    cognitiveCompanion,
   } = useExamStore();
   const [mounted, setMounted] = useState(false);
 
@@ -268,6 +271,21 @@ export default function ResultsPage() {
             totalQuestions={questions.length}
           />
         </motion.div>
+
+        {/* Cognitive Companion Summary */}
+        {cognitiveCompanion && diagnosisResults.size > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55 }}
+            className="mb-8"
+          >
+            <CognitiveCompanionSummary
+              results={diagnosisResults}
+              questions={questions}
+            />
+          </motion.div>
+        )}
 
         {/* Actions */}
         <motion.div
