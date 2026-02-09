@@ -1,219 +1,131 @@
-# OCI Exam Simulator 🎓
+# ExamSimulator 🎓
+### AI-Powered Adaptive Learning & Cognitive Diagnostics
 
-An interactive Oracle Cloud Infrastructure (OCI) certification exam simulator with AI-powered explanations. Practice for your 1Z0-1151-25 certification with 135 real questions and get instant feedback powered by Google Gemini AI.
+**ExamSimulator** is a next-generation learning platform that transforms any content into an interactive exam experience. Powered by **Google Gemini 3**, it goes beyond simple quizzing by acting as a **Cognitive Companion**—diagnosing *why* you get questions wrong and dynamically generating visual explanations to fix your knowledge gaps.
 
-![Next.js](https://img.shields.io/badge/Next.js-14-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38bdf8)
-![Google Gemini](https://img.shields.io/badge/Google-Gemini-4285f4)
+![Gemini 3](https://img.shields.io/badge/AI-Gemini_3_Pro-4285f4?style=for-the-badge&logo=google)
+![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38bdf8?style=for-the-badge&logo=tailwindcss)
+![Status](https://img.shields.io/badge/Status-Hackathon_Live-green?style=for-the-badge)
 
-## ✨ Features
+## 🧠 What Makes This Different?
 
-- **135 Practice Questions** - Real OCI certification exam questions
-- **AI-Powered Explanations** - Get detailed explanations using Google Gemini AI
-- **Timed Exam Mode** - Practice under real exam conditions (30/60/90/120 minutes)
-- **Progress Tracking** - Monitor your performance with detailed analytics
-- **Beautiful UI** - Modern, responsive design with smooth animations
-- **Dark Mode** - Toggle between light and dark themes for comfortable studying
-- **Customizable Themes** - Choose from 5 color themes (Blue, Purple, Green, Orange, Pink)
-- **Local Storage** - Your progress is saved automatically
-- **Instant Feedback** - Know immediately if your answer is correct
+Most exam tools are binary: you are either "Right" or "Wrong." **ExamSimulator** understands the *student*, not just the *subject*.
+
+* **Universal Subject Support:** Whether you are studying for AWS certifications, high school biology, or LeetCode interviews, ExamSimulator adapts to your material.
+* **Deep Think Diagnostics:** Uses **Gemini 3 Pro** (`thinking_level="HIGH"`) to analyze your incorrect answers. It distinguishes between a "silly mistake," a "conceptual misunderstanding," or a "knowledge gap."
+* **Visible Reasoning:** You don't just get the answer; you see the AI's "thought process" as it breaks down your logic in real-time.
+* **Dynamic Visualizations:** If you struggle with a concept, the system writes and executes Python code to generate custom graphs, charts, and data visualizations on the fly.
+
+---
+
+## ✨ Key Features
+
+### 🤖 The Cognitive Companion
+* **Real-time Diagnostic Reasoning:** The AI acts as a private tutor, analyzing your specific misconceptions.
+* **Socratic Method:** Instead of spoon-feeding answers, it asks guiding questions to help you derive the solution yourself.
+* **Thought Signatures:** Maintains context across your session to track your learning progress.
+
+### 📝 Content-to-Exam Engine
+* **Generate from Anything:** Paste a documentation URL, upload a PDF textbook, or simply type a topic (e.g., "Thermodynamics").
+* **Structured Output:** Automatically generates rigorous, multiple-choice questions with distractors designed to test specific cognitive levels.
+
+### 👁️ Visual Solver (Multimodal)
+* **Image Analysis:** Upload a photo of a handwritten math problem, a circuit diagram, or a chemical equation.
+* **Visual Debugging:** The AI uses computer vision to identify errors in your work and Code Execution to plot the correct solution visually.
+
+### 📚 Grounded Learning
+* **Search Grounding:** All AI explanations are cross-referenced with **Google Search** to ensure facts are accurate and current.
+* **Citations:** Every concept comes with trusted source links.
+
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-
-- Node.js 18+ installed
-- npm or yarn package manager
+* Node.js 18+ installed
+* A **Google Gemini API Key** (Must have access to `gemini-3-pro` or `gemini-3-flash`)
 
 ### Installation
 
-1. **Install dependencies**
-   ```bash
-   npm install
-   ```
+1.  **Clone the repository**
+    ```bash
+    git clone [https://github.com/yourusername/exam-simulator.git](https://github.com/yourusername/exam-simulator.git)
+    cd exam-simulator
+    ```
 
-2. **Set up environment variables**
-   ```bash
-   cp .env.local.example .env.local
-   ```
+2.  **Install dependencies**
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
 
-3. **Get your free Gemini API key**
-   - Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Create a free API key
-   - Add it to `.env.local`:
-     ```
-     GEMINI_API_KEY=your_api_key_here
-     ```
+3.  **Configure Environment**
+    Create a `.env.local` file in the root directory:
+    ```bash
+    cp .env.local.example .env.local
+    ```
+    Add your API key and model configuration:
+    ```env
+    GEMINI_API_KEY=your_actual_api_key_here
+    NEXT_PUBLIC_GEMINI_MODEL=gemini-3-pro
+    ```
 
-4. **Run the development server**
-   ```bash
-   npm run dev
-   ```
-
-5. **Open your browser**
-   - Navigate to [http://localhost:3000](http://localhost:3000)
-
-## 📖 How to Use
-
-1. **Start Exam** - Select your preferred duration (30, 60, 90, or 120 minutes)
-2. **Answer Questions** - Read each question carefully and select your answer
-3. **Get AI Feedback** - After submitting, receive detailed AI explanations
-4. **Navigate** - Use Previous/Next buttons to move through questions
-5. **Finish Exam** - Click "Finish Exam" when ready to see your results
-6. **Review Results** - See your score, performance breakdown, and statistics
-
-## 🛠️ Tech Stack
-
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **State Management**: Zustand with persistence
-- **AI**: Google Gemini API
-- **Animations**: Framer Motion
-- **Icons**: Lucide React
-- **Document Parsing**: mammoth.js
-
-## 📁 Project Structure
-
-```
-oci-exam-simulator/
-├── app/
-│   ├── api/ai/explain/    # AI explanation endpoint
-│   ├── exam/              # Exam page
-│   ├── results/           # Results page
-│   └── page.tsx           # Home page
-├── components/
-│   ├── QuestionCard.tsx   # Question display component
-│   ├── Timer.tsx          # Countdown timer
-│   ├── ProgressBar.tsx    # Progress indicator
-│   └── ExplanationModal.tsx # AI explanation modal
-├── lib/
-│   └── store.ts           # Zustand state management
-├── data/
-│   └── questions.json     # Parsed questions
-├── scripts/
-│   ├── parse-questions.js # DOCX parser script
-│   └── inspect-docx.js    # DOCX inspection tool
-└── public/
-    └── questions.docx     # Source question document
-```
-
-## 🔧 Development
-
-### Parse New Questions
-
-If you have a new DOCX file with questions:
-
-1. Place the DOCX file in the `public/` directory
-2. Update the path in `scripts/parse-questions.js`
-3. Run the parser:
-   ```bash
-   node scripts/parse-questions.js
-   ```
-
-### Build for Production
-
-```bash
-npm run build
-npm start
-```
-
-### Linting
-
-```bash
-npm run lint
-```
-
-## 🎨 Features in Detail
-
-### AI Explanations
-
-When you answer a question:
-- **Correct Answer**: AI explains why the answer is correct and the underlying OCI concepts
-- **Incorrect Answer**: AI explains the correct answer, why yours was wrong, and why other options are incorrect
-
-### Timer
-
-- Visual countdown timer
-- Color coding (blue → yellow → red as time decreases)
-- Automatic exam submission when time runs out
-- Warning alerts for low time
-
-### Progress Tracking
-
-- Visual progress bar showing current question
-- Separate tracking for answered vs current question
-- Local storage persistence - resume where you left off
-
-### Results Analytics
-
-- Overall score percentage
-- Pass/Fail status (70% threshold)
-- Correct vs incorrect breakdown
-- Detailed performance metrics
-- Motivational messages
-
-## 🔑 Environment Variables
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `GEMINI_API_KEY` | Google Gemini API key for AI explanations | Yes |
-
-## 📝 Question Format
-
-Questions are structured as:
-
-```typescript
-{
-  id: number,
-  question: string,
-  options: [
-    { id: "A", text: "Option text" },
-    { id: "B", text: "Option text" },
-    ...
-  ],
-  correctAnswer: "A",
-  explanation: "",
-  category: "OCI 1Z0-1151-25",
-  difficulty: "medium"
-}
-```
-
-## 🚧 Troubleshooting
-
-### AI Explanations Not Working
-
-- Check that `GEMINI_API_KEY` is set in `.env.local`
-- Verify API key is valid at [Google AI Studio](https://makersuite.google.com/app/apikey)
-- Check console for error messages
-
-### Questions Not Loading
-
-- Ensure `data/questions.json` exists
-- Run `node scripts/parse-questions.js` to regenerate
-- Check that DOCX file is in `public/` directory
-
-### Build Errors
-
-- Delete `.next` folder and `node_modules`
-- Run `npm install` again
-- Clear Next.js cache: `npm run build` with `--no-cache`
-
-## 🤝 Contributing
-
-This is a personal project for OCI certification preparation. Feel free to fork and customize for your own use!
-
-## 📄 License
-
-This project is for educational purposes. Question content belongs to Oracle Corporation.
-
-## 🙏 Acknowledgments
-
-- Oracle Cloud Infrastructure for the certification program
-- Google Gemini for AI-powered explanations
-- Next.js team for the amazing framework
+4.  **Run the application**
+    ```bash
+    npm run dev
+    ```
+    Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-**Good luck with your OCI certification! 🎉**
+## 📖 How to Use
+
+### 1. Generate an Exam
+* Click **"Generate New Exam"**.
+* Paste a link to a Wikipedia page, technical documentation, or upload your study notes (PDF/DOCX).
+* Select your difficulty level and click **Generate**.
+* The AI will parse the content and create a structured question set.
+
+### 2. Practice Mode (Cognitive Diagnostics)
+* Start the exam.
+* When you answer incorrectly, the **Cognitive Companion** panel will slide out.
+* Watch the **"Thinking..."** block to see the diagnostic diagnosis.
+* Follow the interactive **Learning Plan** to master the concept before moving on.
+
+### 3. Visual Solver
+* Navigate to the **Visual Solver** tab.
+* Upload an image of a complex diagram or problem.
+* The AI will analyze the visual data and provide a step-by-step breakdown using Python-generated graphs where applicable.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+* **Frontend:** Next.js 14 (App Router), React, Tailwind CSS, Framer Motion
+* **AI Orchestration:**
+    * **Models:** `gemini-3-pro` (Reasoning/Diagnostics), `gemini-3-flash` (Content Generation)
+    * **Tools:** Code Execution (Python), Google Search Grounding
+    * **Capabilities:** Thinking Config (High), JSON Mode, Function Calling
+* **State Management:** Zustand with LocalStorage persistence
+* **Document Processing:** `mammoth.js` (DOCX), `pdf-parse` (PDF)
+
+## 📁 Project Structure
+
+```bash
+exam-simulator/
+├── app/
+│   ├── api/ai/diagnose/       # Gemini 3 Deep Think endpoint
+│   ├── api/ai/generate/       # Question generation endpoint
+│   ├── visual-solver/         # Multimodal vision page
+│   └── exam/                  # Adaptive exam interface
+├── components/
+│   ├── CognitiveCompanion.tsx # The diagnostic UI panel
+│   ├── CodeVisualizer.tsx     # Renders Python-generated graphs
+│   └── ThinkingBubble.tsx     # Visualizes AI reasoning tokens
+├── lib/
+│   └── gemini-client.ts       # Google AI SDK configuration
+└── public/
+    └── demo-questions.json    # Sample question set
