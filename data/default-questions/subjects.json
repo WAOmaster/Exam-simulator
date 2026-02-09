@@ -48,15 +48,5 @@
     "questionCount": 25,
     "difficulty": "mixed",
     "file": "mathematics.json"
-  },
-  {
-    "id": "oci",
-    "name": "OCI Certification",
-    "description": "Oracle Cloud Infrastructure practice",
-    "icon": "Cloud",
-    "color": "from-indigo-600 to-blue-600",
-    "questionCount": 49,
-    "difficulty": "medium",
-    "file": "oci.json"
   }
 ]

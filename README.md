@@ -51,8 +51,8 @@ Most exam tools are binary: you are either "Right" or "Wrong." **ExamSimulator**
 
 1.  **Clone the repository**
     ```bash
-    git clone [https://github.com/yourusername/exam-simulator.git](https://github.com/yourusername/exam-simulator.git)
-    cd exam-simulator
+    git clone https://github.com/WAOmaster/Exam-simulator.git
+    cd Exam-simulator
     ```
 
 2.  **Install dependencies**
@@ -64,14 +64,10 @@ Most exam tools are binary: you are either "Right" or "Wrong." **ExamSimulator**
 
 3.  **Configure Environment**
     Create a `.env.local` file in the root directory:
-    ```bash
-    cp .env.local.example .env.local
-    ```
-    Add your API key and model configuration:
     ```env
     GEMINI_API_KEY=your_actual_api_key_here
-    NEXT_PUBLIC_GEMINI_MODEL=gemini-3-pro
     ```
+    Get your free Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey).
 
 4.  **Run the application**
     ```bash
@@ -129,3 +125,21 @@ exam-simulator/
 │   └── gemini-client.ts       # Google AI SDK configuration
 └── public/
     └── demo-questions.json    # Sample question set
+```
+
+---
+
+## 📅 Development Timeline
+
+| Phase | Period | Highlights |
+|-------|--------|------------|
+| **v1 - Foundation** | Oct 2025 | Core exam engine, question generation from files/URLs/search, AI explanations, practice & exam modes |
+| **v2 - Polish** | Nov 2025 | Theme system (dark/light), export (JSON/CSV/PDF), Learn with AI, question editing, progress tracking |
+| **v3 - Advanced Input** | Dec 2025 | Bulk JSON upload, HOTSPOT & drag-and-drop questions, security patches |
+| **v4 - Gemini 3 Hackathon** | Feb 2026 | Cognitive Companion with deep-think diagnostics, Socratic AI, Visual Solver, AI Study Guide, Gemini 3 integration |
+
+---
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
