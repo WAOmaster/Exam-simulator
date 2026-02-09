@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       category,
     } = body;
 
-    if (!question || !correctAnswer || !userAnswer) {
+    if (!question && !category) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 }
