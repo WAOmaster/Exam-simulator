@@ -1,4 +1,4 @@
-import { GoogleGenAI, ThinkingLevel } from '@google/genai';
+import { GoogleGenAI } from '@google/genai';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const maxDuration = 30;
@@ -88,24 +88,15 @@ RULES:
 - Return ONLY the JSON object`;
 
     const response = await getAI().models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
-        thinkingConfig: {
-          thinkingLevel: ThinkingLevel.HIGH,
-          includeThoughts: true,
-        },
+        temperature: 0.4,
+        maxOutputTokens: 2048,
       },
     });
 
-    // Extract thinking steps from response
     const thinkingSteps: string[] = [];
-    const parts = response.candidates?.[0]?.content?.parts || [];
-    for (const part of parts) {
-      if ((part as any).thought && (part as any).text) {
-        thinkingSteps.push((part as any).text);
-      }
-    }
 
     const mainText = response.text || '';
 

@@ -48,6 +48,9 @@ class CognitiveQueue {
   private results: Map<number, DiagnosisResult> = new Map();
   private processing = false;
   private listeners: Set<QueueListener> = new Set();
+  private retryCount: Map<number, number> = new Map();
+  private static MAX_RETRIES = 2;
+  private static BASE_DELAY = 3000; // 3s between requests to avoid rate limiting
 
   // Add a diagnosis request to the queue
   enqueue(request: DiagnosisRequest): void {
@@ -132,6 +135,23 @@ class CognitiveQueue {
         timestamp: Date.now(),
       });
     } catch (err: any) {
+      const retries = this.retryCount.get(request.questionId) || 0;
+
+      if (retries < CognitiveQueue.MAX_RETRIES) {
+        // Retry with exponential backoff
+        this.retryCount.set(request.questionId, retries + 1);
+        this.results.set(request.questionId, {
+          ...this.results.get(request.questionId)!,
+          status: 'pending',
+        });
+        this.queue.unshift(request); // Re-add to front of queue
+        this.notifyListeners();
+        this.processing = false;
+        const backoffDelay = CognitiveQueue.BASE_DELAY * Math.pow(2, retries);
+        setTimeout(() => this.processNext(), backoffDelay);
+        return;
+      }
+
       this.results.set(request.questionId, {
         questionId: request.questionId,
         status: 'error',
@@ -145,10 +165,9 @@ class CognitiveQueue {
     this.processing = false;
     this.notifyListeners();
 
-    // Process next in queue
+    // Process next in queue with delay to avoid rate limiting
     if (this.queue.length > 0) {
-      // Small delay between requests to avoid rate limiting
-      setTimeout(() => this.processNext(), 500);
+      setTimeout(() => this.processNext(), CognitiveQueue.BASE_DELAY);
     }
   }
 
@@ -200,6 +219,7 @@ class CognitiveQueue {
   reset(): void {
     this.queue = [];
     this.results = new Map();
+    this.retryCount = new Map();
     this.processing = false;
     this.notifyListeners();
   }
