@@ -179,6 +179,7 @@ export default function ExamPage() {
     if (currentQuestionIndex < questions.length - 1) {
       nextQuestion();
     } else {
+      if (cognitiveCompanion) cognitiveQueue.flush();
       completeExam();
       router.push('/results');
     }
@@ -191,6 +192,7 @@ export default function ExamPage() {
   };
 
   const handleTimeUp = () => {
+    if (cognitiveCompanion) cognitiveQueue.flush();
     completeExam();
     router.push('/results');
   };
@@ -201,6 +203,7 @@ export default function ExamPage() {
         `You have answered ${answeredCount} out of ${questions.length} questions. Are you sure you want to finish the exam?`
       )
     ) {
+      if (cognitiveCompanion) cognitiveQueue.flush();
       completeExam();
       router.push('/results');
     }

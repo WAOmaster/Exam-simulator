@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useExamStore } from '@/lib/store';
 import { motion } from 'framer-motion';
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import SessionSummary from '@/components/SessionSummary';
 import CognitiveCompanionSummary from '@/components/CognitiveCompanionSummary';
+import { saveSessionRecord, generateSessionId } from '@/lib/sessionHistory';
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -30,12 +31,57 @@ export default function ResultsPage() {
     examDuration,
     diagnosisResults,
     cognitiveCompanion,
+    examStartTime,
+    currentQuestionSetId,
   } = useExamStore();
   const [mounted, setMounted] = useState(false);
+  const sessionSaved = useRef(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Save session record to localStorage for study guide
+  useEffect(() => {
+    if (!mounted || !isExamCompleted || userAnswers.size === 0 || sessionSaved.current) return;
+    sessionSaved.current = true;
+
+    const score = getScore();
+    const maxStreak = sessionMetrics.streakHistory.reduce(
+      (acc, result, i, arr) => {
+        if (result === 'correct') {
+          const streak = arr.slice(0, i + 1).reverse().findIndex(r => r !== 'correct');
+          return Math.max(acc, streak === -1 ? i + 1 : streak);
+        }
+        return acc;
+      },
+      0
+    );
+
+    const durationMs = examStartTime ? Date.now() - examStartTime : 0;
+
+    // Determine subject from first question category
+    const subject = questions.length > 0 ? (questions[0].category || 'General') : 'General';
+
+    saveSessionRecord({
+      id: generateSessionId(),
+      timestamp: Date.now(),
+      subject,
+      questionSetId: currentQuestionSetId || 'unknown',
+      score: {
+        correct: score.correct,
+        total: score.total,
+        percentage: score.percentage,
+      },
+      duration: durationMs,
+      categoryPerformance: sessionMetrics.categoryPerformance,
+      averageResponseTime: sessionMetrics.averageResponseTime,
+      streaks: {
+        max: maxStreak,
+        final: sessionMetrics.consecutiveCorrect,
+      },
+    });
+  }, [mounted, isExamCompleted, userAnswers.size]);
 
   // Redirect if exam not completed - do this in useEffect, not during render
   useEffect(() => {
