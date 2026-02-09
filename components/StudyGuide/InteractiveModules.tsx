@@ -20,6 +20,9 @@ import {
   Trophy,
   ExternalLink,
   Check,
+  Star,
+  Zap,
+  Award,
 } from 'lucide-react';
 import type { LearningPlan } from '@/lib/types';
 import type { WeakConcept } from '@/lib/diagnosisHistory';
@@ -30,11 +33,30 @@ interface InteractiveModulesProps {
 }
 
 const STEPS = [
-  { num: 1, label: 'Think', icon: MessageCircle },
-  { num: 2, label: 'Learn', icon: Eye },
-  { num: 3, label: 'Practice', icon: Dumbbell },
-  { num: 4, label: 'Verify', icon: CheckCircle },
+  { num: 1, label: 'Think', icon: MessageCircle, points: 10 },
+  { num: 2, label: 'Learn', icon: Eye, points: 0 },
+  { num: 3, label: 'Practice', icon: Dumbbell, points: 45 },
+  { num: 4, label: 'Verify', icon: CheckCircle, points: 25 },
 ] as const;
+
+const COMPLIMENTS = [
+  "Outstanding! You've mastered this concept!",
+  "Brilliant work! Knowledge gap: closed!",
+  "Excellent! You're on fire!",
+  "Incredible focus! You nailed it!",
+  "Superb understanding! Keep it up!",
+  "Perfect! That concept is locked in!",
+];
+
+function getRandomCompliment(): string {
+  return COMPLIMENTS[Math.floor(Math.random() * COMPLIMENTS.length)];
+}
+
+function getStarRating(points: number): number {
+  if (points >= 70) return 3;
+  if (points >= 40) return 2;
+  return 1;
+}
 
 interface ModuleState {
   loading: boolean;
@@ -48,6 +70,8 @@ interface ModuleState {
   practiceResults: Map<number, boolean>;
   verifyAnswer: number | null;
   verifyResult: 'pending' | 'success' | 'retry';
+  earnedPoints: number;
+  completed: boolean;
 }
 
 function getInitialModuleState(): ModuleState {
@@ -63,6 +87,8 @@ function getInitialModuleState(): ModuleState {
     practiceResults: new Map(),
     verifyAnswer: null,
     verifyResult: 'pending',
+    earnedPoints: 0,
+    completed: false,
   };
 }
 
@@ -126,11 +152,13 @@ export default function InteractiveModules({ weakConcepts, weakCategories }: Int
   }, []);
 
   const toggleModule = (module: typeof modules[0]) => {
+    const state = getState(module.key);
+    if (state.completed) return; // Don't collapse completed modules on header click
+
     if (expandedModule === module.key) {
       setExpandedModule(null);
     } else {
       setExpandedModule(module.key);
-      const state = getState(module.key);
       if (!state.plan && !state.loading) {
         fetchPlan(module);
       }
@@ -159,36 +187,64 @@ export default function InteractiveModules({ weakConcepts, weakCategories }: Int
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.06 }}
-            className="rounded-xl border overflow-hidden"
-            style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)' }}
+            className={`rounded-xl border overflow-hidden ${state.completed ? 'border-emerald-300 dark:border-emerald-700' : ''}`}
+            style={!state.completed ? { borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)' } : { backgroundColor: 'var(--hp-surface)' }}
           >
             {/* Accordion Header */}
             <button
               onClick={() => toggleModule(module)}
-              className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+              className={`w-full p-4 flex items-center justify-between text-left transition-colors ${
+                state.completed
+                  ? 'bg-emerald-50/50 dark:bg-emerald-900/10'
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+              }`}
             >
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500/10 to-teal-500/10 dark:from-cyan-500/20 dark:to-teal-500/20 border border-cyan-500/15 flex items-center justify-center shrink-0">
-                  <GraduationCap className="w-4.5 h-4.5 hp-icon-cyan" />
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                  state.completed
+                    ? 'bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20'
+                    : 'bg-gradient-to-br from-cyan-500/10 to-teal-500/10 dark:from-cyan-500/20 dark:to-teal-500/20 border border-cyan-500/15'
+                }`}>
+                  {state.completed ? (
+                    <CheckCircle className="w-4.5 h-4.5 text-emerald-500" />
+                  ) : (
+                    <GraduationCap className="w-4.5 h-4.5 hp-icon-cyan" />
+                  )}
                 </div>
                 <div className="min-w-0">
-                  <h4 className="font-semibold hp-text-primary text-sm truncate">{module.concept}</h4>
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-semibold hp-text-primary text-sm truncate">{module.concept}</h4>
+                    {state.completed && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-bold flex items-center gap-0.5">
+                        <Check className="w-3 h-3" />
+                        Done
+                      </span>
+                    )}
+                    {state.earnedPoints > 0 && !state.completed && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-bold flex items-center gap-0.5">
+                        <Zap className="w-3 h-3" />
+                        {state.earnedPoints} pts
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-[10px] hp-text-quaternary">{module.category}</span>
                     <span className="text-[10px] text-amber-600 dark:text-amber-400">{module.frequency}x</span>
                   </div>
                 </div>
               </div>
-              {isExpanded ? (
-                <ChevronUp className="w-4 h-4 hp-text-quaternary shrink-0" />
-              ) : (
-                <ChevronDown className="w-4 h-4 hp-text-quaternary shrink-0" />
+              {!state.completed && (
+                isExpanded ? (
+                  <ChevronUp className="w-4 h-4 hp-text-quaternary shrink-0" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 hp-text-quaternary shrink-0" />
+                )
               )}
             </button>
 
             {/* Expanded Content */}
             <AnimatePresence>
-              {isExpanded && (
+              {isExpanded && !state.completed && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
@@ -235,7 +291,7 @@ export default function InteractiveModules({ weakConcepts, weakCategories }: Int
   );
 }
 
-// Inline module renderer (simplified version of InteractiveLearningPlan)
+// Inline module renderer
 function InlineModule({
   plan,
   moduleKey,
@@ -247,7 +303,7 @@ function InlineModule({
   state: ModuleState;
   onUpdateState: (updates: Partial<ModuleState>) => void;
 }) {
-  const { currentStep, socraticAnswer, showHint, practiceIndex, practiceAnswers, practiceResults, verifyAnswer, verifyResult } = state;
+  const { currentStep, socraticAnswer, showHint, practiceIndex, practiceAnswers, practiceResults, verifyAnswer, verifyResult, earnedPoints } = state;
 
   const socraticCorrect = socraticAnswer === plan.socratic_opener.correct_index;
 
@@ -275,9 +331,21 @@ function InlineModule({
 
   return (
     <div className="space-y-4">
+      {/* Points display */}
+      {earnedPoints > 0 && verifyResult !== 'success' && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex items-center justify-center gap-2 py-1.5 px-3 rounded-full bg-gradient-to-r from-amber-100/80 to-orange-100/80 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200/50 dark:border-amber-700/30 mx-auto w-fit"
+        >
+          <Zap className="w-3.5 h-3.5 text-amber-500" />
+          <span className="text-xs font-bold text-amber-700 dark:text-amber-300">{earnedPoints} / 80 pts</span>
+        </motion.div>
+      )}
+
       {/* Step Progress */}
       <div className="flex items-center justify-between">
-        {STEPS.map(({ num, label, icon: Icon }, idx) => (
+        {STEPS.map(({ num, label, icon: Icon, points: stepPts }, idx) => (
           <div key={num} className="flex items-center flex-1">
             <div className="flex flex-col items-center gap-1">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors text-xs ${
@@ -292,6 +360,13 @@ function InlineModule({
               <span className={`text-[9px] font-medium ${currentStep >= num ? 'text-cyan-600 dark:text-cyan-400' : 'hp-text-quaternary'}`}>
                 {label}
               </span>
+              {stepPts > 0 && (
+                <span className={`text-[8px] font-bold ${
+                  currentStep > num ? 'text-emerald-500' : 'hp-text-quaternary'
+                }`}>
+                  +{stepPts}
+                </span>
+              )}
             </div>
             {idx < STEPS.length - 1 && (
               <div className={`flex-1 h-0.5 mx-1.5 rounded-full ${currentStep > num ? 'bg-emerald-500' : 'bg-gray-200 dark:bg-gray-700'}`} />
@@ -308,7 +383,11 @@ function InlineModule({
               data={plan.socratic_opener}
               answer={socraticAnswer}
               showHint={showHint}
-              onAnswer={(idx) => onUpdateState({ socraticAnswer: idx })}
+              onAnswer={(idx) => {
+                const isCorrect = idx === plan.socratic_opener.correct_index;
+                const pts = isCorrect && socraticAnswer === null ? 10 : 0;
+                onUpdateState({ socraticAnswer: idx, earnedPoints: earnedPoints + pts });
+              }}
               onShowHint={() => onUpdateState({ showHint: true })}
             />
           )}
@@ -323,7 +402,12 @@ function InlineModule({
                 const isCorrect = idx === plan.practice_questions[practiceIndex].correct_index;
                 const newAnswers = new Map(practiceAnswers).set(practiceIndex, idx);
                 const newResults = new Map(practiceResults).set(practiceIndex, isCorrect);
-                onUpdateState({ practiceAnswers: newAnswers, practiceResults: newResults });
+                const pts = isCorrect ? 15 : 0;
+                onUpdateState({
+                  practiceAnswers: newAnswers,
+                  practiceResults: newResults,
+                  earnedPoints: earnedPoints + pts,
+                });
               }}
               onNextPractice={() => onUpdateState({ practiceIndex: practiceIndex + 1 })}
             />
@@ -334,12 +418,31 @@ function InlineModule({
               answer={verifyAnswer}
               result={verifyResult}
               sources={plan.grounded_sources}
+              earnedPoints={earnedPoints}
               onAnswer={(idx) => {
-                const result = idx === plan.verification.correct_index ? 'success' : 'retry';
-                onUpdateState({ verifyAnswer: idx, verifyResult: result as any });
+                const isCorrect = idx === plan.verification.correct_index;
+                const result = isCorrect ? 'success' : 'retry';
+                const pts = isCorrect ? 25 : 0;
+                onUpdateState({
+                  verifyAnswer: idx,
+                  verifyResult: result as any,
+                  earnedPoints: earnedPoints + pts,
+                  completed: isCorrect,
+                });
               }}
               onRetry={() => {
-                onUpdateState({ verifyAnswer: null, verifyResult: 'pending', currentStep: 2 });
+                // Full reset — go back to step 1
+                onUpdateState({
+                  currentStep: 1,
+                  socraticAnswer: null,
+                  showHint: false,
+                  practiceIndex: 0,
+                  practiceAnswers: new Map(),
+                  practiceResults: new Map(),
+                  verifyAnswer: null,
+                  verifyResult: 'pending',
+                  earnedPoints: 0,
+                });
               }}
             />
           )}
@@ -354,12 +457,12 @@ function InlineModule({
             Previous
           </button>
         ) : <div />}
-        {canProceed() && (
+        {canProceed() && currentStep < 4 && (
           <button
             onClick={handleNext}
             className="flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 text-white text-xs font-bold rounded-lg transition-all"
           >
-            {currentStep === 4 ? 'Complete' : 'Continue'}
+            Continue
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         )}
@@ -400,13 +503,25 @@ function StepSocratic({ data, answer, showHint, onAnswer, onShowHint }: {
           );
         })}
       </div>
+      {correct && (
+        <motion.div
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 rounded-lg text-xs text-emerald-700 dark:text-emerald-300"
+        >
+          <div className="flex items-center gap-1.5 mb-1">
+            <CheckCircle className="w-3.5 h-3.5" />
+            <span className="font-bold">+10 pts</span>
+          </div>
+          {data.expected_insight}
+        </motion.div>
+      )}
       {!correct && answer !== null && !showHint && (
         <button onClick={onShowHint} className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
           <Lightbulb className="w-3.5 h-3.5" />Show hint
         </button>
       )}
       {showHint && <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg text-xs text-amber-700 dark:text-amber-300"><Lightbulb className="w-3.5 h-3.5 inline mr-1" />{data.hint_if_stuck}</div>}
-      {correct && <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 rounded-lg text-xs text-emerald-700 dark:text-emerald-300"><CheckCircle className="w-3.5 h-3.5 inline mr-1" />{data.expected_insight}</div>}
     </div>
   );
 }
@@ -477,33 +592,113 @@ function StepPractice({ questions, practiceIndex, answers, results, onAnswer, on
           );
         })}
       </div>
-      {answered && <div className={`p-2.5 rounded-lg text-xs ${isCorrect ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300' : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300'}`}>{q.explanation}</div>}
+      {answered && (
+        <motion.div
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`p-2.5 rounded-lg text-xs ${isCorrect ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300' : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300'}`}
+        >
+          {isCorrect && <span className="font-bold">+15 pts — </span>}
+          {q.explanation}
+        </motion.div>
+      )}
       {answered && practiceIndex < questions.length - 1 && (
         <button onClick={onNextPractice} className="w-full py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-medium rounded-lg flex items-center justify-center gap-1">
           Next Question <ChevronRight className="w-3.5 h-3.5" />
         </button>
       )}
-      {allDone && <div className="p-2.5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 rounded-lg text-center text-xs text-emerald-700 dark:text-emerald-300 font-medium">All practice complete! Continue to verification.</div>}
+      {allDone && (
+        <div className="p-2.5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 rounded-lg text-center text-xs text-emerald-700 dark:text-emerald-300 font-medium">
+          All practice complete! Continue to verification.
+        </div>
+      )}
     </div>
   );
 }
 
-function StepVerify({ data, answer, result, sources, onAnswer, onRetry }: {
+function StepVerify({ data, answer, result, sources, earnedPoints, onAnswer, onRetry }: {
   data: LearningPlan['verification'];
   answer: number | null;
   result: 'pending' | 'success' | 'retry';
   sources: LearningPlan['grounded_sources'];
+  earnedPoints: number;
   onAnswer: (idx: number) => void;
   onRetry: () => void;
 }) {
   if (result === 'success') {
+    const stars = getStarRating(earnedPoints);
+    const compliment = getRandomCompliment();
+
     return (
-      <div className="p-5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 rounded-xl text-center">
-        <Trophy className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
-        <h4 className="font-bold text-emerald-800 dark:text-emerald-200 text-sm mb-1">Knowledge Gap Closed!</h4>
-        <p className="text-xs text-emerald-700 dark:text-emerald-300">{data.success_message}</p>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ type: 'spring', damping: 15 }}
+        className="p-6 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/20 dark:to-cyan-900/20 border border-emerald-200 dark:border-emerald-700 rounded-xl text-center relative overflow-hidden"
+      >
+        {/* Celebration particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(8)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 rounded-full"
+              style={{
+                background: ['#10b981', '#06b6d4', '#f59e0b', '#8b5cf6', '#ec4899'][i % 5],
+                left: `${10 + (i * 12)}%`,
+                top: '-10%',
+              }}
+              animate={{
+                y: [0, 200, 300],
+                x: [0, (i % 2 ? 30 : -30), (i % 2 ? -20 : 20)],
+                opacity: [1, 0.8, 0],
+                scale: [1, 1.2, 0.5],
+              }}
+              transition={{
+                duration: 2,
+                delay: i * 0.1,
+                ease: 'easeOut',
+              }}
+            />
+          ))}
+        </div>
+
+        <motion.div
+          animate={{ rotate: [0, -5, 5, 0] }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <Trophy className="w-12 h-12 text-amber-500 mx-auto mb-3" />
+        </motion.div>
+
+        {/* Star rating */}
+        <div className="flex items-center justify-center gap-1 mb-2">
+          {[1, 2, 3].map((s) => (
+            <motion.div
+              key={s}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 + s * 0.15, type: 'spring', damping: 10 }}
+            >
+              <Star className={`w-6 h-6 ${s <= stars ? 'text-amber-400 fill-amber-400' : 'text-gray-300 dark:text-gray-600'}`} />
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Award className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+            <span className="text-lg font-black text-cyan-700 dark:text-cyan-300">{earnedPoints} pts</span>
+          </div>
+          <h4 className="font-bold text-emerald-800 dark:text-emerald-200 text-sm mb-1">Knowledge Gap Closed!</h4>
+          <p className="text-xs text-emerald-700 dark:text-emerald-300 mb-1">{compliment}</p>
+          <p className="text-[10px] text-emerald-600 dark:text-emerald-400">{data.success_message}</p>
+        </motion.div>
+
         {sources && sources.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-emerald-200 dark:border-emerald-700 text-left">
+          <div className="mt-4 pt-3 border-t border-emerald-200 dark:border-emerald-700 text-left">
             <p className="text-[10px] font-semibold hp-text-tertiary mb-1">Further reading:</p>
             {sources.map((s, i) => (
               <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[10px] text-cyan-600 dark:text-cyan-400 hover:underline mt-0.5">
@@ -512,26 +707,39 @@ function StepVerify({ data, answer, result, sources, onAnswer, onRetry }: {
             ))}
           </div>
         )}
-      </div>
+      </motion.div>
     );
   }
 
   if (result === 'retry') {
     return (
-      <div className="p-5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl text-center">
-        <AlertCircle className="w-8 h-8 text-amber-500 mx-auto mb-2" />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="p-5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl text-center"
+      >
+        <RotateCcw className="w-8 h-8 text-amber-500 mx-auto mb-2" />
         <h4 className="font-bold text-amber-800 dark:text-amber-200 text-sm mb-1">Not Quite There</h4>
-        <p className="text-xs text-amber-700 dark:text-amber-300 mb-3">{data.retry_message}</p>
-        <button onClick={onRetry} className="flex items-center gap-1 mx-auto px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-medium rounded-lg">
-          <RotateCcw className="w-3.5 h-3.5" />Review Again
+        <p className="text-xs text-amber-700 dark:text-amber-300 mb-1">{data.retry_message}</p>
+        <p className="text-[10px] text-amber-600 dark:text-amber-400 mb-3 italic">
+          Let&apos;s try again from the beginning — you&apos;ve got this!
+        </p>
+        <button onClick={onRetry} className="flex items-center gap-1.5 mx-auto px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold rounded-lg transition-all shadow-sm">
+          <RotateCcw className="w-3.5 h-3.5" />
+          Start Over
         </button>
-      </div>
+      </motion.div>
     );
   }
 
   return (
     <div className="space-y-3">
-      <p className="text-sm hp-text-primary font-medium">{data.question}</p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm hp-text-primary font-medium">{data.question}</p>
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 font-bold">
+          +25 pts
+        </span>
+      </div>
       <div className="space-y-2">
         {data.options.map((opt, idx) => {
           let cls = 'border hp-text-secondary';
