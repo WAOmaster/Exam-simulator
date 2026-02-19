@@ -1,0 +1,515 @@
+[
+  {
+    "id": 1, "category": "Verbal", "type": "Sentence Completion",
+    "question": "Choose the word that, when inserted in the sentence to replace the blank, best fits the meaning of the sentence.\n\nThe researcher's conclusions were highly _____, as they were based on a very small and unrepresentative sample size.",
+    "options": ["reliable", "tentative", "conclusive", "definitive", "absolute"],
+    "correct": 1,
+    "explanation": "\"Tentative\" means not certain or fixed; provisional. Since the conclusions are based on a small, unrepresentative sample, they would be uncertain and preliminary — making \"tentative\" the best fit."
+  },
+  {
+    "id": 2, "category": "Math & Logic", "type": "Word Problem",
+    "question": "A delivery truck travels 240 miles using 16 gallons of fuel. At the same rate, how many gallons will the truck need to travel 375 miles?",
+    "options": ["20 gallons", "22 gallons", "25 gallons", "28 gallons", "30 gallons"],
+    "correct": 2,
+    "explanation": "Rate = 240 miles ÷ 16 gallons = 15 miles/gallon.\nGallons needed = 375 ÷ 15 = 25 gallons.\nThe correct answer is (C)."
+  },
+  {
+    "id": 3, "category": "Spatial Reasoning", "type": "Next in Series",
+    "question": "Which of the following boxes should replace the question mark (?) to complete the pattern?",
+    "spatial": "nextInSeries",
+    "seriesDescriptors": [
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 25, "y1": 7, "x2": 25, "y2": 43, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 7, "y1": 25, "x2": 43, "y2": 25, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 25, "y1": 7, "x2": 25, "y2": 43, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 7, "y1": 25, "x2": 43, "y2": 25, "stroke": "#333", "strokeWidth": 2 } ] },
+      null
+    ],
+    "optionDescriptors": [
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 12, "y1": 12, "x2": 38, "y2": 38, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 25, "y1": 7, "x2": 25, "y2": 43, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "#333", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "rect", "x": 7, "y": 7, "width": 36, "height": 36, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 7, "y1": 25, "x2": 43, "y2": 25, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 7, "y1": 25, "x2": 43, "y2": 25, "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 25, "y1": 7, "x2": 25, "y2": 43, "stroke": "#333", "strokeWidth": 2 } ] }
+    ],
+    "options": ["A", "B", "C", "D", "E"],
+    "correct": 1,
+    "explanation": "The pattern alternates between a circle with a vertical line and a circle with a horizontal line. Position 5 continues the alternation: vertical. Option B (circle with vertical line) completes the pattern."
+  },
+  {
+    "id": 4, "category": "Verbal", "type": "Analogy",
+    "question": "ARCHITECT is to BLUEPRINT as COMPOSER is to ______.",
+    "options": ["orchestra", "score", "melody", "instrument", "conductor"],
+    "correct": 1,
+    "explanation": "An architect creates a blueprint (a detailed plan for a building). Similarly, a composer creates a score (a detailed written form of a musical composition)."
+  },
+  {
+    "id": 5, "category": "Math & Logic", "type": "Number Series",
+    "question": "What number comes next in the series?\n\n3,  7,  15,  31,  63,  ?",
+    "options": ["95", "111", "126", "127", "131"],
+    "correct": 3,
+    "explanation": "Each number is (previous × 2) + 1.\n3 × 2 + 1 = 7\n7 × 2 + 1 = 15\n15 × 2 + 1 = 31\n31 × 2 + 1 = 63\n63 × 2 + 1 = 127\nThe correct answer is (D) 127."
+  },
+  {
+    "id": 6, "category": "Verbal", "type": "Sentence Completion",
+    "question": "Choose the word that best fits the meaning of the sentence.\n\nThe artist's work was praised for its _____ quality, blending traditional techniques with modern innovation.",
+    "options": ["derivative", "eclectic", "mundane", "redundant", "archaic"],
+    "correct": 1,
+    "explanation": "\"Eclectic\" means deriving ideas, style, or taste from a broad and diverse range of sources. Since the artist blends traditional and modern techniques, \"eclectic\" best captures this diverse quality."
+  },
+  {
+    "id": 7, "category": "Spatial Reasoning", "type": "Odd One Out",
+    "question": "Which of the following does not belong?",
+    "spatial": "oddOneOut",
+    "oddDescriptors": [
+      { "shapes": [ { "type": "polygon", "points": "25,5 45,40 5,40", "fill": "none", "stroke": "#333", "strokeWidth": 2.5 }, { "type": "circle", "cx": 25, "cy": 28, "r": 6, "fill": "#333" } ] },
+      { "shapes": [ { "type": "rect", "x": 8, "y": 8, "width": 34, "height": 34, "fill": "none", "stroke": "#333", "strokeWidth": 2.5 }, { "type": "circle", "cx": 25, "cy": 25, "r": 6, "fill": "#333" } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,5 47,18 40,43 10,43 3,18", "fill": "none", "stroke": "#333", "strokeWidth": 2.5 }, { "type": "circle", "cx": 25, "cy": 25, "r": 6, "fill": "#333" } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,5 45,20 38,43 12,43 5,20", "fill": "none", "stroke": "#333", "strokeWidth": 2.5 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,3 47,15 47,35 25,47 3,35 3,15", "fill": "none", "stroke": "#333", "strokeWidth": 2.5 }, { "type": "circle", "cx": 25, "cy": 25, "r": 6, "fill": "#333" } ] }
+    ],
+    "options": ["A", "B", "C", "D", "E"],
+    "correct": 3,
+    "explanation": "All shapes except D contain a filled circle in the center. Option D is a pentagon with no inner circle, making it the odd one out."
+  },
+  {
+    "id": 8, "category": "Math & Logic", "type": "Word Problem",
+    "question": "A store offers a 20% discount on a jacket originally priced at $85. After the discount, a sales tax of 8% is applied. What is the final price of the jacket?",
+    "options": ["$68.00", "$70.72", "$73.44", "$74.80", "$77.52"],
+    "correct": 2,
+    "explanation": "Discounted price = $85 × (1 − 0.20) = $85 × 0.80 = $68.00\nSales tax = $68.00 × 0.08 = $5.44\nFinal price = $68.00 + $5.44 = $73.44\nThe correct answer is (C)."
+  },
+  {
+    "id": 9, "category": "Verbal", "type": "Sentence Completion",
+    "question": "Choose the word that best fits the meaning of the sentence.\n\nThe CEO's decision to restructure the company was met with _____ from long-tenured employees who feared losing their positions.",
+    "options": ["apathy", "indifference", "apprehension", "enthusiasm", "curiosity"],
+    "correct": 2,
+    "explanation": "\"Apprehension\" means anxiety or fear that something bad will happen. Employees who feared losing their positions would naturally feel apprehension about the restructuring."
+  },
+  {
+    "id": 10, "category": "Math & Logic", "type": "Syllogism",
+    "question": "If the first two statements are true, is the final statement true?\n\nAll managers in the company must complete a leadership training course.\nSarah is a manager in the company.\nSarah has completed the leadership training course.",
+    "options": ["True", "False", "Uncertain"],
+    "correct": 0,
+    "explanation": "The first statement says ALL managers MUST complete the training. Sarah is a manager. Therefore, Sarah must have completed the training. The final statement is TRUE."
+  },
+  {
+    "id": 11, "category": "Verbal", "type": "Antonym",
+    "question": "One word below is underlined. What is the OPPOSITE of that word?\n\nThe committee praised the candidate's _abundant_ experience in the field.",
+    "options": ["scarce", "plentiful", "excessive", "copious", "ample"],
+    "correct": 0,
+    "explanation": "\"Abundant\" means existing in large quantities; plentiful. The opposite is \"scarce,\" which means insufficient or in short supply."
+  },
+  {
+    "id": 12, "category": "Math & Logic", "type": "Word Problem",
+    "question": "A company has 150 employees. If 60% are full-time and the rest are part-time, and 25% of the part-time employees work from home, how many part-time employees work from home?",
+    "options": ["10", "15", "20", "25", "38"],
+    "correct": 1,
+    "explanation": "Part-time employees = 150 × (1 − 0.60) = 150 × 0.40 = 60.\nPart-time working from home = 60 × 0.25 = 15.\nThe correct answer is (B) 15."
+  },
+  {
+    "id": 13, "category": "Spatial Reasoning", "type": "Matrix",
+    "question": "Which of the following boxes should replace the question mark (?) to complete the pattern?",
+    "spatial": "matrix",
+    "matrixDescriptors": [
+      { "shapes": [ { "type": "circle", "cx": 12, "cy": 25, "r": 8, "fill": "#333" } ] },
+      { "shapes": [ { "type": "circle", "cx": 12, "cy": 25, "r": 8, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 25, "r": 8, "fill": "#333" } ] },
+      { "shapes": [ { "type": "circle", "cx": 12, "cy": 25, "r": 8, "fill": "#333" }, { "type": "circle", "cx": 25, "cy": 25, "r": 8, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 25, "r": 8, "fill": "#333" } ] },
+      { "shapes": [ { "type": "circle", "cx": 12, "cy": 15, "r": 7, "fill": "#333" }, { "type": "circle", "cx": 12, "cy": 35, "r": 7, "fill": "#333" } ] },
+      { "shapes": [ { "type": "circle", "cx": 12, "cy": 15, "r": 7, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 15, "r": 7, "fill": "#333" }, { "type": "circle", "cx": 12, "cy": 35, "r": 7, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 35, "r": 7, "fill": "#333" } ] },
+      { "shapes": [ { "type": "circle", "cx": 12, "cy": 12, "r": 6, "fill": "#333" }, { "type": "circle", "cx": 25, "cy": 12, "r": 6, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 12, "r": 6, "fill": "#333" }, { "type": "circle", "cx": 12, "cy": 38, "r": 6, "fill": "#333" }, { "type": "circle", "cx": 25, "cy": 38, "r": 6, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 38, "r": 6, "fill": "#333" } ] },
+      { "shapes": [ { "type": "circle", "cx": 12, "cy": 12, "r": 6, "fill": "#333" }, { "type": "circle", "cx": 12, "cy": 25, "r": 6, "fill": "#333" }, { "type": "circle", "cx": 12, "cy": 38, "r": 6, "fill": "#333" } ] },
+      { "shapes": [ { "type": "circle", "cx": 12, "cy": 12, "r": 6, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 12, "r": 6, "fill": "#333" }, { "type": "circle", "cx": 12, "cy": 25, "r": 6, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 25, "r": 6, "fill": "#333" }, { "type": "circle", "cx": 12, "cy": 38, "r": 6, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 38, "r": 6, "fill": "#333" } ] },
+      null
+    ],
+    "optionDescriptors": [
+      { "shapes": [ { "type": "circle", "cx": 12, "cy": 12, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 25, "cy": 12, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 12, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 12, "cy": 25, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 25, "cy": 25, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 25, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 12, "cy": 38, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 25, "cy": 38, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 38, "r": 5, "fill": "#333" } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 10, "fill": "#333" } ] },
+      { "shapes": [ { "type": "circle", "cx": 12, "cy": 12, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 12, "cy": 25, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 12, "cy": 38, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 12, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 25, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 38, "r": 5, "fill": "#333" } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 12, "r": 6, "fill": "#333" }, { "type": "circle", "cx": 25, "cy": 25, "r": 6, "fill": "#333" }, { "type": "circle", "cx": 25, "cy": 38, "r": 6, "fill": "#333" } ] },
+      { "shapes": [ { "type": "circle", "cx": 12, "cy": 12, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 25, "cy": 12, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 12, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 12, "cy": 38, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 25, "cy": 38, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 38, "cy": 38, "r": 5, "fill": "#333" } ] }
+    ],
+    "options": ["A", "B", "C", "D", "E"],
+    "correct": 0,
+    "explanation": "The pattern shows dots increasing across rows and columns. Row 3 column 3 needs 9 dots in a 3×3 grid. Option A is correct."
+  },
+  {
+    "id": 14, "category": "Verbal", "type": "Attention to Detail",
+    "question": "How many of the five items in the left-hand column are exactly the same as the corresponding entry in the right-hand column?",
+    "spatial": "attention",
+    "attentionLeft": ["Hartwell & Associates Inc.", "Pacific Northwest Trading Co.", "Greenfield Capital Partners", "Montgomery Healthcare Ltd.", "Fitzgerald & Sons Consulting"],
+    "attentionRight": ["Hartwell & Associates Inc.", "Pacific Northwest Trading Co.", "Greenfield Capitol Partners", "Montgomery Healthcare Ltd.", "Fitzgerald & Son Consulting"],
+    "options": ["1", "2", "3", "4", "5"],
+    "correct": 2,
+    "explanation": "Comparing each pair:\n1. Hartwell & Associates Inc. ✓\n2. Pacific Northwest Trading Co. ✓\n3. Greenfield Capital ≠ Greenfield Capitol ✗\n4. Montgomery Healthcare Ltd. ✓\n5. Fitzgerald & Sons ≠ Fitzgerald & Son ✗\n3 items match. The correct answer is (C) 3."
+  },
+  {
+    "id": 15, "category": "Math & Logic", "type": "Word Problem",
+    "question": "A rectangular garden has a perimeter of 56 meters. If the length is 4 meters more than the width, what is the area of the garden?",
+    "options": ["180 sq m", "192 sq m", "196 sq m", "204 sq m", "210 sq m"],
+    "correct": 1,
+    "explanation": "Let width = w, then length = w + 4.\nPerimeter = 2(w + w + 4) = 4w + 8 = 56\n4w = 48, so w = 12 meters.\nLength = 12 + 4 = 16 meters.\nArea = 16 × 12 = 192 sq m.\nThe correct answer is (B)."
+  },
+  {
+    "id": 16, "category": "Verbal", "type": "Sentence Completion",
+    "question": "Choose the word that best fits the meaning of the sentence.\n\nThe witness provided a _____ account of the events, omitting critical details that could have changed the outcome of the trial.",
+    "options": ["comprehensive", "partial", "meticulous", "exhaustive", "thorough"],
+    "correct": 1,
+    "explanation": "\"Partial\" means not complete; covering only a part. Since the witness omitted critical details, the account was incomplete or partial."
+  },
+  {
+    "id": 17, "category": "Math & Logic", "type": "Basic Math",
+    "question": "What is the arithmetic mean of the following numbers?\n\n12,  18,  24,  31,  45",
+    "options": ["24", "26", "28", "30", "32"],
+    "correct": 1,
+    "explanation": "Arithmetic mean = (12 + 18 + 24 + 31 + 45) ÷ 5 = 130 ÷ 5 = 26.\nThe correct answer is (B) 26."
+  },
+  {
+    "id": 18, "category": "Spatial Reasoning", "type": "Next in Series",
+    "question": "Which of the following boxes should replace the question mark (?) to complete the pattern?",
+    "spatial": "nextInSeries",
+    "seriesDescriptors": [
+      { "shapes": [ { "type": "rect", "x": 10, "y": 10, "width": 30, "height": 30, "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "rect", "x": 10, "y": 10, "width": 30, "height": 30, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "rect", "x": 15, "y": 15, "width": 20, "height": 20, "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "rect", "x": 10, "y": 10, "width": 30, "height": 30, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "rect", "x": 15, "y": 15, "width": 20, "height": 20, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "rect", "x": 20, "y": 20, "width": 10, "height": 10, "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] },
+      null
+    ],
+    "optionDescriptors": [
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "circle", "cx": 25, "cy": 25, "r": 12, "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "rect", "x": 10, "y": 10, "width": 30, "height": 30, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "rect", "x": 15, "y": 15, "width": 20, "height": 20, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "rect", "x": 20, "y": 20, "width": 10, "height": 10, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "rect", "x": 22, "y": 22, "width": 6, "height": 6, "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "#333" } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,5 45,40 5,40", "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "rect", "x": 15, "y": 15, "width": 20, "height": 20, "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] }
+    ],
+    "options": ["A", "B", "C", "D", "E"],
+    "correct": 0,
+    "explanation": "The pattern alternates between squares (gaining one nested shape each step) and circles (following the same nesting rule). The 5th position is a circle with 2 concentric circles. Option A is correct."
+  },
+  {
+    "id": 19, "category": "Verbal", "type": "Analogy",
+    "question": "TELESCOPE is to ASTRONOMER as STETHOSCOPE is to ______.",
+    "options": ["scientist", "nurse", "physician", "hospital", "patient"],
+    "correct": 2,
+    "explanation": "A telescope is the primary professional tool of an astronomer. A stethoscope is the primary professional tool of a physician."
+  },
+  {
+    "id": 20, "category": "Math & Logic", "type": "Word Problem",
+    "question": "Two trains leave from the same station traveling in opposite directions. Train A travels at 65 mph and Train B travels at 85 mph. After how many hours will they be 450 miles apart?",
+    "options": ["2 hours", "2.5 hours", "3 hours", "3.5 hours", "4 hours"],
+    "correct": 2,
+    "explanation": "Combined speed = 65 + 85 = 150 mph.\nTime = Distance ÷ Speed = 450 ÷ 150 = 3 hours.\nThe correct answer is (C) 3 hours."
+  },
+  {
+    "id": 21, "category": "Verbal", "type": "Sentence Completion",
+    "question": "Choose the word that best fits the meaning of the sentence.\n\nThe negotiation reached a _____ when neither party was willing to compromise on the key terms of the agreement.",
+    "options": ["resolution", "breakthrough", "stalemate", "consensus", "milestone"],
+    "correct": 2,
+    "explanation": "A \"stalemate\" is a situation in which further action is blocked; a deadlock. When neither party will compromise, a stalemate results."
+  },
+  {
+    "id": 22, "category": "Spatial Reasoning", "type": "Odd One Out",
+    "question": "Which of the following does not belong?",
+    "spatial": "oddOneOut",
+    "oddDescriptors": [
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2.5, "transform": "rotate(45 25 25)", "rx": 5 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,3 47,25 25,47 3,25", "fill": "none", "stroke": "#333", "strokeWidth": 2.5 } ] },
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2.5, "transform": "rotate(45 25 25)" } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,5 45,15 45,35 25,45 5,35 5,15", "fill": "none", "stroke": "#333", "strokeWidth": 2.5 } ] },
+      { "shapes": [ { "type": "rect", "x": 7, "y": 7, "width": 36, "height": 36, "fill": "none", "stroke": "#333", "strokeWidth": 2.5, "transform": "rotate(45 25 25)" } ] }
+    ],
+    "options": ["A", "B", "C", "D", "E"],
+    "correct": 3,
+    "explanation": "Options A, B, C, and E are all four-sided shapes (diamonds/rotated squares). Option D is a hexagon (six sides), which does not belong with the group of four-sided shapes."
+  },
+  {
+    "id": 23, "category": "Math & Logic", "type": "Syllogism",
+    "question": "If the first two statements are true, is the final statement true?\n\nSome members of the book club enjoy science fiction.\nAll people who enjoy science fiction also enjoy fantasy.\nSome members of the book club enjoy fantasy.",
+    "options": ["True", "False", "Uncertain"],
+    "correct": 0,
+    "explanation": "If some book club members enjoy science fiction, and all sci-fi lovers also enjoy fantasy, then those book club members who enjoy science fiction also enjoy fantasy. The statement is TRUE."
+  },
+  {
+    "id": 24, "category": "Math & Logic", "type": "Word Problem",
+    "question": "Maria invested $5,000 in a savings account that earns 6% simple interest per year. How much total money will she have in the account after 3 years?",
+    "options": ["$5,300", "$5,600", "$5,900", "$5,955", "$6,000"],
+    "correct": 2,
+    "explanation": "Simple interest = Principal × Rate × Time = $5,000 × 0.06 × 3 = $900.\nTotal = $5,000 + $900 = $5,900.\nThe correct answer is (C) $5,900."
+  },
+  {
+    "id": 25, "category": "Verbal", "type": "Attention to Detail",
+    "question": "How many of the five items in the left-hand column are exactly the same as the corresponding entry in the right-hand column?",
+    "spatial": "attention",
+    "attentionLeft": ["DR-2847-XKP-091", "FN-5523-QRT-447", "BV-9081-LMZ-336", "HK-4476-WSD-118", "TJ-6639-YBC-225"],
+    "attentionRight": ["DR-2847-XKP-091", "FN-5523-QRT-474", "BV-9081-LMZ-336", "HK-4476-WSD-118", "TJ-6639-YCB-225"],
+    "options": ["1", "2", "3", "4", "5"],
+    "correct": 2,
+    "explanation": "1. DR-2847-XKP-091 ✓\n2. FN-5523-QRT-447 ≠ FN-5523-QRT-474 ✗ (447 vs 474)\n3. BV-9081-LMZ-336 ✓\n4. HK-4476-WSD-118 ✓\n5. TJ-6639-YBC-225 ≠ TJ-6639-YCB-225 ✗ (YBC vs YCB)\n3 items match. The correct answer is (C) 3."
+  },
+  {
+    "id": 26, "category": "Verbal", "type": "Sentence Completion",
+    "question": "Choose the word that best fits the meaning of the sentence.\n\nThe journalist's article was intentionally _____, designed to provoke outrage rather than inform the public.",
+    "options": ["informative", "inflammatory", "objective", "educational", "balanced"],
+    "correct": 1,
+    "explanation": "\"Inflammatory\" means intended to arouse angry or violent feelings. An article designed to provoke outrage rather than inform would be inflammatory."
+  },
+  {
+    "id": 27, "category": "Math & Logic", "type": "Tables and Graphs",
+    "question": "The table below shows quarterly sales (in thousands of dollars) for a company.\n\n| Quarter | Product A | Product B |\n| Q1 | 120 | 85 |\n| Q2 | 145 | 92 |\n| Q3 | 130 | 110 |\n| Q4 | 165 | 98 |\n\nWhat was the total combined sales of Product A and Product B for Q2 and Q3?",
+    "options": ["$355,000", "$367,000", "$440,000", "$477,000", "$560,000"],
+    "correct": 3,
+    "explanation": "Q2: Product A ($145K) + Product B ($92K) = $237K\nQ3: Product A ($130K) + Product B ($110K) = $240K\nTotal for Q2 + Q3 = $237K + $240K = $477K\nThe correct answer is (D) $477,000."
+  },
+  {
+    "id": 28, "category": "Spatial Reasoning", "type": "Next in Series",
+    "question": "Which of the following boxes should replace the question mark (?) to complete the pattern?",
+    "spatial": "nextInSeries",
+    "seriesDescriptors": [
+      { "shapes": [ { "type": "polygon", "points": "25,8 42,42 8,42", "fill": "#333", "stroke": "#333", "strokeWidth": 1 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,42 42,8 8,8", "fill": "none", "stroke": "#333", "strokeWidth": 2.5 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,8 42,42 8,42", "fill": "#333", "stroke": "#333", "strokeWidth": 1 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,42 42,8 8,8", "fill": "none", "stroke": "#333", "strokeWidth": 2.5 } ] },
+      null
+    ],
+    "optionDescriptors": [
+      { "shapes": [ { "type": "polygon", "points": "25,42 42,8 8,8", "fill": "#333", "stroke": "#333", "strokeWidth": 1 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,8 42,42 8,42", "fill": "#333", "stroke": "#333", "strokeWidth": 1 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,8 42,42 8,42", "fill": "none", "stroke": "#333", "strokeWidth": 2.5 } ] },
+      { "shapes": [ { "type": "rect", "x": 10, "y": 10, "width": 30, "height": 30, "fill": "#333" } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,42 42,8 8,8", "fill": "none", "stroke": "#333", "strokeWidth": 2.5 } ] }
+    ],
+    "options": ["A", "B", "C", "D", "E"],
+    "correct": 1,
+    "explanation": "The pattern alternates: filled upward triangle, empty downward triangle. Position 5 continues: filled upward triangle. Option B is correct."
+  },
+  {
+    "id": 29, "category": "Math & Logic", "type": "Word Problem",
+    "question": "A bakery makes 360 pastries per day. Croissants make up 40% of production, and danishes make up 25%. How many pastries produced daily are neither croissants nor danishes?",
+    "options": ["90", "108", "126", "144", "234"],
+    "correct": 2,
+    "explanation": "Croissants = 360 × 0.40 = 144\nDanishes = 360 × 0.25 = 90\nNeither = 360 − 144 − 90 = 126\nThe correct answer is (C) 126."
+  },
+  {
+    "id": 30, "category": "Verbal", "type": "Analogy",
+    "question": "CHAPTER is to NOVEL as ACT is to ______.",
+    "options": ["performance", "stage", "play", "scene", "theater"],
+    "correct": 2,
+    "explanation": "A chapter is a major structural division of a novel. An act is a major structural division of a play. Both represent the primary organizational unit of their respective creative works."
+  },
+  {
+    "id": 31, "category": "Math & Logic", "type": "Word Problem",
+    "question": "A printer can print 30 pages per minute. If a document has 450 pages and the printer runs continuously, how long will it take to print the entire document?",
+    "options": ["12 minutes", "13 minutes", "15 minutes", "18 minutes", "20 minutes"],
+    "correct": 2,
+    "explanation": "Time = Total pages ÷ Pages per minute = 450 ÷ 30 = 15 minutes.\nThe correct answer is (C) 15 minutes."
+  },
+  {
+    "id": 32, "category": "Spatial Reasoning", "type": "Odd One Out",
+    "question": "Which of the following does not belong?",
+    "spatial": "oddOneOut",
+    "oddDescriptors": [
+      { "shapes": [ { "type": "line", "x1": 5, "y1": 25, "x2": 45, "y2": 25, "stroke": "#333", "strokeWidth": 2.5 }, { "type": "line", "x1": 25, "y1": 5, "x2": 25, "y2": 45, "stroke": "#333", "strokeWidth": 2.5 } ] },
+      { "shapes": [ { "type": "line", "x1": 10, "y1": 10, "x2": 40, "y2": 40, "stroke": "#333", "strokeWidth": 2.5 }, { "type": "line", "x1": 40, "y1": 10, "x2": 10, "y2": 40, "stroke": "#333", "strokeWidth": 2.5 } ] },
+      { "shapes": [ { "type": "line", "x1": 5, "y1": 25, "x2": 45, "y2": 25, "stroke": "#333", "strokeWidth": 2.5 }, { "type": "line", "x1": 25, "y1": 5, "x2": 25, "y2": 45, "stroke": "#333", "strokeWidth": 2.5 }, { "type": "line", "x1": 10, "y1": 10, "x2": 40, "y2": 40, "stroke": "#333", "strokeWidth": 2.5 }, { "type": "line", "x1": 40, "y1": 10, "x2": 10, "y2": 40, "stroke": "#333", "strokeWidth": 2.5 } ] },
+      { "shapes": [ { "type": "line", "x1": 5, "y1": 15, "x2": 45, "y2": 15, "stroke": "#333", "strokeWidth": 2.5 }, { "type": "line", "x1": 5, "y1": 35, "x2": 45, "y2": 35, "stroke": "#333", "strokeWidth": 2.5 } ] },
+      { "shapes": [ { "type": "line", "x1": 12, "y1": 7, "x2": 38, "y2": 43, "stroke": "#333", "strokeWidth": 2.5 }, { "type": "line", "x1": 38, "y1": 7, "x2": 12, "y2": 43, "stroke": "#333", "strokeWidth": 2.5 } ] }
+    ],
+    "options": ["A", "B", "C", "D", "E"],
+    "correct": 3,
+    "explanation": "Options A, B, C, and E all have lines that cross/intersect at a point. Option D has two parallel horizontal lines that do not intersect, making it the odd one out."
+  },
+  {
+    "id": 33, "category": "Verbal", "type": "Sentence Completion",
+    "question": "Choose the word that best fits the meaning of the sentence.\n\nThe new evidence was so _____ that even the most skeptical jurors were convinced of the defendant's innocence.",
+    "options": ["ambiguous", "circumstantial", "compelling", "trivial", "questionable"],
+    "correct": 2,
+    "explanation": "\"Compelling\" means evoking interest, attention, or admiration in a powerfully irresistible way. Evidence that convinces even skeptics would be compelling."
+  },
+  {
+    "id": 34, "category": "Math & Logic", "type": "Number Series",
+    "question": "What number comes next in the series?\n\n2,  6,  12,  20,  30,  ?",
+    "options": ["38", "40", "42", "44", "46"],
+    "correct": 2,
+    "explanation": "The differences between consecutive numbers are: 4, 6, 8, 10, ...\nThe differences increase by 2 each time.\nNext difference = 12, so next number = 30 + 12 = 42.\nThe correct answer is (C) 42."
+  },
+  {
+    "id": 35, "category": "Math & Logic", "type": "Syllogism",
+    "question": "If the first two statements are true, is the final statement true?\n\nNo students who failed the midterm are allowed to take the final exam.\nJason is taking the final exam.\nJason did not fail the midterm.",
+    "options": ["True", "False", "Uncertain"],
+    "correct": 0,
+    "explanation": "If no students who failed the midterm can take the final, and Jason IS taking the final, then Jason cannot have failed the midterm. The final statement is TRUE."
+  },
+  {
+    "id": 36, "category": "Verbal", "type": "Antonym",
+    "question": "One word below is underlined. What is the OPPOSITE of that word?\n\nThe professor's _concise_ explanation helped students understand the concept quickly.",
+    "options": ["brief", "succinct", "verbose", "clear", "pithy"],
+    "correct": 2,
+    "explanation": "\"Concise\" means giving a lot of information clearly in few words. The opposite is \"verbose,\" which means using more words than needed."
+  },
+  {
+    "id": 37, "category": "Math & Logic", "type": "Word Problem",
+    "question": "A warehouse has 3 times as many boxes of Product X as Product Y. If the warehouse has a total of 480 boxes of both products, how many boxes of Product X are there?",
+    "options": ["120", "160", "240", "320", "360"],
+    "correct": 4,
+    "explanation": "Let Product Y = y. Then Product X = 3y.\n3y + y = 480\n4y = 480\ny = 120 (Product Y)\nProduct X = 3 × 120 = 360.\nThe correct answer is (E) 360."
+  },
+  {
+    "id": 38, "category": "Spatial Reasoning", "type": "Matrix",
+    "question": "Which of the following boxes should replace the question mark (?) to complete the pattern?",
+    "spatial": "matrix",
+    "matrixDescriptors": [
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 5, "y1": 5, "x2": 45, "y2": 45, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 5, "y1": 5, "x2": 45, "y2": 45, "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 45, "y1": 5, "x2": 5, "y2": 45, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 7, "y1": 25, "x2": 43, "y2": 25, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 7, "y1": 25, "x2": 43, "y2": 25, "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 25, "y1": 7, "x2": 25, "y2": 43, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,7 43,40 7,40", "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,7 43,40 7,40", "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 25, "y1": 7, "x2": 25, "y2": 40, "stroke": "#333", "strokeWidth": 2 } ] },
+      null
+    ],
+    "optionDescriptors": [
+      { "shapes": [ { "type": "polygon", "points": "25,7 43,40 7,40", "fill": "#333", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,7 43,40 7,40", "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 25, "y1": 7, "x2": 25, "y2": 40, "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 16, "y1": 24, "x2": 34, "y2": 24, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,7 43,40 7,40", "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 7, "y1": 40, "x2": 43, "y2": 40, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,7 43,40 7,40", "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "circle", "cx": 25, "cy": 30, "r": 6, "fill": "#333" } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,7 43,40 7,40", "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 25, "y1": 7, "x2": 7, "y2": 40, "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 25, "y1": 7, "x2": 43, "y2": 40, "stroke": "#333", "strokeWidth": 2 } ] }
+    ],
+    "options": ["A", "B", "C", "D", "E"],
+    "correct": 1,
+    "explanation": "Row pattern: each shape gains one internal line. Column 3 needs 2 lines inside a triangle. Option B (triangle with vertical and horizontal lines) is correct."
+  },
+  {
+    "id": 39, "category": "Math & Logic", "type": "Seating Arrangement",
+    "question": "Five colleagues — Anna, Ben, Clara, David, and Emma — sit in a row of 5 chairs at a conference table.\n• Anna sits to the immediate left of Ben.\n• Clara does not sit next to David.\n• Emma sits at one of the two ends.\n\nIf Emma sits at the far left end and Anna sits in the 3rd chair, who must sit in the 5th chair (far right)?",
+    "options": ["Anna", "Ben", "Clara", "David", "Cannot be determined"],
+    "correct": 4,
+    "explanation": "Emma is in chair 1. Anna is in chair 3. Anna is immediately left of Ben, so Ben is in chair 4. Remaining: Clara and David for chairs 2 and 5. Both arrangements satisfy the Clara-David constraint. Cannot be determined."
+  },
+  {
+    "id": 40, "category": "Verbal", "type": "Sentence Completion",
+    "question": "Choose the word that best fits the meaning of the sentence.\n\nThe discovery of ancient ruins beneath the city was entirely _____, as the construction crew had no idea they would find anything of archaeological significance.",
+    "options": ["anticipated", "serendipitous", "planned", "expected", "deliberate"],
+    "correct": 1,
+    "explanation": "\"Serendipitous\" means occurring by chance in a happy or beneficial way. The discovery was unplanned and unexpected, making it serendipitous."
+  },
+  {
+    "id": 41, "category": "Math & Logic", "type": "Word Problem",
+    "question": "A school has 240 students. The ratio of boys to girls is 5:7. How many girls are in the school?",
+    "options": ["100", "110", "120", "130", "140"],
+    "correct": 4,
+    "explanation": "Total parts = 5 + 7 = 12.\nEach part = 240 ÷ 12 = 20.\nGirls = 7 × 20 = 140.\nThe correct answer is (E) 140."
+  },
+  {
+    "id": 42, "category": "Spatial Reasoning", "type": "Odd One Out",
+    "question": "Which of the following does not belong?",
+    "spatial": "oddOneOut",
+    "oddDescriptors": [
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 18, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 25, "y1": 7, "x2": 25, "y2": 43, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "rect", "x": 7, "y": 7, "width": 36, "height": 36, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 25, "y1": 7, "x2": 25, "y2": 43, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,5 45,40 5,40", "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 25, "y1": 5, "x2": 25, "y2": 40, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,5 47,18 40,43 10,43 3,18", "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 3, "y1": 18, "x2": 40, "y2": 43, "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,3 47,15 47,35 25,47 3,35 3,15", "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "line", "x1": 25, "y1": 3, "x2": 25, "y2": 47, "stroke": "#333", "strokeWidth": 2 } ] }
+    ],
+    "options": ["A", "B", "C", "D", "E"],
+    "correct": 3,
+    "explanation": "All shapes except D have a vertical line of symmetry drawn through the center. Option D has a diagonal line that is not a line of symmetry, making it the odd one out."
+  },
+  {
+    "id": 43, "category": "Math & Logic", "type": "Word Problem",
+    "question": "A tank is being filled by two pipes. Pipe A can fill the tank in 6 hours, and Pipe B can fill it in 4 hours. If both pipes are opened at the same time, how long will it take to fill the tank?",
+    "options": ["2 hours", "2.4 hours", "2.5 hours", "3 hours", "5 hours"],
+    "correct": 1,
+    "explanation": "Pipe A rate = 1/6 tank per hour.\nPipe B rate = 1/4 tank per hour.\nCombined rate = 1/6 + 1/4 = 5/12 tank per hour.\nTime = 12/5 = 2.4 hours.\nThe correct answer is (B) 2.4 hours."
+  },
+  {
+    "id": 44, "category": "Verbal", "type": "Analogy",
+    "question": "FLOCK is to SHEEP as SWARM is to ______.",
+    "options": ["wolves", "fish", "bees", "horses", "birds"],
+    "correct": 2,
+    "explanation": "A flock is the collective noun for a group of sheep. A swarm is the collective noun for a group of bees."
+  },
+  {
+    "id": 45, "category": "Math & Logic", "type": "Tables and Graphs",
+    "question": "The table shows the number of employees in different departments.\n\n| Department | Full-Time | Part-Time |\n| Engineering | 45 | 12 |\n| Marketing | 28 | 18 |\n| Sales | 35 | 22 |\n| HR | 15 | 8 |\n\nWhat percentage of all employees are part-time? (Round to nearest whole number)",
+    "options": ["28%", "30%", "33%", "35%", "38%"],
+    "correct": 2,
+    "explanation": "Total Full-Time = 45 + 28 + 35 + 15 = 123\nTotal Part-Time = 12 + 18 + 22 + 8 = 60\nTotal = 183\nPercentage part-time = (60 ÷ 183) × 100 ≈ 32.8% ≈ 33%\nThe correct answer is (C) 33%."
+  },
+  {
+    "id": 46, "category": "Spatial Reasoning", "type": "Next in Series",
+    "question": "Which of the following boxes should replace the question mark (?) to complete the pattern?",
+    "spatial": "nextInSeries",
+    "seriesDescriptors": [
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "circle", "cx": 15, "cy": 15, "r": 5, "fill": "#333" } ] },
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "circle", "cx": 35, "cy": 15, "r": 5, "fill": "#333" } ] },
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "circle", "cx": 35, "cy": 35, "r": 5, "fill": "#333" } ] },
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "circle", "cx": 15, "cy": 35, "r": 5, "fill": "#333" } ] },
+      null
+    ],
+    "optionDescriptors": [
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "circle", "cx": 25, "cy": 25, "r": 5, "fill": "#333" } ] },
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "circle", "cx": 15, "cy": 15, "r": 5, "fill": "#333" } ] },
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "circle", "cx": 15, "cy": 25, "r": 5, "fill": "#333" } ] },
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "circle", "cx": 35, "cy": 15, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 15, "cy": 35, "r": 5, "fill": "#333" } ] },
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2 }, { "type": "circle", "cx": 35, "cy": 35, "r": 5, "fill": "#333" }, { "type": "circle", "cx": 15, "cy": 15, "r": 5, "fill": "#333" } ] }
+    ],
+    "options": ["A", "B", "C", "D", "E"],
+    "correct": 1,
+    "explanation": "A dot moves clockwise around the corners: top-left → top-right → bottom-right → bottom-left → back to top-left. Option B (top-left) is correct."
+  },
+  {
+    "id": 47, "category": "Verbal", "type": "Sentence Completion",
+    "question": "Choose the word that best fits the meaning of the sentence.\n\nThe mountain trail was known for its _____ terrain, requiring experienced hikers with proper equipment to navigate safely.",
+    "options": ["smooth", "treacherous", "pleasant", "gentle", "welcoming"],
+    "correct": 1,
+    "explanation": "\"Treacherous\" means presenting hidden or unexpected dangers. A trail that requires experienced hikers with proper equipment suggests dangerous, difficult terrain."
+  },
+  {
+    "id": 48, "category": "Spatial Reasoning", "type": "Matrix",
+    "question": "Which of the following boxes should replace the question mark (?) to complete the pattern?",
+    "spatial": "matrix",
+    "matrixDescriptors": [
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "#333" } ] },
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "#999" } ] },
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 20, "fill": "#333" } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 20, "fill": "#999" } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 20, "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,5 45,40 5,40", "fill": "#333" } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,5 45,40 5,40", "fill": "#999" } ] },
+      null
+    ],
+    "optionDescriptors": [
+      { "shapes": [ { "type": "polygon", "points": "25,5 45,40 5,40", "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,5 45,40 5,40", "fill": "#333" } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,5 45,40 5,40", "fill": "#666" } ] },
+      { "shapes": [ { "type": "rect", "x": 5, "y": 5, "width": 40, "height": 40, "fill": "none", "stroke": "#333", "strokeWidth": 2 } ] },
+      { "shapes": [ { "type": "circle", "cx": 25, "cy": 25, "r": 20, "fill": "#999" } ] }
+    ],
+    "options": ["A", "B", "C", "D", "E"],
+    "correct": 0,
+    "explanation": "Each row shows the same shape in 3 states: black, grey, outline. Row 3: black triangle → grey triangle → outline triangle. Option A is correct."
+  },
+  {
+    "id": 49, "category": "Math & Logic", "type": "Word Problem",
+    "question": "A clothing store offers a \"buy 3, get 1 free\" promotion on shirts priced at $45 each. How much does a customer pay for 8 shirts?",
+    "options": ["$270", "$315", "$225", "$360", "$280"],
+    "correct": 0,
+    "explanation": "For every 4 shirts, you pay for 3.\n8 shirts = 2 groups of 4.\nPaid shirts = 2 × 3 = 6 shirts.\nCost = 6 × $45 = $270.\nThe correct answer is (A) $270."
+  },
+  {
+    "id": 50, "category": "Spatial Reasoning", "type": "Odd One Out",
+    "question": "Which of the following does not belong?",
+    "spatial": "oddOneOut",
+    "oddDescriptors": [
+      { "shapes": [ { "type": "rect", "x": 7, "y": 15, "width": 36, "height": 20, "fill": "none", "stroke": "#333", "strokeWidth": 2.5 } ] },
+      { "shapes": [ { "type": "ellipse", "cx": 25, "cy": 25, "rx": 20, "ry": 12, "fill": "none", "stroke": "#333", "strokeWidth": 2.5 } ] },
+      { "shapes": [ { "type": "polygon", "points": "5,35 25,10 45,35", "fill": "none", "stroke": "#333", "strokeWidth": 2.5 } ] },
+      { "shapes": [ { "type": "polygon", "points": "5,25 25,10 45,25 25,40", "fill": "none", "stroke": "#333", "strokeWidth": 2.5 } ] },
+      { "shapes": [ { "type": "polygon", "points": "25,7 40,17 40,37 25,47 10,37 10,17", "fill": "none", "stroke": "#333", "strokeWidth": 2.5 } ] }
+    ],
+    "options": ["A", "B", "C", "D", "E"],
+    "correct": 2,
+    "explanation": "All shapes except C have horizontal bilateral symmetry. A rectangle (A), ellipse (B), diamond (D), and hexagon (E) all have horizontal symmetry. A triangle (C) only has vertical symmetry — making C the odd one out."
+  }
+]

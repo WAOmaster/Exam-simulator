@@ -42,6 +42,13 @@ export async function intelligentQuestionProcessing(
   content: string,
   config: GenerationConfig
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata; mode: 'extracted' | 'generated' }> {
+  // CCAT mode: route to CCAT-specific generation
+  if (config.ccatMode || config.subject?.toLowerCase().includes('ccat')) {
+    console.log('CCAT mode detected - using CCAT question generation');
+    const result = await generateCCATQuestions(content, config);
+    return { ...result, mode: 'generated' };
+  }
+
   const hasExistingQuestions = detectExistingQuestions(content);
 
   if (hasExistingQuestions) {
@@ -60,6 +67,121 @@ export async function intelligentQuestionProcessing(
     const result = await generateQuestions(content, config);
     return { ...result, mode: 'generated' };
   }
+}
+
+// ─── CCAT Question Generation ─────────────────────────────────────────────
+
+const CCAT_TYPE_DESCRIPTIONS: Record<string, string> = {
+  'verbal-analogy': 'WORD A is to WORD B as WORD C is to ______. Tests vocabulary and relationships between concepts.',
+  'sentence-completion': 'A sentence with one blank. Select the word that best fits the meaning.',
+  'antonym': 'One word is underlined. Select its closest OPPOSITE meaning.',
+  'syllogism': 'Given two true premises, determine if the conclusion is TRUE, FALSE, or UNCERTAIN. Use 3 options only.',
+  'number-series': 'Find the next number in the pattern. Must be solvable by mental arithmetic.',
+  'word-problem': 'Multi-step arithmetic word problem solvable in under 30 seconds without a calculator.',
+  'attention-to-detail': 'Present two columns of items. Ask how many pairs are exactly identical.',
+};
+
+function buildCCATPrompt(content: string, config: GenerationConfig): string {
+  const ccatTypes = config.questionTypes.filter(t => Object.keys(CCAT_TYPE_DESCRIPTIONS).includes(t));
+  const activeTypes = ccatTypes.length > 0 ? ccatTypes : Object.keys(CCAT_TYPE_DESCRIPTIONS);
+
+  const typeGuidance = activeTypes
+    .map(t => `- ${t}: ${CCAT_TYPE_DESCRIPTIONS[t]}`)
+    .join('\n');
+
+  const isSyllogismOnly = activeTypes.length === 1 && activeTypes[0] === 'syllogism';
+
+  return `You are an expert CCAT (Criteria Cognitive Aptitude Test) question generator.
+Generate exactly ${config.numberOfQuestions} CCAT-style questions.
+
+CRITICAL RULES:
+1. ALL questions use 5 options labeled A through E — EXCEPT syllogism questions which use exactly 3 options: A=True, B=False, C=Uncertain
+2. Questions must be solvable in under 30 seconds (CCAT average is 18 sec/question)
+3. No calculators — math must use mental arithmetic or simple estimation
+4. Do NOT generate spatial or visual pattern questions (those require SVG rendering)
+5. Mix question types proportionally if multiple types are selected
+6. Difficulty: ${config.difficulty}
+
+Active question types:
+${typeGuidance}
+
+${content ? `Source material for context:\n${content.substring(0, 6000)}\n` : ''}
+Subject focus: ${config.subject || 'General Cognitive Aptitude'}
+
+Return ONLY a valid JSON object in this exact format:
+{
+  "questions": [
+    {
+      "id": 1,
+      "question": "Question text here",
+      "options": [
+        {"id": "A", "text": "Option A"},
+        {"id": "B", "text": "Option B"},
+        {"id": "C", "text": "Option C"},
+        {"id": "D", "text": "Option D"},
+        {"id": "E", "text": "Option E"}
+      ],
+      "correctAnswer": "B",
+      "explanation": "Brief explanation (max 60 words)",
+      "difficulty": "easy",
+      "type": "verbal-analogy",
+      "category": "Verbal"
+    }
+  ]
+}
+
+For SYLLOGISM questions use exactly 3 options:
+{"id":"A","text":"True"}, {"id":"B","text":"False"}, {"id":"C","text":"Uncertain"}
+
+Valid type values: ${activeTypes.join(', ')}
+Valid category values: "Verbal", "Math & Logic"
+Valid difficulty values: easy, medium, hard
+
+${isSyllogismOnly ? 'IMPORTANT: This is syllogism-only mode. Every question must be a syllogism with 3 options.' : ''}
+
+Return ONLY the JSON object, no other text.`;
+}
+
+/**
+ * Generate CCAT-style questions with 5 options (A-E) and CCAT-specific question types
+ */
+async function generateCCATQuestions(
+  content: string,
+  config: GenerationConfig
+): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
+  const ai = getGeminiClient();
+  const prompt = buildCCATPrompt(content, config);
+
+  console.log(`Generating ${config.numberOfQuestions} CCAT questions...`);
+
+  let responseText = '';
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      config: {
+        temperature: 0.7,
+        maxOutputTokens: 8192,
+        thinkingConfig: { thinkingBudget: 0 },
+      },
+    });
+    responseText = response.text ?? '';
+  } catch (error: any) {
+    if (error?.status === 503) {
+      console.log('Model overloaded, retrying with gemini-2.5-flash...');
+      const ai2 = getGeminiClient();
+      const response2 = await ai2.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        config: { temperature: 0.7, maxOutputTokens: 8192 },
+      });
+      responseText = response2.text ?? '';
+    } else {
+      throw error;
+    }
+  }
+
+  return parseGeneratedQuestions(responseText, config);
 }
 
 /**

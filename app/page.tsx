@@ -349,6 +349,38 @@ export default function Home() {
                 </div>
               </motion.button>
             </motion.div>
+
+            {/* ===== CCAT PRACTICE BANNER ===== */}
+            <motion.button
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+              onClick={() => router.push('/ccat')}
+              whileHover={{ y: -4, transition: { duration: 0.25 } }}
+              whileTap={{ scale: 0.98 }}
+              className="action-card-shine group relative w-full max-w-5xl mx-auto p-5 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-violet-500/30 flex items-center justify-between gap-4"
+              style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)', boxShadow: 'var(--hp-card-shadow)' }}
+            >
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-violet-500/5 dark:from-violet-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative z-10 flex items-center gap-4 flex-1">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500/10 to-purple-500/10 dark:from-violet-500/20 dark:to-purple-500/20 border border-violet-500/10 flex items-center justify-center flex-shrink-0 group-hover:border-violet-500/30 transition-colors">
+                  <Brain className="w-5 h-5 hp-icon-purple" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <h3 className="text-base font-semibold hp-text-primary">CCAT Practice Test</h3>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300">
+                      50 Questions · 15 Min
+                    </span>
+                  </div>
+                  <p className="text-sm hp-text-tertiary">Full-length Criteria Cognitive Aptitude Test simulation · Verbal · Math · Spatial Reasoning</p>
+                </div>
+              </div>
+              <div className="relative z-10 flex items-center gap-1.5 text-violet-600 dark:text-violet-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                <span>Start now</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </motion.button>
           </div>
         </section>
 
