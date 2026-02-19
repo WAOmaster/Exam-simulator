@@ -73,7 +73,7 @@ export async function generateSpatialQuestion(
   try {
     // Step 1: Generate the spatial pattern image
     const imageResponse = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-preview-05-20',
+      model: 'gemini-2.5-flash-image',
       contents: IMAGE_PROMPTS[spatialType],
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
