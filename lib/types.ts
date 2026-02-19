@@ -7,7 +7,12 @@ export interface Question {
   explanation: string;
   category: string;
   difficulty: 'easy' | 'medium' | 'hard';
-  type?: 'multiple-choice' | 'true-false' | 'scenario' | 'hotspot' | 'drag-and-drop';
+  type?: 'multiple-choice' | 'true-false' | 'scenario' | 'hotspot' | 'drag-and-drop'
+       | 'verbal-analogy' | 'sentence-completion' | 'antonym' | 'syllogism'
+       | 'number-series' | 'word-problem' | 'attention-to-detail'
+       | 'spatial-next-in-series' | 'spatial-matrix' | 'spatial-odd-one-out';
+  // AI-generated spatial image (base64 data URL, present for spatial-* question types)
+  spatialImage?: string;
 }
 
 // Question set types
@@ -67,10 +72,16 @@ export interface KnowledgeArea {
 export interface GenerationConfig {
   numberOfQuestions: number;
   difficulty: 'easy' | 'medium' | 'hard' | 'mixed';
-  questionTypes: ('multiple-choice' | 'true-false' | 'scenario')[];
+  questionTypes: (
+    'multiple-choice' | 'true-false' | 'scenario'
+    | 'verbal-analogy' | 'sentence-completion' | 'antonym' | 'syllogism'
+    | 'number-series' | 'word-problem' | 'attention-to-detail'
+    | 'spatial-next-in-series' | 'spatial-matrix' | 'spatial-odd-one-out'
+  )[];
   topicFocus?: string;
   subject: string;
   estimatedQuestionCount?: number; // Frontend's detection, overrides backend
+  ccatMode?: boolean; // When true, uses CCAT-specific generation (5 options, CCAT question types)
 }
 
 // Content source types

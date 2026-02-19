@@ -121,6 +121,17 @@ export default function QuestionCard({
         <h2 className="text-xl md:text-2xl font-display leading-relaxed text-foreground">
           {question.question}
         </h2>
+
+        {/* Spatial image (AI-generated for spatial-* question types) */}
+        {question.spatialImage && (
+          <div className="mt-4">
+            <img
+              src={question.spatialImage}
+              alt="Spatial pattern"
+              className="max-w-full rounded-xl border border-card-border"
+            />
+          </div>
+        )}
       </div>
 
       {/* Options - Bubble sheet style */}

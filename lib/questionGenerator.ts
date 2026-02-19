@@ -42,6 +42,13 @@ export async function intelligentQuestionProcessing(
   content: string,
   config: GenerationConfig
 ): Promise<{ questions: Question[]; metadata: QuestionSetMetadata; mode: 'extracted' | 'generated' }> {
+  // CCAT mode: route to CCAT-specific generation
+  if (config.ccatMode || config.subject?.toLowerCase().includes('ccat')) {
+    console.log('CCAT mode detected - using CCAT question generation');
+    const result = await generateCCATQuestions(content, config);
+    return { ...result, mode: 'generated' };
+  }
+
   const hasExistingQuestions = detectExistingQuestions(content);
 
   if (hasExistingQuestions) {
@@ -60,6 +67,242 @@ export async function intelligentQuestionProcessing(
     const result = await generateQuestions(content, config);
     return { ...result, mode: 'generated' };
   }
+}
+
+// ─── CCAT Question Generation ─────────────────────────────────────────────
+
+const CCAT_TYPE_DESCRIPTIONS: Record<string, string> = {
+  'verbal-analogy': 'WORD A is to WORD B as WORD C is to ______. Tests vocabulary and relationships between concepts.',
+  'sentence-completion': 'A sentence with one blank. Select the word that best fits the meaning.',
+  'antonym': 'One word is underlined. Select its closest OPPOSITE meaning.',
+  'syllogism': 'Given two true premises, determine if the conclusion is TRUE, FALSE, or UNCERTAIN. Use 3 options only.',
+  'number-series': 'Find the next number in the pattern. Must be solvable by mental arithmetic.',
+  'word-problem': 'Multi-step arithmetic word problem solvable in under 30 seconds without a calculator.',
+  'attention-to-detail': 'Present two columns of items. Ask how many pairs are exactly identical.',
+};
+
+// Spatial types that are image-generated separately — excluded from the text prompt
+const CCAT_SPATIAL_TYPES = new Set([
+  'spatial-next-in-series',
+  'spatial-matrix',
+  'spatial-odd-one-out',
+]);
+
+// Map from config type → API spatialType param
+const SPATIAL_TYPE_MAP: Record<string, 'nextInSeries' | 'matrix' | 'oddOneOut'> = {
+  'spatial-next-in-series': 'nextInSeries',
+  'spatial-matrix': 'matrix',
+  'spatial-odd-one-out': 'oddOneOut',
+};
+
+function buildCCATPrompt(content: string, config: GenerationConfig, textQuestionCount: number): string {
+  // Exclude spatial types — those are image-generated separately
+  const ccatTypes = config.questionTypes.filter(
+    t => Object.keys(CCAT_TYPE_DESCRIPTIONS).includes(t) && !CCAT_SPATIAL_TYPES.has(t)
+  );
+  const activeTypes = ccatTypes.length > 0 ? ccatTypes : Object.keys(CCAT_TYPE_DESCRIPTIONS);
+
+  const typeGuidance = activeTypes
+    .map(t => `- ${t}: ${CCAT_TYPE_DESCRIPTIONS[t]}`)
+    .join('\n');
+
+  const isSyllogismOnly = activeTypes.length === 1 && activeTypes[0] === 'syllogism';
+
+  return `You are an expert CCAT (Criteria Cognitive Aptitude Test) question generator.
+Generate exactly ${textQuestionCount} CCAT-style questions.
+
+CRITICAL RULES:
+1. ALL questions use 5 options labeled A through E — EXCEPT syllogism questions which use exactly 3 options: A=True, B=False, C=Uncertain
+2. Questions must be solvable in under 30 seconds (CCAT average is 18 sec/question)
+3. No calculators — math must use mental arithmetic or simple estimation
+4. Mix question types proportionally if multiple types are selected
+5. Difficulty: ${config.difficulty}
+
+Active question types:
+${typeGuidance}
+
+${content ? `Source material for context:\n${content.substring(0, 6000)}\n` : ''}
+Subject focus: ${config.subject || 'General Cognitive Aptitude'}
+
+Return ONLY a valid JSON object in this exact format:
+{
+  "questions": [
+    {
+      "id": 1,
+      "question": "Question text here",
+      "options": [
+        {"id": "A", "text": "Option A"},
+        {"id": "B", "text": "Option B"},
+        {"id": "C", "text": "Option C"},
+        {"id": "D", "text": "Option D"},
+        {"id": "E", "text": "Option E"}
+      ],
+      "correctAnswer": "B",
+      "explanation": "Brief explanation (max 60 words)",
+      "difficulty": "easy",
+      "type": "verbal-analogy",
+      "category": "Verbal"
+    }
+  ]
+}
+
+For SYLLOGISM questions use exactly 3 options:
+{"id":"A","text":"True"}, {"id":"B","text":"False"}, {"id":"C","text":"Uncertain"}
+
+Valid type values: ${activeTypes.join(', ')}
+Valid category values: "Verbal", "Math & Logic"
+Valid difficulty values: easy, medium, hard
+
+${isSyllogismOnly ? 'IMPORTANT: This is syllogism-only mode. Every question must be a syllogism with 3 options.' : ''}
+
+Return ONLY the JSON object, no other text.`;
+}
+
+/**
+ * Generate CCAT-style questions with 5 options (A-E) and CCAT-specific question types.
+ * Spatial question types (spatial-next-in-series, spatial-matrix, spatial-odd-one-out)
+ * are generated as images via the /api/ai/ccat-spatial endpoint.
+ */
+async function generateCCATQuestions(
+  content: string,
+  config: GenerationConfig
+): Promise<{ questions: Question[]; metadata: QuestionSetMetadata }> {
+  // Split requested types into text-based and spatial (image-based)
+  const spatialTypes = config.questionTypes.filter(t => CCAT_SPATIAL_TYPES.has(t));
+  const hasTextTypes = config.questionTypes.some(
+    t => !CCAT_SPATIAL_TYPES.has(t) && Object.keys(CCAT_TYPE_DESCRIPTIONS).includes(t)
+  );
+
+  // Calculate how many of each we need
+  const totalRequested = config.numberOfQuestions;
+  let spatialCount = 0;
+  if (spatialTypes.length > 0) {
+    // Allocate spatial questions proportionally; at least 1 per selected spatial type
+    const fraction = spatialTypes.length / config.questionTypes.filter(
+      t => CCAT_SPATIAL_TYPES.has(t) || Object.keys(CCAT_TYPE_DESCRIPTIONS).includes(t)
+    ).length;
+    spatialCount = Math.max(spatialTypes.length, Math.round(totalRequested * fraction));
+    spatialCount = Math.min(spatialCount, totalRequested);
+  }
+  const textCount = totalRequested - spatialCount;
+
+  console.log(`Generating ${config.numberOfQuestions} CCAT questions (${textCount} text, ${spatialCount} spatial)...`);
+
+  // ── Generate text-based questions ──────────────────────────────────────────
+  let textQuestions: Question[] = [];
+  if (textCount > 0 && hasTextTypes) {
+    const prompt = buildCCATPrompt(content, config, textCount);
+    let responseText = '';
+    try {
+      const ai = getGeminiClient();
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        config: {
+          temperature: 0.7,
+          maxOutputTokens: 8192,
+          thinkingConfig: { thinkingBudget: 0 },
+        },
+      });
+      responseText = response.text ?? '';
+    } catch (error: any) {
+      if (error?.status === 503) {
+        console.log('Model overloaded, retrying with gemini-2.5-flash...');
+        const ai2 = getGeminiClient();
+        const response2 = await ai2.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          config: { temperature: 0.7, maxOutputTokens: 8192 },
+        });
+        responseText = response2.text ?? '';
+      } else {
+        throw error;
+      }
+    }
+    const parsed = parseGeneratedQuestions(responseText, config);
+    textQuestions = parsed.questions;
+  } else if (textCount > 0 && !hasTextTypes) {
+    // Only spatial types selected but we still need placeholder text questions — skip
+    // all questions will come from spatial generation
+  }
+
+  // ── Generate spatial (image-based) questions ───────────────────────────────
+  const spatialQuestions: Question[] = [];
+  if (spatialCount > 0 && spatialTypes.length > 0) {
+    // Distribute spatial count across selected spatial types evenly
+    const perType = Math.ceil(spatialCount / spatialTypes.length);
+    let idOffset = textQuestions.length;
+
+    for (const spatialType of spatialTypes) {
+      const countForThisType = Math.min(perType, spatialCount - spatialQuestions.length);
+      if (countForThisType <= 0) break;
+
+      // Fetch questions in parallel (max 3 concurrent to avoid rate limits)
+      const CONCURRENT = 3;
+      let generated = 0;
+      while (generated < countForThisType) {
+        const batch = Math.min(CONCURRENT, countForThisType - generated);
+        const promises = Array.from({ length: batch }, () =>
+          fetchSpatialQuestion(spatialType, config.difficulty, SPATIAL_TYPE_MAP[spatialType])
+        );
+        const results = await Promise.allSettled(promises);
+
+        for (const result of results) {
+          if (result.status === 'fulfilled') {
+            idOffset++;
+            spatialQuestions.push({
+              id: idOffset,
+              question: result.value.question,
+              options: result.value.options.map((text: string, i: number) => ({
+                id: String.fromCharCode(65 + i),
+                text,
+              })),
+              correctAnswer: String.fromCharCode(65 + result.value.correct),
+              explanation: result.value.explanation,
+              category: 'Spatial Reasoning',
+              difficulty: (config.difficulty === 'mixed' ? 'medium' : config.difficulty) as 'easy' | 'medium' | 'hard',
+              type: spatialType as Question['type'],
+              // Attach the generated image (may be null on fallback)
+              ...(result.value.spatialImage ? { spatialImage: result.value.spatialImage } : {}),
+            } as Question);
+          }
+          generated++;
+        }
+      }
+    }
+  }
+
+  const allQuestions = [...textQuestions, ...spatialQuestions];
+
+  // Re-use metadata calculation from text result if available; otherwise build a simple one
+  const metadata = calculateMetadata(allQuestions, config);
+  return { questions: allQuestions, metadata };
+}
+
+/**
+ * Call the /api/ai/ccat-spatial endpoint to generate one image-based spatial question.
+ * Returns a plain object with { question, options, correct, explanation, spatialImage }.
+ */
+async function fetchSpatialQuestion(
+  configType: string,
+  difficulty: string,
+  spatialType: 'nextInSeries' | 'matrix' | 'oddOneOut'
+): Promise<{ question: string; options: string[]; correct: number; explanation: string; spatialImage: string | null }> {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/api/ai/ccat-spatial`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ spatialType, difficulty }),
+  });
+  if (!res.ok) throw new Error(`ccat-spatial API returned ${res.status}`);
+  const data = await res.json();
+  return {
+    question: data.question,
+    options: data.options,
+    correct: data.correct,
+    explanation: data.explanation,
+    spatialImage: data.spatialImage ?? null,
+  };
 }
 
 /**

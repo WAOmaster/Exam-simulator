@@ -480,6 +480,8 @@ export default function GeneratePage() {
   };
 
   const handleGenerateQuestions = async () => {
+    const isCCATMode = config.subject.toLowerCase().includes('ccat') || config.ccatMode;
+
     // Validate inputs - subject required only for generation mode, not extraction
     const isExtractionMode = contentAnalysis?.hasQuestions;
 
@@ -495,7 +497,10 @@ export default function GeneratePage() {
 
     let source: ContentSource;
 
-    if (activeTab === 'search') {
+    if (isCCATMode) {
+      // CCAT questions are purely AI-generated — no source content needed
+      source = { type: 'text', content: '' };
+    } else if (activeTab === 'search') {
       if (!searchQuery.trim()) {
         setError('Please enter a search query');
         return;
@@ -695,7 +700,20 @@ export default function GeneratePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column: Input & Controls */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Input Method Tabs */}
+            {/* CCAT Mode: no input method needed */}
+            {config.ccatMode || config.subject.toLowerCase().includes('ccat') ? (
+              <div className="bg-violet-50 dark:bg-violet-900/20 rounded-lg border border-violet-200 dark:border-violet-700 p-6 flex items-start gap-4">
+                <div className="p-2 bg-violet-100 dark:bg-violet-800 rounded-lg flex-shrink-0">
+                  <Sparkles className="w-5 h-5 text-violet-700 dark:text-violet-300" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-violet-900 dark:text-violet-100 mb-1">CCAT Mode — No Input Needed</h3>
+                  <p className="text-sm text-violet-800 dark:text-violet-200">
+                    CCAT questions are generated entirely by AI based on your configuration below. No source document, URL, or text input is required.
+                  </p>
+                </div>
+              </div>
+            ) : (
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 1. Choose Input Method
@@ -932,12 +950,13 @@ export default function GeneratePage() {
                 </div>
               )}
             </div>
+            )} {/* end CCAT / non-CCAT input section */}
 
             {/* Generation Controls - Hide for JSON mode */}
             {activeTab !== 'json' && (
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                  2. Configure Generation
+                  {(config.ccatMode || config.subject.toLowerCase().includes('ccat')) ? '1.' : '2.'} Configure Generation
                 </h2>
                 <GenerationControls
                   onConfigChange={setConfig}
