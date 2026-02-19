@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { Question, GenerationConfig, QuestionSetMetadata } from './types';
+import { generateSpatialQuestion, SpatialType } from './ccatSpatialGenerator';
 
 // Initialize Gemini AI
 const getGeminiClient = () => {
@@ -280,28 +281,22 @@ async function generateCCATQuestions(
 }
 
 /**
- * Call the /api/ai/ccat-spatial endpoint to generate one image-based spatial question.
- * Returns a plain object with { question, options, correct, explanation, spatialImage }.
+ * Generate one image-based spatial question by calling the shared lib directly (no HTTP).
  */
 async function fetchSpatialQuestion(
   configType: string,
   difficulty: string,
-  spatialType: 'nextInSeries' | 'matrix' | 'oddOneOut'
+  spatialType: SpatialType
 ): Promise<{ question: string; options: string[]; correct: number; explanation: string; spatialImage: string | null }> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/ai/ccat-spatial`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ spatialType, difficulty }),
-  });
-  if (!res.ok) throw new Error(`ccat-spatial API returned ${res.status}`);
-  const data = await res.json();
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
+  const result = await generateSpatialQuestion(spatialType, difficulty, apiKey);
   return {
-    question: data.question,
-    options: data.options,
-    correct: data.correct,
-    explanation: data.explanation,
-    spatialImage: data.spatialImage ?? null,
+    question: result.question,
+    options: result.options,
+    correct: result.correct,
+    explanation: result.explanation,
+    spatialImage: result.spatialImage,
   };
 }
 
