@@ -129,11 +129,22 @@ export default function CCATExamScreen({
         {q.question}
       </p>
 
-      {/* Spatial elements */}
-      {q.spatial === 'attention' && q.attentionLeft && q.attentionRight && (
+      {/* AI-generated spatial image (image-based spatial questions) */}
+      {q.spatialImage && (
+        <div className="my-3">
+          <img
+            src={q.spatialImage}
+            alt="Spatial pattern"
+            className="max-w-full rounded-lg border border-gray-200 dark:border-gray-600"
+          />
+        </div>
+      )}
+
+      {/* SVG descriptor-based spatial elements (pre-built questions) */}
+      {!q.spatialImage && q.spatial === 'attention' && q.attentionLeft && q.attentionRight && (
         <CCATAttentionTable left={q.attentionLeft} right={q.attentionRight} />
       )}
-      {q.spatial === 'nextInSeries' && q.seriesDescriptors && q.optionDescriptors && (
+      {!q.spatialImage && q.spatial === 'nextInSeries' && q.seriesDescriptors && q.optionDescriptors && (
         <div className="my-2">
           <CCATNextInSeries
             descriptors={q.seriesDescriptors}
@@ -141,7 +152,7 @@ export default function CCATExamScreen({
           />
         </div>
       )}
-      {q.spatial === 'matrix' && q.matrixDescriptors && q.optionDescriptors && (
+      {!q.spatialImage && q.spatial === 'matrix' && q.matrixDescriptors && q.optionDescriptors && (
         <div className="my-2">
           <CCATMatrix
             descriptors={q.matrixDescriptors}
@@ -149,7 +160,7 @@ export default function CCATExamScreen({
           />
         </div>
       )}
-      {q.spatial === 'oddOneOut' && q.oddDescriptors && (
+      {!q.spatialImage && q.spatial === 'oddOneOut' && q.oddDescriptors && (
         <div className="my-2">
           <CCATOddOneOut descriptors={q.oddDescriptors} />
         </div>

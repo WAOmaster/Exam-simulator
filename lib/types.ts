@@ -9,7 +9,10 @@ export interface Question {
   difficulty: 'easy' | 'medium' | 'hard';
   type?: 'multiple-choice' | 'true-false' | 'scenario' | 'hotspot' | 'drag-and-drop'
        | 'verbal-analogy' | 'sentence-completion' | 'antonym' | 'syllogism'
-       | 'number-series' | 'word-problem' | 'attention-to-detail';
+       | 'number-series' | 'word-problem' | 'attention-to-detail'
+       | 'spatial-next-in-series' | 'spatial-matrix' | 'spatial-odd-one-out';
+  // AI-generated spatial image (base64 data URL, present for spatial-* question types)
+  spatialImage?: string;
 }
 
 // Question set types
@@ -73,6 +76,7 @@ export interface GenerationConfig {
     'multiple-choice' | 'true-false' | 'scenario'
     | 'verbal-analogy' | 'sentence-completion' | 'antonym' | 'syllogism'
     | 'number-series' | 'word-problem' | 'attention-to-detail'
+    | 'spatial-next-in-series' | 'spatial-matrix' | 'spatial-odd-one-out'
   )[];
   topicFocus?: string;
   subject: string;

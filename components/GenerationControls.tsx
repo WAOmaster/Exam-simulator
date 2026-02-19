@@ -27,10 +27,13 @@ const CCAT_QUESTION_TYPES = [
   { id: 'number-series', label: 'Number Series', description: 'Next number in the pattern' },
   { id: 'word-problem', label: 'Word Problem', description: 'Multi-step arithmetic (no calculator)' },
   { id: 'attention-to-detail', label: 'Attention to Detail', description: 'Count matching column pairs' },
+  { id: 'spatial-next-in-series', label: 'Next in Series ✦', description: 'AI-generated visual sequence pattern' },
+  { id: 'spatial-matrix', label: 'Matrix ✦', description: 'AI-generated 3×3 grid pattern' },
+  { id: 'spatial-odd-one-out', label: 'Odd One Out ✦', description: 'AI-generated shape — find the mismatch' },
 ] as const;
 
 type StandardType = 'multiple-choice' | 'true-false' | 'scenario';
-type CCATType = 'verbal-analogy' | 'sentence-completion' | 'antonym' | 'syllogism' | 'number-series' | 'word-problem' | 'attention-to-detail';
+type CCATType = 'verbal-analogy' | 'sentence-completion' | 'antonym' | 'syllogism' | 'number-series' | 'word-problem' | 'attention-to-detail' | 'spatial-next-in-series' | 'spatial-matrix' | 'spatial-odd-one-out';
 
 export default function GenerationControls({ onConfigChange, isExtractionMode = false, estimatedQuestions = 0 }: GenerationControlsProps) {
   const [config, setConfig] = useState<GenerationConfig>({
@@ -126,7 +129,7 @@ export default function GenerationControls({ onConfigChange, isExtractionMode = 
           <Brain className="w-4 h-4 text-violet-600 dark:text-violet-400 flex-shrink-0 mt-0.5" />
           <div className="text-xs text-violet-800 dark:text-violet-200 space-y-0.5">
             <p className="font-semibold">CCAT Question Generation</p>
-            <p>Questions use 5 options (A–E). Spatial/visual questions cannot be AI-generated. Syllogism questions use 3 options (True/False/Uncertain).</p>
+            <p>Questions use 5 options (A–E). Types marked ✦ generate images with Gemini — they take longer. Syllogism uses 3 options (True/False/Uncertain).</p>
           </div>
         </div>
       )}

@@ -53,6 +53,8 @@ export interface CCATQuestion {
   // attention detail: plain string arrays
   attentionLeft?: string[];
   attentionRight?: string[];
+  // AI-generated spatial image (base64 PNG data URL, e.g. "data:image/png;base64,...")
+  spatialImage?: string;
 }
 
 export type CCATScreen = 'start' | 'exam' | 'results';
