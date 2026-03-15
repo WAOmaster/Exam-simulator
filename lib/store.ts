@@ -69,6 +69,7 @@ interface ExamState {
   setCurrentQuestionSet: (questionSetId: string) => void;
   loadQuestionSets: (sets: QuestionSet[]) => void;
   addQuestionSet: (set: QuestionSet) => void;
+  removeQuestionSet: (id: string) => void;
 }
 
 export const useExamStore = create<ExamState>()(
@@ -314,6 +315,13 @@ export const useExamStore = create<ExamState>()(
         const state = get();
         set({
           availableQuestionSets: [...state.availableQuestionSets, questionSet],
+        });
+      },
+
+      removeQuestionSet: (id) => {
+        const state = get();
+        set({
+          availableQuestionSets: state.availableQuestionSets.filter(s => s.id !== id),
         });
       },
     }),

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/lib/theme-context";
 import ThemeWrapper from "@/components/ThemeWrapper";
+import SessionProvider from "@/components/SessionProvider";
 
 export const metadata: Metadata = {
   title: "ExamSimulator - AI-Powered Practice Exams",
@@ -33,10 +34,12 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <ThemeProvider>
-          <ThemeWrapper />
-          {children}
-        </ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider>
+            <ThemeWrapper />
+            {children}
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );
