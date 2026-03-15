@@ -3,15 +3,16 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Library as LibraryIcon, ArrowLeft, Search, Filter, Loader2, AlertCircle } from 'lucide-react';
+import { Library as LibraryIcon, ArrowLeft, Search, Filter, Loader2, AlertCircle, Upload } from 'lucide-react';
 import QuestionSetCard from '@/components/QuestionSetCard';
 import ExamSetupModal from '@/components/ExamSetupModal';
+import JsonImportDialog from '@/components/JsonImportDialog';
 import { useExamStore } from '@/lib/store';
 import { QuestionSet } from '@/lib/types';
 
 export default function LibraryPage() {
   const router = useRouter();
-  const { loadQuestionSets, setCurrentQuestionSet, startExam, resetExam, availableQuestionSets } = useExamStore();
+  const { loadQuestionSets, setCurrentQuestionSet, startExam, resetExam, availableQuestionSets, addQuestionSet } = useExamStore();
 
   const [questionSets, setQuestionSets] = useState<QuestionSet[]>([]);
   const [filteredSets, setFilteredSets] = useState<QuestionSet[]>([]);
@@ -21,6 +22,7 @@ export default function LibraryPage() {
   const [error, setError] = useState('');
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [selectedQuestionSet, setSelectedQuestionSet] = useState<QuestionSet | null>(null);
+  const [showImportDialog, setShowImportDialog] = useState(false);
 
   // Load question sets from store on mount
   useEffect(() => {
@@ -120,6 +122,10 @@ export default function LibraryPage() {
     }
   };
 
+  const handleImportQuestionSet = (questionSet: QuestionSet) => {
+    addQuestionSet(questionSet);
+  };
+
   // Get unique subjects for filter
   const subjects = ['all', ...new Set(questionSets.map((set) => set.subject))];
 
@@ -136,11 +142,20 @@ export default function LibraryPage() {
             Back to Home
           </button>
 
-          <div className="flex items-center gap-3 mb-2">
-            <LibraryIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-              My Library
-            </h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3 mb-2">
+              <LibraryIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+                My Library
+              </h1>
+            </div>
+            <button
+              onClick={() => setShowImportDialog(true)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium hover:from-blue-700 hover:to-purple-700 transition shadow-md text-sm"
+            >
+              <Upload className="w-4 h-4" />
+              Import JSON
+            </button>
           </div>
           <p className="text-gray-600 dark:text-gray-400">
             Browse and manage your saved question sets
@@ -266,6 +281,14 @@ export default function LibraryPage() {
           questionCount={selectedQuestionSet.questions.length}
         />
       )}
+
+      {/* JSON Import Dialog */}
+      <JsonImportDialog
+        isOpen={showImportDialog}
+        onClose={() => setShowImportDialog(false)}
+        onImport={handleImportQuestionSet}
+        existingIds={availableQuestionSets.map(s => s.id)}
+      />
     </div>
   );
 }

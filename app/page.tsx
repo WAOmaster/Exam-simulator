@@ -33,6 +33,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import subjects from '@/data/default-questions/subjects.json';
+import AuthButton from '@/components/AuthButton';
 
 const iconMap: Record<string, any> = {
   Atom, Code, Cog, Palette, Calculator, Cloud,
@@ -176,6 +177,11 @@ export default function Home() {
 
       {/* Grain texture */}
       <div className="fixed inset-0 pointer-events-none grain-overlay" aria-hidden="true" />
+
+      {/* ===== Auth Button (top-right) ===== */}
+      <div className="fixed top-4 right-4 z-50">
+        <AuthButton />
+      </div>
 
       {/* ===== Main Content ===== */}
       <div className="relative z-10">

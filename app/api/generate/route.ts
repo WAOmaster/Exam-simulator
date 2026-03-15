@@ -47,8 +47,11 @@ export async function POST(request: NextRequest) {
       const searchQuery = source.metadata?.searchQuery || source.content;
       result = await generateQuestionsFromSearch(searchQuery, config);
     } else {
+      // CCAT mode generates questions from scratch — no source content required
+      const isCCATMode = config.ccatMode || config.subject?.toLowerCase().includes('ccat');
+
       // Process content intelligently (extract or generate)
-      if (!source.content || source.content.trim().length === 0) {
+      if (!isCCATMode && (!source.content || source.content.trim().length === 0)) {
         return NextResponse.json(
           {
             success: false,

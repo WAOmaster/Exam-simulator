@@ -10,7 +10,9 @@ import GenerationControls from '@/components/GenerationControls';
 import QuestionPreview from '@/components/QuestionPreview';
 import SaveDialog from '@/components/SaveDialog';
 import ProgressTracker, { ProgressStage } from '@/components/ProgressTracker';
+import { useSession } from 'next-auth/react';
 import { useExamStore } from '@/lib/store';
+import { pushQuestionSetToCloud } from '@/lib/syncManager';
 import { GenerationConfig, ContentSource, Question, QuestionSet } from '@/lib/types';
 
 type InputTab = 'upload' | 'url' | 'search' | 'text' | 'json';
@@ -86,6 +88,7 @@ const generateDescription = (config: GenerationConfig, activeTab: InputTab, ques
 
 export default function GeneratePage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const { addQuestionSet, resetExam, setCurrentQuestionSet, startExam } = useExamStore();
 
   const [activeTab, setActiveTab] = useState<InputTab>('upload');
@@ -611,9 +614,13 @@ export default function GeneratePage() {
 
   const handleSaveQuestionSet = async (questionSet: QuestionSet, makePublic: boolean) => {
     try {
-      // Save directly to Zustand store (persists to localStorage)
-      // No server API needed - works on Vercel's read-only filesystem
+      // Save to Zustand store (persists to localStorage)
       addQuestionSet(questionSet);
+
+      // Also push to cloud if signed in (fire-and-forget)
+      if (session?.user?.id) {
+        pushQuestionSetToCloud(questionSet).catch(console.error);
+      }
 
       // Navigate to library
       router.push('/library');
