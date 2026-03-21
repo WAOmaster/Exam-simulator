@@ -48,19 +48,19 @@ export default function ThemeSwitcher() {
   ];
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+    <div className="fixed top-4 right-16 sm:right-20 z-50 flex items-center gap-2">
       {/* Dark/Light Mode Toggle */}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={toggleMode}
-        className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 transition-colors"
+        className="p-2.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full shadow-sm border border-gray-200 dark:border-gray-600 transition-colors hover:shadow-md"
         aria-label="Toggle theme mode"
       >
         {mode === 'light' ? (
-          <Sun className="w-5 h-5 text-yellow-500" />
+          <Sun className="w-4 h-4 text-yellow-500" />
         ) : (
-          <Moon className="w-5 h-5 text-blue-400" />
+          <Moon className="w-4 h-4 text-blue-400" />
         )}
       </motion.button>
 
