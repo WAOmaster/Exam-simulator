@@ -79,7 +79,7 @@ export default function LiveStatsOverlay({
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="fixed top-20 right-4 z-40"
+      className="fixed top-16 sm:top-20 right-2 sm:right-4 z-40"
     >
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden min-w-[200px]">
         {/* Header */}

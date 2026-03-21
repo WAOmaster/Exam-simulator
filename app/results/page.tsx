@@ -125,31 +125,31 @@ export default function ResultsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-6 sm:py-12">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
         >
-          <div className="flex items-center justify-center mb-6">
+          <div className="flex items-center justify-center mb-4 sm:mb-6">
             {isPassing ? (
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', duration: 0.6 }}
               >
-                <Trophy className="w-24 h-24 text-yellow-500 dark:text-yellow-400" />
+                <Trophy className="w-16 h-16 sm:w-24 sm:h-24 text-yellow-500 dark:text-yellow-400" />
               </motion.div>
             ) : (
-              <Target className="w-24 h-24 text-blue-500 dark:text-blue-400" />
+              <Target className="w-16 h-16 sm:w-24 sm:h-24 text-blue-500 dark:text-blue-400" />
             )}
           </div>
 
-          <h1 className="text-5xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+          <h1 className="text-3xl sm:text-5xl font-bold text-gray-800 dark:text-gray-100 mb-3 sm:mb-4">
             {isPassing ? 'Congratulations! 🎉' : 'Exam Completed'}
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
+          <p className="text-base sm:text-xl text-gray-600 dark:text-gray-300">
             {isPassing
               ? "You've passed the exam with flying colors!"
               : 'Keep practicing, you can do better!'}
@@ -165,12 +165,12 @@ export default function ResultsPage() {
             isPassing
               ? 'from-green-500 to-emerald-600 dark:from-green-600 dark:to-emerald-700'
               : 'from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700'
-          } rounded-2xl shadow-2xl p-8 mb-8 text-white`}
+          } rounded-2xl shadow-2xl p-5 sm:p-8 mb-6 sm:mb-8 text-white`}
         >
           <div className="text-center">
-            <p className="text-lg mb-2 opacity-90">Your Score</p>
-            <div className="text-7xl font-bold mb-4">{score.percentage}%</div>
-            <p className="text-2xl opacity-90">
+            <p className="text-sm sm:text-lg mb-2 opacity-90">Your Score</p>
+            <div className="text-5xl sm:text-7xl font-bold mb-3 sm:mb-4">{score.percentage}%</div>
+            <p className="text-lg sm:text-2xl opacity-90">
               {score.correct} out of {score.total} questions correct
             </p>
           </div>
@@ -181,7 +181,7 @@ export default function ResultsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8"
         >
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors">
             <div className="flex items-center gap-4">
@@ -231,11 +231,11 @@ export default function ResultsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 transition-colors"
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-8 mb-6 sm:mb-8 transition-colors"
         >
-          <div className="flex items-center gap-3 mb-6">
-            <BarChart3 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+          <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100">
               Performance Breakdown
             </h2>
           </div>
@@ -259,7 +259,7 @@ export default function ResultsPage() {
           </div>
 
           {/* Detailed Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
             <div className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
               <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">{score.total}</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Total Questions</p>

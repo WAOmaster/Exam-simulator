@@ -141,12 +141,12 @@ export default function GenerationControls({ onConfigChange, isExtractionMode = 
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           Number of Questions
         </label>
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-2 sm:gap-3">
           {QUESTION_COUNTS.map((count) => (
             <button
               key={count}
               onClick={() => updateConfig({ numberOfQuestions: count })}
-              className={`px-4 py-3 rounded-lg font-medium transition-all ${
+              className={`px-2 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition-all ${
                 config.numberOfQuestions === count
                   ? isCCATMode
                     ? 'bg-violet-600 dark:bg-violet-700 text-white shadow-md scale-105'
@@ -165,12 +165,12 @@ export default function GenerationControls({ onConfigChange, isExtractionMode = 
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           Difficulty Level
         </label>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
           {DIFFICULTIES.map((difficulty) => (
             <button
               key={difficulty}
               onClick={() => updateConfig({ difficulty })}
-              className={`px-4 py-3 rounded-lg font-medium capitalize transition-all ${
+              className={`px-2 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium capitalize transition-all ${
                 config.difficulty === difficulty
                   ? isCCATMode
                     ? 'bg-violet-600 dark:bg-violet-700 text-white shadow-md'

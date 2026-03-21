@@ -255,21 +255,21 @@ export default function PracticePage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-30 transition-colors border-b dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-gray-100 truncate">
                 Practice Mode
               </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
                 Instant AI feedback • Interactive Learning
               </p>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
               {/* CC Queue Status */}
               {cognitiveCompanion && queueSummary.total > 0 && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
+                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
                   <Brain className="w-4 h-4 text-amber-500" />
                   <span className="text-xs font-medium text-amber-700 dark:text-amber-300">
                     {queueSummary.completed}/{queueSummary.total}
@@ -302,15 +302,15 @@ export default function PracticePage() {
 
               <button
                 onClick={handleGoHome}
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white text-sm sm:text-base font-medium rounded-lg transition-colors flex items-center gap-1.5 sm:gap-2"
               >
                 <Home className="w-4 h-4" />
-                Exit
+                <span className="hidden sm:inline">Exit</span>
               </button>
             </div>
           </div>
 
-          <div className="mt-4">
+          <div className="mt-2 sm:mt-4">
             <ProgressBar
               current={currentQuestionIndex}
               total={questions.length}
@@ -331,28 +331,28 @@ export default function PracticePage() {
       {/* Main Content - Split Layout */}
       <div className="flex">
         {/* Question Section */}
-        <div className={`transition-all duration-300 ${anySidePaneOpen ? 'lg:w-2/3' : 'w-full'} px-4 py-8`}>
+        <div className={`transition-all duration-300 ${anySidePaneOpen ? 'lg:w-2/3' : 'w-full'} px-3 sm:px-4 py-4 sm:py-8`}>
           <div className="max-w-4xl mx-auto">
             {/* Practice Mode Info */}
-            <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg flex items-center gap-3 transition-colors">
-              <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <p className="text-sm text-blue-800 dark:text-blue-300">
-                Practice Mode: Click an answer to see instant AI feedback in the side panel
+            <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg flex items-center gap-2 sm:gap-3 transition-colors">
+              <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+              <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300">
+                Click an answer to see instant AI feedback
               </p>
             </div>
 
             {/* Question Card */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
-              <div className="mb-4">
-                <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 mb-4 sm:mb-6">
+              <div className="mb-3 sm:mb-4">
+                <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                   Question {currentQuestionIndex + 1} of {questions.length}
                 </span>
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mt-2">
+                <h2 className="text-base sm:text-xl font-semibold text-gray-800 dark:text-gray-100 mt-1.5 sm:mt-2">
                   {currentQuestion.question}
                 </h2>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {currentQuestion.options.map((option) => {
                   const isSelected = selectedAnswer === option.id;
                   const isCorrect = option.id === currentQuestion.correctAnswer;
@@ -377,9 +377,9 @@ export default function PracticePage() {
                     <button
                       key={option.id}
                       onClick={() => handleAnswerSelect(option.id)}
-                      className={`w-full text-left p-4 border-2 rounded-lg transition-all ${optionStyle}`}
+                      className={`w-full text-left p-3 sm:p-4 border-2 rounded-lg transition-all ${optionStyle}`}
                     >
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-start gap-2 sm:gap-3">
                         <span className={`font-bold ${
                           showResult && isCorrect
                             ? 'text-green-700 dark:text-green-300'
@@ -438,37 +438,39 @@ export default function PracticePage() {
             </div>
 
             {/* Navigation */}
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center gap-2">
               <button
                 onClick={handlePrevious}
                 disabled={currentQuestionIndex === 0}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
+                className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition-all ${
                   currentQuestionIndex === 0
                     ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                     : 'bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
                 }`}
               >
-                <ChevronLeft className="w-5 h-5" />
-                Previous
+                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Previous</span>
+                <span className="sm:hidden">Prev</span>
               </button>
 
               {currentQuestionIndex < questions.length - 1 && (
                 <button
                   onClick={handleNext}
-                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
+                  className="flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg text-sm sm:text-base font-medium transition-all shadow-md hover:shadow-lg"
                 >
                   Next
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               )}
 
               {currentQuestionIndex === questions.length - 1 && (
                 <button
                   onClick={handleGoHome}
-                  className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
+                  className="flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2.5 sm:py-3 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white rounded-lg text-sm sm:text-base font-medium transition-all shadow-md hover:shadow-lg"
                 >
-                  <Home className="w-5 h-5" />
-                  Finish Practice
+                  <Home className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline">Finish Practice</span>
+                  <span className="sm:hidden">Finish</span>
                 </button>
               )}
             </div>

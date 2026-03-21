@@ -186,30 +186,30 @@ export default function StudyGuidePage() {
       {/* ===== Main Content ===== */}
       <div className="relative z-10">
         {/* Header */}
-        <section className="px-4 pt-8 pb-6">
+        <section className="px-3 sm:px-4 pt-4 sm:pt-8 pb-4 sm:pb-6">
           <div className="max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center gap-3 mb-6"
+              className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6"
             >
               <button
                 onClick={() => router.push('/')}
-                className="p-2 rounded-xl border transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="p-2 rounded-xl border transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 flex-shrink-0"
                 style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)' }}
               >
-                <ArrowLeft className="w-5 h-5 hp-text-secondary" />
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 hp-text-secondary" />
               </button>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/10 to-teal-500/10 dark:from-cyan-500/20 dark:to-teal-500/20 border border-cyan-500/15 flex items-center justify-center">
-                  <BookOpen className="w-5 h-5 hp-icon-cyan" />
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-cyan-500/10 to-teal-500/10 dark:from-cyan-500/20 dark:to-teal-500/20 border border-cyan-500/15 flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 hp-icon-cyan" />
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold hp-text-primary">Study Guide</h1>
-                  <p className="text-xs hp-text-quaternary">Personalized learning based on your performance</p>
+                <div className="min-w-0">
+                  <h1 className="text-xl sm:text-2xl font-bold hp-text-primary">Study Guide</h1>
+                  <p className="text-[10px] sm:text-xs hp-text-quaternary hidden sm:block">Personalized learning based on your performance</p>
                 </div>
               </div>
-              <div className="ml-auto flex items-center gap-2 px-3 py-1.5 rounded-full border" style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)' }}>
+              <div className="ml-auto hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border flex-shrink-0" style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)' }}>
                 <Zap className="w-3.5 h-3.5 text-amber-500" />
                 <span className="text-xs hp-text-tertiary font-medium">Powered by Gemini</span>
               </div>
