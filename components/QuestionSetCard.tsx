@@ -30,12 +30,12 @@ export default function QuestionSetCard({ questionSet, onStart, onDelete }: Ques
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all hover:border-blue-500 dark:hover:border-blue-400">
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6 hover:shadow-lg transition-all hover:border-blue-500 dark:hover:border-blue-400">
       {/* Header */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+      <div className="flex items-start justify-between mb-2 sm:mb-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">
               {questionSet.title}
             </h3>
             {questionSet.isPublic ? (

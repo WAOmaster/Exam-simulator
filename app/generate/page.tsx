@@ -682,29 +682,29 @@ export default function GeneratePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-4 sm:mb-8">
           <button
             onClick={() => router.push('/')}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4"
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-3 sm:mb-4 text-sm sm:text-base"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </button>
 
-          <div className="flex items-center gap-3 mb-2">
-            <Sparkles className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 dark:text-blue-400" />
+            <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-white">
               Generate Questions
             </h1>
           </div>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
             Create custom exam questions from your content using AI
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
           {/* Left Column: Input & Controls */}
           <div className="lg:col-span-2 space-y-6">
             {/* CCAT Mode: no input method needed */}
@@ -721,20 +721,20 @@ export default function GeneratePage() {
                 </div>
               </div>
             ) : (
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
                 1. Choose Input Method
               </h2>
 
               {/* Tabs */}
-              <div className="flex flex-wrap gap-2 mb-6">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-6">
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
                   return (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                      className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                         activeTab === tab.id
                           ? 'bg-blue-600 dark:bg-blue-700 text-white shadow-md'
                           : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'

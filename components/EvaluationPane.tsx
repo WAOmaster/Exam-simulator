@@ -106,12 +106,12 @@ export default function EvaluationPane({
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             className="fixed right-0 top-0 h-full w-full lg:w-1/3 bg-white dark:bg-gray-800 shadow-2xl z-50 overflow-y-auto"
           >
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {/* Header */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
                 <div className="flex items-center gap-2">
-                  <Brain className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     AI Evaluation
                   </h2>
                 </div>

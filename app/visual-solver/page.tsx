@@ -136,17 +136,17 @@ export default function VisualSolverPage() {
     <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-md border-b dark:border-gray-700">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg">
-                <Camera className="w-6 h-6 text-white" />
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <div className="p-1.5 sm:p-2 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg flex-shrink-0">
+                <Camera className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-gray-100 truncate">
                   Visual Problem Solver
                 </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
                   Upload an image • Get AI-powered solutions
                 </p>
               </div>
@@ -161,8 +161,8 @@ export default function VisualSolverPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
           {/* Left Column - Upload and Settings */}
           <div className="space-y-6">
             {/* Image Upload */}

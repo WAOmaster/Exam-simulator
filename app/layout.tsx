@@ -1,8 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/lib/theme-context";
 import ThemeWrapper from "@/components/ThemeWrapper";
 import SessionProvider from "@/components/SessionProvider";
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: "ExamSimulator - AI-Powered Practice Exams",

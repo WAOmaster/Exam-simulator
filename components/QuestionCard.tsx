@@ -95,11 +95,11 @@ export default function QuestionCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="card-paper p-6 md:p-8"
+      className="card-paper p-4 sm:p-6 md:p-8"
     >
       {/* Question Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-5">
+      <div className="mb-4 sm:mb-6">
+        <div className="flex items-center justify-between mb-3 sm:mb-5">
           {/* Question number badge */}
           <div className="flex items-center gap-3">
             <span className="question-badge">
@@ -118,7 +118,7 @@ export default function QuestionCard({
         </div>
 
         {/* Question text */}
-        <h2 className="text-xl md:text-2xl font-display leading-relaxed text-foreground">
+        <h2 className="text-base sm:text-xl md:text-2xl font-display leading-relaxed text-foreground">
           {question.question}
         </h2>
 
@@ -135,7 +135,7 @@ export default function QuestionCard({
       </div>
 
       {/* Options - Bubble sheet style */}
-      <div className="space-y-3 mb-8">
+      <div className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
         {question.options.map((option, index) => (
           <motion.button
             key={option.id}
@@ -148,11 +148,11 @@ export default function QuestionCard({
             disabled={isSubmitted}
             className={getOptionStyle(option.id)}
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2.5 sm:gap-4">
               {/* Bubble-style option indicator */}
               <div className={`
-                flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center
-                font-mono font-bold text-sm transition-all duration-200
+                flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center
+                font-mono font-bold text-xs sm:text-sm transition-all duration-200
                 ${selectedAnswer === option.id
                   ? isSubmitted
                     ? showFeedback
@@ -168,7 +168,7 @@ export default function QuestionCard({
               </div>
 
               {/* Option text */}
-              <span className="flex-1 text-base leading-relaxed">
+              <span className="flex-1 text-sm sm:text-base leading-relaxed">
                 {option.text}
               </span>
 
@@ -192,7 +192,7 @@ export default function QuestionCard({
           onClick={onSubmit}
           disabled={!selectedAnswer || isLoading}
           className={`
-            w-full py-4 px-6 rounded-xl font-semibold text-lg
+            w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold text-base sm:text-lg
             transition-all duration-300 flex items-center justify-center gap-3
             ${selectedAnswer && !isLoading
               ? 'btn-primary'

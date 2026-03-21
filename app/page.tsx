@@ -186,7 +186,7 @@ export default function Home() {
       {/* ===== Main Content ===== */}
       <div className="relative z-10">
         {/* ===== HERO SECTION ===== */}
-        <section className="relative pt-20 pb-16 px-4">
+        <section className="relative pt-12 sm:pt-20 pb-10 sm:pb-16 px-3 sm:px-4">
           <div className="max-w-6xl mx-auto text-center">
             {/* Orbiting elements around logo */}
             <div className="relative inline-block mb-8">
@@ -223,7 +223,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
             >
-              <h1 className="text-6xl md:text-7xl font-extrabold tracking-tight mb-4">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4">
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-900 to-gray-700 dark:from-white dark:via-white dark:to-white/70">
                   Exam
                 </span>
@@ -238,7 +238,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.35, duration: 0.6 }}
-              className="text-lg md:text-xl hp-text-tertiary max-w-xl mx-auto mb-3 font-light"
+              className="text-base sm:text-lg md:text-xl hp-text-tertiary max-w-xl mx-auto mb-3 font-light px-2 sm:px-0"
             >
               AI-powered practice exams that adapt to your learning
             </motion.p>
@@ -261,7 +261,7 @@ export default function Home() {
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto mb-6"
+              className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 max-w-5xl mx-auto mb-6"
             >
               {/* Generate Questions */}
               <motion.button
@@ -269,17 +269,17 @@ export default function Home() {
                 onClick={() => router.push('/generate')}
                 whileHover={{ y: -6, transition: { duration: 0.3 } }}
                 whileTap={{ scale: 0.97 }}
-                className="action-card-shine group relative p-6 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-indigo-500/30"
+                className="action-card-shine group relative p-4 sm:p-6 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-indigo-500/30"
                 style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)', boxShadow: 'var(--hp-card-shadow)' }}
               >
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500/5 dark:from-indigo-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative z-10">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 border border-indigo-500/10 flex items-center justify-center mb-4 group-hover:border-indigo-500/30 transition-colors">
-                    <Wand2 className="w-6 h-6 hp-icon-indigo" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 border border-indigo-500/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-indigo-500/30 transition-colors">
+                    <Wand2 className="w-5 h-5 sm:w-6 sm:h-6 hp-icon-indigo" />
                   </div>
-                  <h3 className="text-lg font-semibold hp-text-primary mb-1">Generate Questions</h3>
-                  <p className="text-sm hp-text-tertiary leading-relaxed">Create custom exams from files, URLs, or any content</p>
-                  <div className="flex items-center gap-1.5 mt-4 text-indigo-600 dark:text-indigo-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  <h3 className="text-sm sm:text-lg font-semibold hp-text-primary mb-1">Generate Questions</h3>
+                  <p className="text-xs sm:text-sm hp-text-tertiary leading-relaxed hidden sm:block">Create custom exams from files, URLs, or any content</p>
+                  <div className="hidden sm:flex items-center gap-1.5 mt-4 text-indigo-600 dark:text-indigo-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                     <span>Get started</span>
                     <ArrowRight className="w-4 h-4" />
                   </div>
@@ -292,17 +292,17 @@ export default function Home() {
                 onClick={() => router.push('/library')}
                 whileHover={{ y: -6, transition: { duration: 0.3 } }}
                 whileTap={{ scale: 0.97 }}
-                className="action-card-shine group relative p-6 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-emerald-500/30"
+                className="action-card-shine group relative p-4 sm:p-6 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-emerald-500/30"
                 style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)', boxShadow: 'var(--hp-card-shadow)' }}
               >
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/5 dark:from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative z-10">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20 border border-emerald-500/10 flex items-center justify-center mb-4 group-hover:border-emerald-500/30 transition-colors">
-                    <BookMarked className="w-6 h-6 hp-icon-emerald" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20 border border-emerald-500/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-emerald-500/30 transition-colors">
+                    <BookMarked className="w-5 h-5 sm:w-6 sm:h-6 hp-icon-emerald" />
                   </div>
-                  <h3 className="text-lg font-semibold hp-text-primary mb-1">My Library</h3>
-                  <p className="text-sm hp-text-tertiary leading-relaxed">Browse and manage your saved question sets</p>
-                  <div className="flex items-center gap-1.5 mt-4 text-emerald-600 dark:text-emerald-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  <h3 className="text-sm sm:text-lg font-semibold hp-text-primary mb-1">My Library</h3>
+                  <p className="text-xs sm:text-sm hp-text-tertiary leading-relaxed hidden sm:block">Browse and manage your saved question sets</p>
+                  <div className="hidden sm:flex items-center gap-1.5 mt-4 text-emerald-600 dark:text-emerald-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                     <span>Browse sets</span>
                     <ArrowRight className="w-4 h-4" />
                   </div>
@@ -315,17 +315,17 @@ export default function Home() {
                 onClick={() => router.push('/visual-solver')}
                 whileHover={{ y: -6, transition: { duration: 0.3 } }}
                 whileTap={{ scale: 0.97 }}
-                className="action-card-shine group relative p-6 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-amber-500/30"
+                className="action-card-shine group relative p-4 sm:p-6 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-amber-500/30"
                 style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)', boxShadow: 'var(--hp-card-shadow)' }}
               >
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-500/5 dark:from-amber-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative z-10">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 dark:from-amber-500/20 dark:to-orange-500/20 border border-amber-500/10 flex items-center justify-center mb-4 group-hover:border-amber-500/30 transition-colors">
-                    <Camera className="w-6 h-6 hp-icon-amber" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 dark:from-amber-500/20 dark:to-orange-500/20 border border-amber-500/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-amber-500/30 transition-colors">
+                    <Camera className="w-5 h-5 sm:w-6 sm:h-6 hp-icon-amber" />
                   </div>
-                  <h3 className="text-lg font-semibold hp-text-primary mb-1">Visual Solver</h3>
-                  <p className="text-sm hp-text-tertiary leading-relaxed">Upload images for AI-powered solutions</p>
-                  <div className="flex items-center gap-1.5 mt-4 text-amber-600 dark:text-amber-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  <h3 className="text-sm sm:text-lg font-semibold hp-text-primary mb-1">Visual Solver</h3>
+                  <p className="text-xs sm:text-sm hp-text-tertiary leading-relaxed hidden sm:block">Upload images for AI-powered solutions</p>
+                  <div className="hidden sm:flex items-center gap-1.5 mt-4 text-amber-600 dark:text-amber-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                     <span>Upload image</span>
                     <ArrowRight className="w-4 h-4" />
                   </div>
@@ -338,17 +338,17 @@ export default function Home() {
                 onClick={() => router.push('/study-guide')}
                 whileHover={{ y: -6, transition: { duration: 0.3 } }}
                 whileTap={{ scale: 0.97 }}
-                className="action-card-shine group relative p-6 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-cyan-500/30"
+                className="action-card-shine group relative p-4 sm:p-6 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-cyan-500/30"
                 style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)', boxShadow: 'var(--hp-card-shadow)' }}
               >
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/5 dark:from-cyan-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative z-10">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/10 to-teal-500/10 dark:from-cyan-500/20 dark:to-teal-500/20 border border-cyan-500/10 flex items-center justify-center mb-4 group-hover:border-cyan-500/30 transition-colors">
-                    <BookOpen className="w-6 h-6 hp-icon-cyan" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-cyan-500/10 to-teal-500/10 dark:from-cyan-500/20 dark:to-teal-500/20 border border-cyan-500/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-cyan-500/30 transition-colors">
+                    <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 hp-icon-cyan" />
                   </div>
-                  <h3 className="text-lg font-semibold hp-text-primary mb-1">Study Guide</h3>
-                  <p className="text-sm hp-text-tertiary leading-relaxed">Personalized plans based on your performance</p>
-                  <div className="flex items-center gap-1.5 mt-4 text-cyan-600 dark:text-cyan-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  <h3 className="text-sm sm:text-lg font-semibold hp-text-primary mb-1">Study Guide</h3>
+                  <p className="text-xs sm:text-sm hp-text-tertiary leading-relaxed hidden sm:block">Personalized plans based on your performance</p>
+                  <div className="hidden sm:flex items-center gap-1.5 mt-4 text-cyan-600 dark:text-cyan-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                     <span>View guide</span>
                     <ArrowRight className="w-4 h-4" />
                   </div>
@@ -364,25 +364,25 @@ export default function Home() {
               onClick={() => router.push('/ccat')}
               whileHover={{ y: -4, transition: { duration: 0.25 } }}
               whileTap={{ scale: 0.98 }}
-              className="action-card-shine group relative w-full max-w-5xl mx-auto p-5 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-violet-500/30 flex items-center justify-between gap-4"
+              className="action-card-shine group relative w-full max-w-5xl mx-auto p-3 sm:p-5 rounded-2xl border backdrop-blur-sm text-left transition-all duration-300 hover:border-violet-500/30 flex items-center justify-between gap-2 sm:gap-4"
               style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)', boxShadow: 'var(--hp-card-shadow)' }}
             >
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-violet-500/5 dark:from-violet-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative z-10 flex items-center gap-4 flex-1">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500/10 to-purple-500/10 dark:from-violet-500/20 dark:to-purple-500/20 border border-violet-500/10 flex items-center justify-center flex-shrink-0 group-hover:border-violet-500/30 transition-colors">
-                  <Brain className="w-5 h-5 hp-icon-purple" />
+              <div className="relative z-10 flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-violet-500/10 to-purple-500/10 dark:from-violet-500/20 dark:to-purple-500/20 border border-violet-500/10 flex items-center justify-center flex-shrink-0 group-hover:border-violet-500/30 transition-colors">
+                  <Brain className="w-4 h-4 sm:w-5 sm:h-5 hp-icon-purple" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <h3 className="text-base font-semibold hp-text-primary">CCAT Practice Test</h3>
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                    <h3 className="text-sm sm:text-base font-semibold hp-text-primary">CCAT Practice Test</h3>
+                    <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300">
                       50 Questions · 15 Min
                     </span>
                   </div>
-                  <p className="text-sm hp-text-tertiary">Full-length Criteria Cognitive Aptitude Test simulation · Verbal · Math · Spatial Reasoning</p>
+                  <p className="text-xs sm:text-sm hp-text-tertiary truncate sm:whitespace-normal">Full-length CCAT simulation · Verbal · Math · Spatial</p>
                 </div>
               </div>
-              <div className="relative z-10 flex items-center gap-1.5 text-violet-600 dark:text-violet-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+              <div className="relative z-10 hidden sm:flex items-center gap-1.5 text-violet-600 dark:text-violet-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                 <span>Start now</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
@@ -391,7 +391,7 @@ export default function Home() {
         </section>
 
         {/* ===== EXPLORE SUBJECTS ===== */}
-        <section className="relative px-4 pb-12">
+        <section className="relative px-3 sm:px-4 pb-8 sm:pb-12">
           <div className="max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -404,14 +404,14 @@ export default function Home() {
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/20 dark:to-pink-500/20 border border-purple-500/10 flex items-center justify-center">
                   <Layers className="w-4 h-4 hp-icon-purple" />
                 </div>
-                <h2 className="text-2xl font-bold hp-text-primary">Explore Subjects</h2>
+                <h2 className="text-xl sm:text-2xl font-bold hp-text-primary">Explore Subjects</h2>
               </div>
               <p className="hp-text-tertiary mb-8 ml-11 text-sm">
                 Jump into pre-built question sets to experience the platform
               </p>
 
               {/* Subject Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
                 {subjects.map((subject, i) => {
                   const Icon = iconMap[subject.icon] || FileText;
                   const isSelected = selectedSubject === subject.id;
@@ -427,7 +427,7 @@ export default function Home() {
                       whileHover={{ y: -3, transition: { duration: 0.25 } }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedSubject(subject.id)}
-                      className={`subject-card relative p-5 rounded-2xl text-left transition-all duration-300 ${
+                      className={`subject-card relative p-3.5 sm:p-5 rounded-2xl text-left transition-all duration-300 ${
                         isSelected
                           ? `border-2 ${accent.borderSelected}`
                           : 'border'
@@ -492,7 +492,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="relative px-4 pb-20"
+              className="relative px-3 sm:px-4 pb-12 sm:pb-20"
             >
               <div className="max-w-4xl mx-auto">
                 <div className="relative rounded-3xl border backdrop-blur-sm overflow-hidden" style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)', boxShadow: 'var(--hp-card-shadow)' }}>
@@ -506,17 +506,17 @@ export default function Home() {
                       { icon: iconMap[selectedSubjectData.icon] || FileText, label: 'Subject', value: selectedSubjectData.name, iconClass: 'hp-icon-emerald' },
                       { icon: Brain, label: 'AI Powered', value: 'Gemini', iconClass: 'hp-icon-purple' },
                     ].map((stat, i) => (
-                      <div key={i} className={`p-5 flex items-center gap-3 ${i < 2 ? 'border-r' : ''}`} style={i < 2 ? { borderColor: 'var(--hp-surface-border)' } : {}}>
-                        <stat.icon className={`w-5 h-5 ${stat.iconClass} shrink-0`} />
+                      <div key={i} className={`p-3 sm:p-5 flex items-center gap-2 sm:gap-3 ${i < 2 ? 'border-r' : ''}`} style={i < 2 ? { borderColor: 'var(--hp-surface-border)' } : {}}>
+                        <stat.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${stat.iconClass} shrink-0`} />
                         <div className="min-w-0">
-                          <p className="text-lg font-bold hp-text-primary truncate">{stat.value}</p>
-                          <p className="text-xs hp-text-quaternary">{stat.label}</p>
+                          <p className="text-sm sm:text-lg font-bold hp-text-primary truncate">{stat.value}</p>
+                          <p className="text-[10px] sm:text-xs hp-text-quaternary">{stat.label}</p>
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  <div className="p-8 space-y-8">
+                  <div className="p-4 sm:p-8 space-y-6 sm:space-y-8">
                     {/* Previous Score */}
                     {isExamCompleted && score && (
                       <motion.div
@@ -741,12 +741,12 @@ export default function Home() {
                           transition={{ duration: 0.3 }}
                         >
                           <label className="block text-sm font-medium hp-text-tertiary mb-3 tracking-wide uppercase">Duration</label>
-                          <div className="flex gap-2">
+                          <div className="grid grid-cols-4 gap-2">
                             {[30, 60, 90, 120].map((d) => (
                               <button
                                 key={d}
                                 onClick={() => setExamDuration(d)}
-                                className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all duration-300 border ${
+                                className={`py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 border ${
                                   examDuration === d
                                     ? 'bg-indigo-50 dark:bg-indigo-500/15 border-indigo-500/30 text-indigo-600 dark:text-indigo-300 shadow-lg shadow-indigo-500/5'
                                     : 'hp-text-tertiary'

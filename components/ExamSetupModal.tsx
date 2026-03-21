@@ -55,21 +55,21 @@ export default function ExamSetupModal({
           />
 
           {/* Modal */}
-          <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              className="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-lg shadow-2xl max-w-2xl w-full max-h-[85vh] sm:max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex items-start justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 sm:p-6 flex items-start justify-between">
+                <div className="min-w-0 flex-1 mr-2">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-1">
                     Setup Your Session
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
                     {questionSetTitle} • {questionCount} questions
                   </p>
                 </div>
@@ -82,13 +82,13 @@ export default function ExamSetupModal({
               </div>
 
               {/* Content */}
-              <div className="p-6 space-y-6">
+              <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
                 {/* Mode Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                     Select Mode
                   </label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-4">
                     <button
                       onClick={() => setMode('practice')}
                       className={`p-4 rounded-lg border-2 transition-all ${
@@ -288,19 +288,19 @@ export default function ExamSetupModal({
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                       Duration
                     </label>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-4 gap-2 sm:gap-3">
                       {durations.map((duration) => (
                         <button
                           key={duration}
                           onClick={() => setExamDuration(duration)}
-                          className={`p-4 rounded-lg border-2 transition-all ${
+                          className={`p-2.5 sm:p-4 rounded-lg border-2 transition-all ${
                             examDuration === duration
                               ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30'
                               : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-blue-400 dark:hover:border-blue-500'
                           }`}
                         >
                           <div className="text-center">
-                            <div className={`text-2xl font-bold ${
+                            <div className={`text-lg sm:text-2xl font-bold ${
                               examDuration === duration
                                 ? 'text-blue-600 dark:text-blue-400'
                                 : 'text-gray-700 dark:text-gray-300'
@@ -319,16 +319,16 @@ export default function ExamSetupModal({
               </div>
 
               {/* Footer */}
-              <div className="sticky bottom-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-6 flex gap-3">
+              <div className="sticky bottom-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 sm:p-6 flex gap-2 sm:gap-3">
                 <button
                   onClick={onClose}
-                  className="flex-1 px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm sm:text-base font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleStart}
-                  className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white font-bold rounded-lg transition-colors shadow-lg hover:shadow-xl"
+                  className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white text-sm sm:text-base font-bold rounded-lg transition-colors shadow-lg hover:shadow-xl"
                 >
                   Start {mode === 'practice' ? 'Practice' : 'Exam'}
                 </button>

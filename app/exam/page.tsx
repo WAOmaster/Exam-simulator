@@ -267,19 +267,19 @@ export default function ExamPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-30 transition-colors border-b dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-gray-100 truncate">
                 Practice Exam
               </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">AI-Powered Questions</p>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hidden sm:block">AI-Powered Questions</p>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
               {/* CC Queue Status */}
               {cognitiveCompanion && queueSummary.total > 0 && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
+                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
                   <Brain className="w-4 h-4 text-amber-500" />
                   <span className="text-xs font-medium text-amber-700 dark:text-amber-300">
                     {queueSummary.completed}/{queueSummary.total}
@@ -312,15 +312,16 @@ export default function ExamPage() {
 
               <button
                 onClick={handleFinishExam}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white text-sm sm:text-base font-medium rounded-lg transition-colors flex items-center gap-1.5 sm:gap-2"
               >
                 <Trophy className="w-4 h-4" />
-                Finish Exam
+                <span className="hidden sm:inline">Finish Exam</span>
+                <span className="sm:hidden">Finish</span>
               </button>
             </div>
           </div>
 
-          <div className="mt-4">
+          <div className="mt-2 sm:mt-4">
             <ProgressBar
               current={currentQuestionIndex}
               total={questions.length}
@@ -341,13 +342,13 @@ export default function ExamPage() {
       {/* Main Content - Split Layout */}
       <div className="flex">
         {/* Question Section */}
-        <div className={`transition-all duration-300 ${anySidePaneOpen ? 'lg:w-2/3' : 'w-full'} px-4 py-8`}>
+        <div className={`transition-all duration-300 ${anySidePaneOpen ? 'lg:w-2/3' : 'w-full'} px-3 sm:px-4 py-4 sm:py-8`}>
           <div className="max-w-4xl mx-auto">
             {/* Warning if unanswered */}
             {!isAnswered && answeredCount > 0 && (
-              <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg flex items-center gap-3 transition-colors">
-                <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
-                <p className="text-sm text-yellow-800 dark:text-yellow-300">
+              <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg flex items-center gap-2 sm:gap-3 transition-colors">
+                <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
+                <p className="text-xs sm:text-sm text-yellow-800 dark:text-yellow-300">
                   You haven&apos;t answered this question yet. Select an answer and submit.
                 </p>
               </div>
@@ -374,34 +375,36 @@ export default function ExamPage() {
             )}
 
             {/* Navigation */}
-            <div className="flex justify-between items-center mt-6">
+            <div className="flex justify-between items-center mt-4 sm:mt-6 gap-2">
               <button
                 onClick={handlePrevious}
                 disabled={currentQuestionIndex === 0}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
+                className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition-all ${
                   currentQuestionIndex === 0
                     ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                     : 'bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
                 }`}
               >
-                <ChevronLeft className="w-5 h-5" />
-                Previous
+                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Previous</span>
+                <span className="sm:hidden">Prev</span>
               </button>
 
-              <div className="flex gap-3">
+              <div className="flex gap-2 sm:gap-3">
                 {isAnswered && !anySidePaneOpen && reviewAnswers && (
                   <button
                     onClick={handleReviewAnswer}
-                    className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
+                    className="flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2.5 sm:py-3 bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 text-white rounded-lg text-sm sm:text-base font-medium transition-all shadow-md hover:shadow-lg"
                   >
-                    Review Answer
+                    <span className="hidden sm:inline">Review Answer</span>
+                    <span className="sm:hidden">Review</span>
                   </button>
                 )}
 
                 {isAnswered && (
                   <button
                     onClick={handleNext}
-                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
+                    className="flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg text-sm sm:text-base font-medium transition-all shadow-md hover:shadow-lg"
                   >
                     {currentQuestionIndex < questions.length - 1 ? (
                       <>
