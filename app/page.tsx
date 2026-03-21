@@ -34,6 +34,8 @@ import {
 } from 'lucide-react';
 import subjects from '@/data/default-questions/subjects.json';
 import AuthButton from '@/components/AuthButton';
+import { useSession } from 'next-auth/react';
+import { SyncStatus, pushQuestionSetToCloud, pullQuestionSetsFromCloud, pushSessionHistoryToCloud } from '@/lib/syncManager';
 
 const iconMap: Record<string, any> = {
   Atom, Code, Cog, Palette, Calculator, Cloud,
@@ -86,6 +88,8 @@ export default function Home() {
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [loadedQuestions, setLoadedQuestions] = useState<any[]>([]);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
+  const { data: session } = useSession();
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     setMousePos({
@@ -109,6 +113,48 @@ export default function Home() {
       }
     }
   }, [selectedSubject]);
+
+  // Auto-sync when user signs in
+  useEffect(() => {
+    if (session?.user?.id && syncStatus === 'idle') {
+      handleSync();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.id]);
+
+  const handleSync = useCallback(async () => {
+    if (!session?.user?.id) return;
+    setSyncStatus('syncing');
+    try {
+      const store = useExamStore.getState();
+      const localSets = store.availableQuestionSets || [];
+      // Push local data to cloud
+      for (const set of localSets) {
+        await pushQuestionSetToCloud(set);
+      }
+      // Push session history
+      const sessionHistory = JSON.parse(localStorage.getItem('exam-session-history') || '[]');
+      if (sessionHistory.length > 0) {
+        await pushSessionHistoryToCloud(sessionHistory);
+      }
+      // Pull from cloud
+      const cloudSets = await pullQuestionSetsFromCloud();
+      if (cloudSets && cloudSets.length > 0) {
+        // Merge cloud sets into local store
+        for (const set of cloudSets) {
+          const exists = localSets.find(s => s.id === set.id);
+          if (!exists) {
+            store.addQuestionSet(set);
+          }
+        }
+      }
+      setSyncStatus('synced');
+      setTimeout(() => setSyncStatus('idle'), 5000);
+    } catch {
+      setSyncStatus('error');
+      setTimeout(() => setSyncStatus('idle'), 5000);
+    }
+  }, [session?.user?.id]);
 
   const handleStart = () => {
     if (!selectedSubject || loadedQuestions.length === 0) {
@@ -180,7 +226,7 @@ export default function Home() {
 
       {/* ===== Auth Button (top-right) ===== */}
       <div className="fixed top-4 right-4 z-50">
-        <AuthButton />
+        <AuthButton syncStatus={syncStatus} onSync={handleSync} />
       </div>
 
       {/* ===== Main Content ===== */}
