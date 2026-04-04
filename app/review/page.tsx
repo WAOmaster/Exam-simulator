@@ -28,6 +28,7 @@ import {
   calculateNextInterval,
 } from '@/lib/fsrs';
 import { useExamStore } from '@/lib/store';
+import { answersMatch, isOptionSelected, isCorrectOption, isMultiAnswer, getRequiredAnswerCount, toggleAnswer } from '@/lib/multiAnswer';
 
 interface Question {
   id: number;
@@ -74,7 +75,11 @@ export default function ReviewPage() {
 
   const handleAnswerSelect = (answerId: string) => {
     if (showResult) return;
-    setSelectedAnswer(answerId);
+    if (currentQuestion && isMultiAnswer(currentQuestion.correctAnswer, currentQuestion.question)) {
+      setSelectedAnswer(toggleAnswer(answerId, selectedAnswer));
+    } else {
+      setSelectedAnswer(answerId);
+    }
   };
 
   const handleSubmit = () => {
@@ -97,7 +102,7 @@ export default function ReviewPage() {
 
     // Update stats
     setReviewedCount((c) => c + 1);
-    if (selectedAnswer === currentQuestion.correctAnswer) {
+    if (selectedAnswer && answersMatch(selectedAnswer, currentQuestion.correctAnswer)) {
       setCorrectCount((c) => c + 1);
     }
 
@@ -135,7 +140,7 @@ export default function ReviewPage() {
     return intervals;
   }, [currentMastery]);
 
-  const isCorrect = currentQuestion && selectedAnswer === currentQuestion.correctAnswer;
+  const isCorrect = currentQuestion && selectedAnswer ? answersMatch(selectedAnswer, currentQuestion.correctAnswer) : false;
 
   if (queue.length === 0) {
     return (
@@ -306,18 +311,27 @@ export default function ReviewPage() {
                 {currentQuestion.question}
               </h2>
 
+              {/* Multi-answer instruction */}
+              {isMultiAnswer(currentQuestion.correctAnswer, currentQuestion.question) && !showResult && (
+                <div className="flex items-center gap-2 mb-3 px-1">
+                  <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                    Select {getRequiredAnswerCount(currentQuestion.correctAnswer, currentQuestion.question)} answers
+                  </span>
+                </div>
+              )}
+
               {/* Options */}
               <div className="space-y-3">
                 {currentQuestion.options.map((option) => {
-                  const isSelected = selectedAnswer === option.id;
-                  const isCorrectOption = option.id === currentQuestion.correctAnswer;
+                  const isSelected = isOptionSelected(option.id, selectedAnswer);
+                  const isCorrectOpt = isCorrectOption(option.id, currentQuestion.correctAnswer);
 
                   let optionStyle = '';
                   if (showResult) {
-                    if (isCorrectOption) {
+                    if (isCorrectOpt) {
                       optionStyle =
                         'border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/30';
-                    } else if (isSelected && !isCorrectOption) {
+                    } else if (isSelected && !isCorrectOpt) {
                       optionStyle =
                         'border-red-500 dark:border-red-400 bg-red-50 dark:bg-red-900/30';
                     } else {
@@ -339,9 +353,9 @@ export default function ReviewPage() {
                       <div className="flex items-start gap-3">
                         <span
                           className={`font-bold ${
-                            showResult && isCorrectOption
+                            showResult && isCorrectOpt
                               ? 'text-green-700 dark:text-green-300'
-                              : showResult && isSelected && !isCorrectOption
+                              : showResult && isSelected && !isCorrectOpt
                               ? 'text-red-700 dark:text-red-300'
                               : 'text-gray-700 dark:text-gray-300'
                           }`}
@@ -350,19 +364,19 @@ export default function ReviewPage() {
                         </span>
                         <span
                           className={`flex-1 ${
-                            showResult && isCorrectOption
+                            showResult && isCorrectOpt
                               ? 'text-green-900 dark:text-green-100'
-                              : showResult && isSelected && !isCorrectOption
+                              : showResult && isSelected && !isCorrectOpt
                               ? 'text-red-900 dark:text-red-100'
                               : 'text-gray-800 dark:text-gray-200'
                           }`}
                         >
                           {option.text}
                         </span>
-                        {showResult && isCorrectOption && (
+                        {showResult && isCorrectOpt && (
                           <CheckCircle className="w-5 h-5 text-green-500 shrink-0" />
                         )}
-                        {showResult && isSelected && !isCorrectOption && (
+                        {showResult && isSelected && !isCorrectOpt && (
                           <XCircle className="w-5 h-5 text-red-500 shrink-0" />
                         )}
                       </div>
@@ -389,7 +403,7 @@ export default function ReviewPage() {
                 {!showResult ? (
                   <button
                     onClick={handleSubmit}
-                    disabled={!selectedAnswer}
+                    disabled={!selectedAnswer || (currentQuestion && isMultiAnswer(currentQuestion.correctAnswer, currentQuestion.question) && selectedAnswer.split(',').filter(Boolean).length < getRequiredAnswerCount(currentQuestion.correctAnswer, currentQuestion.question))}
                     className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg font-medium hover:from-indigo-600 hover:to-purple-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     Show Answer

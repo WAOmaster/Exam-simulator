@@ -172,7 +172,7 @@ export function exportToPDF(questionSet: QuestionSet): void {
 
     // Options
     question.options.forEach((option) => {
-      const prefix = option.id === question.correctAnswer ? '✓ ' : '   ';
+      const prefix = question.correctAnswer.split(',').map(a => a.trim()).includes(option.id) ? '✓ ' : '   ';
       addText(`${prefix}${option.id}. ${option.text}`, 11);
       addSpacing(1);
     });
@@ -368,8 +368,8 @@ export function exportResultsToPDF(
 
     // Options
     question.options.forEach((option) => {
-      const isUserAnswer = userAnswer?.selectedAnswer === option.id;
-      const isCorrectAnswer = option.id === question.correctAnswer;
+      const isUserAnswer = userAnswer?.selectedAnswer ? userAnswer.selectedAnswer.split(',').map((a: string) => a.trim()).includes(option.id) : false;
+      const isCorrectAnswer = question.correctAnswer.split(',').map(a => a.trim()).includes(option.id);
 
       let prefix = '   ';
       if (isCorrectAnswer && isUserAnswer) {
@@ -443,7 +443,7 @@ export function exportToMarkdown(questionSet: QuestionSet, options: ExportOption
 
     // Options
     q.options.forEach((opt) => {
-      const isCorrect = includeAnswers && opt.id === q.correctAnswer;
+      const isCorrect = includeAnswers && q.correctAnswer.split(',').map(a => a.trim()).includes(opt.id);
       const marker = isCorrect ? '✅' : '○';
       markdown += `${marker} **${opt.id}.** ${opt.text}\n`;
     });

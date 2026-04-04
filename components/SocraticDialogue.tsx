@@ -10,6 +10,7 @@ import {
   CheckCircle,
   ArrowUp,
 } from 'lucide-react';
+import { parseAnswers, getCorrectOptionTexts } from '@/lib/multiAnswer';
 
 interface Message {
   role: 'tutor' | 'student';
@@ -120,10 +121,12 @@ export default function SocraticDialogue({
 
   const handleGiveUp = () => {
     setGaveUp(true);
-    const correctText = options.find((opt) => opt.id === correctAnswer)?.text || correctAnswer;
+    const correctIds = parseAnswers(correctAnswer);
+    const correctTexts = getCorrectOptionTexts(correctAnswer, options);
+    const correctDisplay = correctIds.map((id, i) => `**${id}: ${correctTexts[i]}**`).join(', ');
     const giveUpMessage: Message = {
       role: 'tutor',
-      message: `No worries! The correct answer is **${correctAnswer}: ${correctText}**. Understanding comes with practice. Review this concept and you'll get it next time!`,
+      message: `No worries! The correct answer${correctIds.length > 1 ? 's are' : ' is'} ${correctDisplay}. Understanding comes with practice. Review this concept and you'll get it next time!`,
     };
     setMessages((prev) => [...prev, giveUpMessage]);
   };
