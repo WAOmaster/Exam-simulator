@@ -12,6 +12,7 @@ import SocraticDialogue from '@/components/SocraticDialogue';
 import LiveStatsOverlay from '@/components/LiveStatsOverlay';
 import { cognitiveQueue } from '@/lib/cognitiveQueue';
 import { ChevronLeft, ChevronRight, Trophy, AlertCircle, MessageCircle, BarChart3, Brain } from 'lucide-react';
+import { answersMatch, isMultiAnswer, getRequiredAnswerCount, toggleAnswer } from '@/lib/multiAnswer';
 
 export default function ExamPage() {
   const router = useRouter();
@@ -109,11 +110,17 @@ export default function ExamPage() {
 
   const handleAnswerSelect = (answerId: string) => {
     if (!isAnswered) {
-      // Track selection changes
-      if (selectedAnswer && selectedAnswer !== answerId) {
-        recordSelectionChange(currentQuestion.id);
+      const multiAnswer = isMultiAnswer(currentQuestion.correctAnswer, currentQuestion.question);
+      if (multiAnswer) {
+        const newAnswer = toggleAnswer(answerId, selectedAnswer);
+        if (selectedAnswer) recordSelectionChange(currentQuestion.id);
+        setSelectedAnswer(newAnswer || null);
+      } else {
+        if (selectedAnswer && selectedAnswer !== answerId) {
+          recordSelectionChange(currentQuestion.id);
+        }
+        setSelectedAnswer(answerId);
       }
-      setSelectedAnswer(answerId);
     }
   };
 
@@ -122,7 +129,7 @@ export default function ExamPage() {
 
     setIsSubmitting(true);
 
-    const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
+    const isCorrect = answersMatch(selectedAnswer, currentQuestion.correctAnswer);
 
     // Submit the answer
     submitAnswer(currentQuestion.id, selectedAnswer, isCorrect);
@@ -162,7 +169,7 @@ export default function ExamPage() {
 
   const handleReviewAnswer = () => {
     const savedAnswer = userAnswers.get(currentQuestion.id);
-    const isWrong = savedAnswer && savedAnswer.selectedAnswer !== currentQuestion.correctAnswer;
+    const isWrong = savedAnswer && !answersMatch(savedAnswer.selectedAnswer, currentQuestion.correctAnswer);
 
     if (isWrong && socraticMode) {
       setShowSocratic(true);
@@ -220,7 +227,7 @@ export default function ExamPage() {
 
   // Check current answer state
   const savedUserAnswer = userAnswers.get(currentQuestion.id);
-  const isCurrentAnswerWrong = savedUserAnswer && savedUserAnswer.selectedAnswer !== currentQuestion.correctAnswer;
+  const isCurrentAnswerWrong = savedUserAnswer && !answersMatch(savedUserAnswer.selectedAnswer, currentQuestion.correctAnswer);
 
   const anySidePaneOpen = showExplanation || showSocratic;
 
@@ -364,6 +371,8 @@ export default function ExamPage() {
               isSubmitted={isAnswered}
               isLoading={isSubmitting}
               showFeedback={reviewAnswers}
+              multiAnswer={isMultiAnswer(currentQuestion.correctAnswer, currentQuestion.question)}
+              requiredAnswerCount={getRequiredAnswerCount(currentQuestion.correctAnswer, currentQuestion.question)}
             />
 
             {/* CC Indicator - inline below question when answered wrong */}
@@ -433,7 +442,7 @@ export default function ExamPage() {
             options={currentQuestion.options}
             selectedAnswer={selectedAnswer}
             correctAnswer={currentQuestion.correctAnswer}
-            isCorrect={selectedAnswer === currentQuestion.correctAnswer}
+            isCorrect={answersMatch(selectedAnswer, currentQuestion.correctAnswer)}
             explanation={currentQuestion.explanation}
             questionId={currentQuestion.id}
           />

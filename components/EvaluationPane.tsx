@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, CheckCircle, XCircle, Brain, ExternalLink, ShieldCheck } from 'lucide-react';
 import { formatExplanation } from '@/lib/formatExplanation';
 import { useExamStore } from '@/lib/store';
+import { parseAnswers, getCorrectOptionTexts } from '@/lib/multiAnswer';
 
 interface EvaluationPaneProps {
   isOpen: boolean;
@@ -154,11 +155,13 @@ export default function EvaluationPane({
               {!isCorrect && (
                 <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
                   <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                    Correct Answer:
+                    Correct Answer{parseAnswers(correctAnswer).length > 1 ? 's' : ''}:
                   </p>
-                  <p className="text-blue-800 dark:text-blue-200">
-                    {options.find((opt) => opt.id === correctAnswer)?.text}
-                  </p>
+                  {getCorrectOptionTexts(correctAnswer, options).map((text, i) => (
+                    <p key={i} className="text-blue-800 dark:text-blue-200">
+                      {parseAnswers(correctAnswer)[i]}. {text}
+                    </p>
+                  ))}
                 </div>
               )}
 
