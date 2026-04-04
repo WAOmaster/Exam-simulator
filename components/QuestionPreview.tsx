@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Question } from '@/lib/types';
 import { CheckCircle, Edit2 } from 'lucide-react';
+import { isCorrectOption } from '@/lib/multiAnswer';
 import QuestionEditModal from './QuestionEditModal';
 
 interface QuestionPreviewProps {
@@ -70,7 +71,7 @@ export default function QuestionPreview({ questions, onEditQuestion }: QuestionP
             {/* Options */}
             <div className="space-y-2 mb-3">
               {question.options.map((option) => {
-                const isCorrect = option.id === question.correctAnswer;
+                const isCorrect = isCorrectOption(option.id, question.correctAnswer);
                 return (
                   <div
                     key={option.id}

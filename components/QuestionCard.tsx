@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { CheckCircle2, XCircle, Loader2, BookOpen } from 'lucide-react';
 import { Question } from '@/lib/types';
+import { isOptionSelected, isCorrectOption, parseAnswers } from '@/lib/multiAnswer';
 
 interface QuestionCardProps {
   question: Question;
@@ -14,6 +15,8 @@ interface QuestionCardProps {
   isSubmitted: boolean;
   isLoading?: boolean;
   showFeedback?: boolean;
+  multiAnswer?: boolean;
+  requiredAnswerCount?: number;
 }
 
 export default function QuestionCard({
@@ -26,13 +29,17 @@ export default function QuestionCard({
   isSubmitted,
   isLoading = false,
   showFeedback = true,
+  multiAnswer = false,
+  requiredAnswerCount = 1,
 }: QuestionCardProps) {
 
   const getOptionStyle = (optionId: string) => {
     const baseStyle = "w-full text-left p-4 rounded-xl transition-all duration-200";
+    const selected = isOptionSelected(optionId, selectedAnswer);
+    const correct = isCorrectOption(optionId, question.correctAnswer);
 
     if (!isSubmitted) {
-      if (selectedAnswer === optionId) {
+      if (selected) {
         return `${baseStyle} option-selected shadow-sm`;
       }
       return `${baseStyle} option-default cursor-pointer hover:shadow-md`;
@@ -40,17 +47,17 @@ export default function QuestionCard({
 
     // After submission - only show feedback if showFeedback is true
     if (!showFeedback) {
-      return selectedAnswer === optionId
+      return selected
         ? `${baseStyle} bg-muted border-2 border-card-border`
         : `${baseStyle} bg-muted/50 border-2 border-transparent opacity-60`;
     }
 
     // Show color-coded feedback
-    if (optionId === question.correctAnswer) {
+    if (correct) {
       return `${baseStyle} option-correct shadow-sm`;
     }
 
-    if (optionId === selectedAnswer && optionId !== question.correctAnswer) {
+    if (selected && !correct) {
       return `${baseStyle} option-incorrect shadow-sm`;
     }
 
@@ -59,8 +66,10 @@ export default function QuestionCard({
 
   const getOptionIcon = (optionId: string) => {
     if (!isSubmitted || !showFeedback) return null;
+    const correct = isCorrectOption(optionId, question.correctAnswer);
+    const selected = isOptionSelected(optionId, selectedAnswer);
 
-    if (optionId === question.correctAnswer) {
+    if (correct) {
       return (
         <motion.div
           initial={{ scale: 0, rotate: -180 }}
@@ -72,7 +81,7 @@ export default function QuestionCard({
       );
     }
 
-    if (optionId === selectedAnswer && optionId !== question.correctAnswer) {
+    if (selected && !correct) {
       return (
         <motion.div
           initial={{ scale: 0 }}
@@ -134,6 +143,15 @@ export default function QuestionCard({
         )}
       </div>
 
+      {/* Multi-answer instruction */}
+      {multiAnswer && !isSubmitted && (
+        <div className="flex items-center gap-2 mb-3 px-1">
+          <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+            Select {requiredAnswerCount} answers
+          </span>
+        </div>
+      )}
+
       {/* Options - Bubble sheet style */}
       <div className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
         {question.options.map((option, index) => (
@@ -153,10 +171,10 @@ export default function QuestionCard({
               <div className={`
                 flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center
                 font-mono font-bold text-xs sm:text-sm transition-all duration-200
-                ${selectedAnswer === option.id
+                ${isOptionSelected(option.id, selectedAnswer)
                   ? isSubmitted
                     ? showFeedback
-                      ? option.id === question.correctAnswer
+                      ? isCorrectOption(option.id, question.correctAnswer)
                         ? 'bg-accent-green text-white'
                         : 'bg-accent-red text-white'
                       : 'bg-accent-blue text-white'
@@ -190,11 +208,11 @@ export default function QuestionCard({
           whileHover={selectedAnswer ? { scale: 1.01 } : {}}
           whileTap={selectedAnswer ? { scale: 0.99 } : {}}
           onClick={onSubmit}
-          disabled={!selectedAnswer || isLoading}
+          disabled={!selectedAnswer || isLoading || (multiAnswer && parseAnswers(selectedAnswer).length < requiredAnswerCount)}
           className={`
             w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold text-base sm:text-lg
             transition-all duration-300 flex items-center justify-center gap-3
-            ${selectedAnswer && !isLoading
+            ${selectedAnswer && !isLoading && (!multiAnswer || parseAnswers(selectedAnswer).length >= requiredAnswerCount)
               ? 'btn-primary'
               : 'bg-muted text-muted-foreground cursor-not-allowed'
             }
