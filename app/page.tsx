@@ -35,7 +35,7 @@ import {
 import subjects from '@/data/default-questions/subjects.json';
 import AuthButton from '@/components/AuthButton';
 import { useSession } from 'next-auth/react';
-import { SyncStatus, pushQuestionSetToCloud, pullQuestionSetsFromCloud, pushSessionHistoryToCloud } from '@/lib/syncManager';
+import { useSyncContext } from '@/components/SyncProvider';
 
 const iconMap: Record<string, any> = {
   Atom, Code, Cog, Palette, Calculator, Cloud,
@@ -77,7 +77,7 @@ const subjectAccents: Record<string, {
 
 export default function Home() {
   const router = useRouter();
-  const { startExam, resetExam, getScore, isExamCompleted, setQuestions } = useExamStore();
+  const { startExam, resetExam, getScore, isExamCompleted, isExamStarted, setQuestions, questions, userAnswers, mode: activeMode, currentQuestionSetId, availableQuestionSets, restoreSession } = useExamStore();
   const [examDuration, setExamDuration] = useState(90);
   const [mode, setMode] = useState<'practice' | 'exam'>('exam');
   const [useTimer, setUseTimer] = useState(true);
@@ -88,8 +88,8 @@ export default function Home() {
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [loadedQuestions, setLoadedQuestions] = useState<any[]>([]);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
   const { data: session } = useSession();
+  const { syncStatus, performSync, cloudActiveSession, clearCloudActiveSession } = useSyncContext();
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     setMousePos({
@@ -113,48 +113,6 @@ export default function Home() {
       }
     }
   }, [selectedSubject]);
-
-  // Auto-sync when user signs in
-  useEffect(() => {
-    if (session?.user?.id && syncStatus === 'idle') {
-      handleSync();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.user?.id]);
-
-  const handleSync = useCallback(async () => {
-    if (!session?.user?.id) return;
-    setSyncStatus('syncing');
-    try {
-      const store = useExamStore.getState();
-      const localSets = store.availableQuestionSets || [];
-      // Push local data to cloud
-      for (const set of localSets) {
-        await pushQuestionSetToCloud(set);
-      }
-      // Push session history
-      const sessionHistory = JSON.parse(localStorage.getItem('exam-session-history') || '[]');
-      if (sessionHistory.length > 0) {
-        await pushSessionHistoryToCloud(sessionHistory);
-      }
-      // Pull from cloud
-      const cloudSets = await pullQuestionSetsFromCloud();
-      if (cloudSets && cloudSets.length > 0) {
-        // Merge cloud sets into local store
-        for (const set of cloudSets) {
-          const exists = localSets.find(s => s.id === set.id);
-          if (!exists) {
-            store.addQuestionSet(set);
-          }
-        }
-      }
-      setSyncStatus('synced');
-      setTimeout(() => setSyncStatus('idle'), 5000);
-    } catch {
-      setSyncStatus('error');
-      setTimeout(() => setSyncStatus('idle'), 5000);
-    }
-  }, [session?.user?.id]);
 
   const handleStart = () => {
     if (!selectedSubject || loadedQuestions.length === 0) {
@@ -226,11 +184,98 @@ export default function Home() {
 
       {/* ===== Auth Button (top-right) ===== */}
       <div className="fixed top-4 right-4 z-50">
-        <AuthButton syncStatus={syncStatus} onSync={handleSync} />
+        <AuthButton syncStatus={syncStatus} onSync={() => performSync({ force: true })} />
       </div>
 
       {/* ===== Main Content ===== */}
       <div className="relative z-10">
+        {/* ===== RESUME BANNER (local active session) ===== */}
+        {isExamStarted && !isExamCompleted && questions.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative z-20 mx-3 sm:mx-4 mt-4"
+          >
+            <div className="max-w-4xl mx-auto p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-800/40 flex items-center justify-center">
+                  <Play className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div>
+                  <p className="font-semibold text-amber-900 dark:text-amber-100">
+                    Active {activeMode === 'practice' ? 'Practice' : 'Exam'} Session
+                  </p>
+                  <p className="text-sm text-amber-700 dark:text-amber-300">
+                    {userAnswers.size}/{questions.length} answered
+                    {currentQuestionSetId && availableQuestionSets.find(s => s.id === currentQuestionSetId)
+                      ? ` \u2022 ${availableQuestionSets.find(s => s.id === currentQuestionSetId)!.title}`
+                      : ''}
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <button
+                  onClick={() => router.push(activeMode === 'practice' ? '/practice' : '/exam')}
+                  className="flex-1 sm:flex-none px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors text-sm"
+                >
+                  Resume
+                </button>
+                <button
+                  onClick={() => resetExam()}
+                  className="flex-1 sm:flex-none px-4 py-2 bg-white dark:bg-gray-800 border border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-300 font-medium rounded-lg hover:bg-amber-50 dark:hover:bg-gray-700 transition-colors text-sm"
+                >
+                  Discard
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ===== CLOUD RESUME BANNER (cross-device) ===== */}
+        {cloudActiveSession && !isExamStarted && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative z-20 mx-3 sm:mx-4 mt-4"
+          >
+            <div className="max-w-4xl mx-auto p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-800/40 flex items-center justify-center">
+                  <Cloud className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="font-semibold text-blue-900 dark:text-blue-100">
+                    Resume {cloudActiveSession.mode === 'practice' ? 'Practice' : 'Exam'} from another device
+                  </p>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    {cloudActiveSession.userAnswers.length}/{cloudActiveSession.questions.length} answered
+                    {' \u2022 Saved '}
+                    {new Date(cloudActiveSession.savedAt).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <button
+                  onClick={() => {
+                    restoreSession(cloudActiveSession);
+                    clearCloudActiveSession();
+                    router.push(cloudActiveSession.mode === 'practice' ? '/practice' : '/exam');
+                  }}
+                  className="flex-1 sm:flex-none px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-sm"
+                >
+                  Resume
+                </button>
+                <button
+                  onClick={() => clearCloudActiveSession()}
+                  className="flex-1 sm:flex-none px-4 py-2 bg-white dark:bg-gray-800 border border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300 font-medium rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors text-sm"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* ===== HERO SECTION ===== */}
         <section className="relative pt-12 sm:pt-20 pb-10 sm:pb-16 px-3 sm:px-4">
           <div className="max-w-6xl mx-auto text-center">

@@ -1,5 +1,5 @@
 import { put, list, del } from '@vercel/blob';
-import { QuestionSet } from './types';
+import { QuestionSet, ActiveSessionData } from './types';
 
 // Blob path pattern: users/{userId}/question-sets/{setId}.json
 
@@ -64,6 +64,50 @@ export async function saveSessionHistoryToCloud(
     access: 'public',
     addRandomSuffix: false,
   });
+}
+
+// ── Active Session ────────────────────────────────────────────────────────
+
+export async function saveActiveSessionToCloud(
+  userId: string,
+  sessionData: ActiveSessionData
+): Promise<void> {
+  const path = `${BLOB_PREFIX}/${userId}/active-session.json`;
+  await put(path, JSON.stringify(sessionData), {
+    access: 'public',
+    addRandomSuffix: false,
+  });
+}
+
+export async function getActiveSessionFromCloud(
+  userId: string
+): Promise<ActiveSessionData | null> {
+  const prefix = `${BLOB_PREFIX}/${userId}/active-session.json`;
+  const { blobs } = await list({ prefix });
+  if (blobs.length === 0) return null;
+
+  try {
+    const response = await fetch(blobs[0].url);
+    const data = await response.json();
+    // Ignore stale sessions older than 7 days
+    if (data.savedAt && Date.now() - data.savedAt > 7 * 24 * 60 * 60 * 1000) {
+      await deleteActiveSessionFromCloud(userId);
+      return null;
+    }
+    return data as ActiveSessionData;
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteActiveSessionFromCloud(
+  userId: string
+): Promise<void> {
+  const prefix = `${BLOB_PREFIX}/${userId}/active-session.json`;
+  const { blobs } = await list({ prefix });
+  for (const blob of blobs) {
+    await del(blob.url);
+  }
 }
 
 export async function getSessionHistoryFromCloud(

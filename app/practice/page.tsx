@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useExamStore } from '@/lib/store';
+import { useExamStore, useHasHydrated } from '@/lib/store';
 import Timer from '@/components/Timer';
 import ProgressBar from '@/components/ProgressBar';
 import EvaluationPane from '@/components/EvaluationPane';
@@ -16,6 +16,7 @@ import { ChevronLeft, ChevronRight, Home, AlertCircle, MessageCircle, BarChart3,
 
 export default function PracticePage() {
   const router = useRouter();
+  const hasHydrated = useHasHydrated();
   const {
     questions,
     currentQuestionIndex,
@@ -64,16 +65,23 @@ export default function PracticePage() {
     return () => unsubscribe();
   }, [cognitiveCompanion, updateDiagnosisResults]);
 
+  // Wait for Zustand hydration before checking session state
   useEffect(() => {
-    if (!isExamStarted) {
+    if (!hasHydrated) return;
+    if (!isExamStarted || questions.length === 0) {
       router.push('/');
-      return;
     }
+  }, [hasHydrated, isExamStarted, questions.length, router]);
 
-    if (questions.length === 0) {
-      router.push('/');
-    }
-  }, [isExamStarted, questions.length, router]);
+  // Warn before leaving during active session
+  useEffect(() => {
+    if (!isExamStarted) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [isExamStarted]);
 
   // Track question view time
   useEffect(() => {
@@ -99,7 +107,7 @@ export default function PracticePage() {
     }
   }, [currentQuestionIndex, userAnswers]);
 
-  if (!isExamStarted || questions.length === 0) {
+  if (!hasHydrated || !isExamStarted || questions.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>

@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/lib/theme-context";
 import ThemeWrapper from "@/components/ThemeWrapper";
 import SessionProvider from "@/components/SessionProvider";
+import SyncProvider from "@/components/SyncProvider";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -42,10 +43,12 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <SessionProvider>
-          <ThemeProvider>
-            <ThemeWrapper />
-            {children}
-          </ThemeProvider>
+          <SyncProvider>
+            <ThemeProvider>
+              <ThemeWrapper />
+              {children}
+            </ThemeProvider>
+          </SyncProvider>
         </SessionProvider>
       </body>
     </html>
