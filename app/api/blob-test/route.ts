@@ -22,7 +22,7 @@ export async function GET() {
   // Test put
   try {
     const blob = await put('test/ping.txt', 'hello', {
-      access: 'public',
+      access: 'private',
       addRandomSuffix: false,
       token,
     });
