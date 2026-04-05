@@ -13,6 +13,7 @@ import InteractiveLearningPlan from '@/components/InteractiveLearningPlan';
 import LiveStatsOverlay from '@/components/LiveStatsOverlay';
 import { cognitiveQueue } from '@/lib/cognitiveQueue';
 import { ChevronLeft, ChevronRight, Home, AlertCircle, MessageCircle, BarChart3, Brain } from 'lucide-react';
+import { answersMatch, isOptionSelected, isCorrectOption, isMultiAnswer, getRequiredAnswerCount, toggleAnswer } from '@/lib/multiAnswer';
 
 export default function PracticePage() {
   const router = useRouter();
@@ -119,17 +120,29 @@ export default function PracticePage() {
   const answeredCount = userAnswers.size;
 
   const handleAnswerSelect = (answerId: string) => {
-    // Track selection changes
-    if (selectedAnswer && selectedAnswer !== answerId) {
-      recordSelectionChange(currentQuestion.id);
+    const multiAnswer = isMultiAnswer(currentQuestion.correctAnswer, currentQuestion.question);
+    const requiredCount = getRequiredAnswerCount(currentQuestion.correctAnswer, currentQuestion.question);
+
+    let newAnswer: string;
+    if (multiAnswer) {
+      newAnswer = toggleAnswer(answerId, selectedAnswer);
+      if (selectedAnswer) recordSelectionChange(currentQuestion.id);
+      setSelectedAnswer(newAnswer || null);
+      // Don't auto-submit until enough answers selected
+      const selectedCount = newAnswer.split(',').filter(Boolean).length;
+      if (selectedCount < requiredCount) return;
+    } else {
+      if (selectedAnswer && selectedAnswer !== answerId) {
+        recordSelectionChange(currentQuestion.id);
+      }
+      newAnswer = answerId;
+      setSelectedAnswer(newAnswer);
     }
 
-    setSelectedAnswer(answerId);
-
-    const isCorrect = answerId === currentQuestion.correctAnswer;
+    const isCorrect = answersMatch(newAnswer, currentQuestion.correctAnswer);
 
     // Auto-submit answer in practice mode
-    submitAnswer(currentQuestion.id, answerId, isCorrect);
+    submitAnswer(currentQuestion.id, newAnswer, isCorrect);
 
     // Enqueue background diagnosis for wrong answers
     if (!isCorrect && cognitiveCompanion) {
@@ -213,7 +226,7 @@ export default function PracticePage() {
   const currentSelectionChanges = selectionChanges.get(currentQuestion.id) || 0;
 
   // Check current answer state
-  const isCurrentAnswerWrong = selectedAnswer !== null && selectedAnswer !== currentQuestion.correctAnswer;
+  const isCurrentAnswerWrong = selectedAnswer !== null && !answersMatch(selectedAnswer, currentQuestion.correctAnswer);
 
   // Get diagnosis result for current question
   const currentDiagnosisResult = diagnosisResults.get(currentQuestion.id);
@@ -360,11 +373,20 @@ export default function PracticePage() {
                 </h2>
               </div>
 
+              {isMultiAnswer(currentQuestion.correctAnswer, currentQuestion.question) && !userAnswers.has(currentQuestion.id) && (
+                <div className="mb-2 px-1">
+                  <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                    Select {getRequiredAnswerCount(currentQuestion.correctAnswer, currentQuestion.question)} answers
+                  </span>
+                </div>
+              )}
+
               <div className="space-y-2 sm:space-y-3">
                 {currentQuestion.options.map((option) => {
-                  const isSelected = selectedAnswer === option.id;
-                  const isCorrect = option.id === currentQuestion.correctAnswer;
-                  const showResult = selectedAnswer !== null;
+                  const isSelected = isOptionSelected(option.id, selectedAnswer);
+                  const isCorrect = isCorrectOption(option.id, currentQuestion.correctAnswer);
+                  const isAnsweredAlready = userAnswers.has(currentQuestion.id);
+                  const showResult = isAnsweredAlready;
 
                   let optionStyle = '';
                   if (showResult) {
@@ -494,7 +516,7 @@ export default function PracticePage() {
             options={currentQuestion.options}
             selectedAnswer={selectedAnswer}
             correctAnswer={currentQuestion.correctAnswer}
-            isCorrect={selectedAnswer === currentQuestion.correctAnswer}
+            isCorrect={answersMatch(selectedAnswer, currentQuestion.correctAnswer)}
             explanation={currentQuestion.explanation}
             questionId={currentQuestion.id}
           />
