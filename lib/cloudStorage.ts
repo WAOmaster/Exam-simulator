@@ -16,13 +16,10 @@ export async function saveQuestionSetToCloud(
   questionSet: QuestionSet
 ): Promise<void> {
   const path = `${BLOB_PREFIX}/${userId}/question-sets/${questionSet.id}.json`;
-  const token = getBlobToken();
-  console.log('[CloudStorage] put question-set, path:', path, 'token exists:', !!token, 'token length:', token?.length);
   await put(path, JSON.stringify(questionSet), {
-    access: 'private',
     addRandomSuffix: false,
-    token,
-  });
+    token: getBlobToken(),
+  } as any);
 }
 
 export async function getAllQuestionSetsFromCloud(
@@ -36,7 +33,7 @@ export async function getAllQuestionSetsFromCloud(
     const result = await list({ prefix, cursor, token: getBlobToken() });
     for (const blob of result.blobs) {
       try {
-        const readUrl = blob.downloadUrl || blob.url;
+        const readUrl = (blob as any).downloadUrl || blob.url;
         const response = await fetch(readUrl);
         const data = await response.json();
         sets.push(data as QuestionSet);
@@ -69,10 +66,9 @@ export async function saveSessionHistoryToCloud(
 ): Promise<void> {
   const path = `${BLOB_PREFIX}/${userId}/session-history.json`;
   await put(path, JSON.stringify(history), {
-    access: 'private',
     addRandomSuffix: false,
     token: getBlobToken(),
-  });
+  } as any);
 }
 
 // ── Active Session ────────────────────────────────────────────────────────
@@ -83,10 +79,9 @@ export async function saveActiveSessionToCloud(
 ): Promise<void> {
   const path = `${BLOB_PREFIX}/${userId}/active-session.json`;
   await put(path, JSON.stringify(sessionData), {
-    access: 'private',
     addRandomSuffix: false,
     token: getBlobToken(),
-  });
+  } as any);
 }
 
 export async function getActiveSessionFromCloud(
@@ -97,7 +92,7 @@ export async function getActiveSessionFromCloud(
   if (blobs.length === 0) return null;
 
   try {
-    const readUrl = blobs[0].downloadUrl || blobs[0].url;
+    const readUrl = (blobs[0] as any).downloadUrl || blobs[0].url;
     const response = await fetch(readUrl);
     const data = await response.json();
     // Ignore stale sessions older than 7 days
@@ -129,7 +124,7 @@ export async function getSessionHistoryFromCloud(
   if (blobs.length === 0) return [];
 
   try {
-    const readUrl = blobs[0].downloadUrl || blobs[0].url;
+    const readUrl = (blobs[0] as any).downloadUrl || blobs[0].url;
     const response = await fetch(readUrl);
     return await response.json();
   } catch {
