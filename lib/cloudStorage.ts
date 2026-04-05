@@ -19,7 +19,7 @@ export async function saveQuestionSetToCloud(
   const token = getBlobToken();
   console.log('[CloudStorage] put question-set, path:', path, 'token exists:', !!token, 'token length:', token?.length);
   await put(path, JSON.stringify(questionSet), {
-    access: 'public',
+    access: 'private',
     addRandomSuffix: false,
     token,
   });
@@ -36,7 +36,8 @@ export async function getAllQuestionSetsFromCloud(
     const result = await list({ prefix, cursor, token: getBlobToken() });
     for (const blob of result.blobs) {
       try {
-        const response = await fetch(blob.url);
+        const readUrl = blob.downloadUrl || blob.url;
+        const response = await fetch(readUrl);
         const data = await response.json();
         sets.push(data as QuestionSet);
       } catch (err) {
@@ -68,7 +69,7 @@ export async function saveSessionHistoryToCloud(
 ): Promise<void> {
   const path = `${BLOB_PREFIX}/${userId}/session-history.json`;
   await put(path, JSON.stringify(history), {
-    access: 'public',
+    access: 'private',
     addRandomSuffix: false,
     token: getBlobToken(),
   });
@@ -82,7 +83,7 @@ export async function saveActiveSessionToCloud(
 ): Promise<void> {
   const path = `${BLOB_PREFIX}/${userId}/active-session.json`;
   await put(path, JSON.stringify(sessionData), {
-    access: 'public',
+    access: 'private',
     addRandomSuffix: false,
     token: getBlobToken(),
   });
@@ -96,7 +97,8 @@ export async function getActiveSessionFromCloud(
   if (blobs.length === 0) return null;
 
   try {
-    const response = await fetch(blobs[0].url);
+    const readUrl = blobs[0].downloadUrl || blobs[0].url;
+    const response = await fetch(readUrl);
     const data = await response.json();
     // Ignore stale sessions older than 7 days
     if (data.savedAt && Date.now() - data.savedAt > 7 * 24 * 60 * 60 * 1000) {
@@ -127,7 +129,8 @@ export async function getSessionHistoryFromCloud(
   if (blobs.length === 0) return [];
 
   try {
-    const response = await fetch(blobs[0].url);
+    const readUrl = blobs[0].downloadUrl || blobs[0].url;
+    const response = await fetch(readUrl);
     return await response.json();
   } catch {
     return [];
