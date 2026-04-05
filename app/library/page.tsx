@@ -3,16 +3,18 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Library as LibraryIcon, ArrowLeft, Search, Filter, Loader2, AlertCircle, Upload } from 'lucide-react';
+import { Library as LibraryIcon, ArrowLeft, Search, Filter, Loader2, AlertCircle, Upload, RefreshCw } from 'lucide-react';
 import QuestionSetCard from '@/components/QuestionSetCard';
 import ExamSetupModal from '@/components/ExamSetupModal';
 import JsonImportDialog from '@/components/JsonImportDialog';
 import { useExamStore } from '@/lib/store';
 import { QuestionSet } from '@/lib/types';
+import { useSyncContext } from '@/components/SyncProvider';
 
 export default function LibraryPage() {
   const router = useRouter();
-  const { loadQuestionSets, setCurrentQuestionSet, startExam, resetExam, availableQuestionSets, addQuestionSet } = useExamStore();
+  const { loadQuestionSets, setCurrentQuestionSet, startExam, resetExam, availableQuestionSets, addQuestionSet, isExamStarted, isExamCompleted, currentQuestionSetId, mode: activeMode, userAnswers, questions: activeQuestions } = useExamStore();
+  const { syncStatus } = useSyncContext();
 
   const [questionSets, setQuestionSets] = useState<QuestionSet[]>([]);
   const [filteredSets, setFilteredSets] = useState<QuestionSet[]>([]);
@@ -68,7 +70,14 @@ export default function LibraryPage() {
   };
 
   const handleStartExam = (questionSet: QuestionSet) => {
-    // Open setup modal instead of directly starting
+    // If there's an active session for this question set, offer to resume
+    if (isExamStarted && !isExamCompleted && currentQuestionSetId === questionSet.id && activeQuestions.length > 0) {
+      if (confirm(`You have an active ${activeMode} session for "${questionSet.title}" (${userAnswers.size}/${activeQuestions.length} answered). Resume?`)) {
+        router.push(activeMode === 'practice' ? '/practice' : '/exam');
+        return;
+      }
+    }
+    // Open setup modal for new session
     setSelectedQuestionSet(questionSet);
     setShowSetupModal(true);
   };
@@ -195,6 +204,14 @@ export default function LibraryPage() {
             </div>
           </div>
         </div>
+
+        {/* Syncing Indicator */}
+        {syncStatus === 'syncing' && (
+          <div className="flex items-center gap-2 px-4 py-2 mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg text-sm text-blue-700 dark:text-blue-300">
+            <RefreshCw className="w-4 h-4 animate-spin" />
+            Syncing your library from cloud...
+          </div>
+        )}
 
         {/* Loading State */}
         {isLoading && (

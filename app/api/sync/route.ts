@@ -6,6 +6,9 @@ import {
   deleteQuestionSetFromCloud,
   saveSessionHistoryToCloud,
   getSessionHistoryFromCloud,
+  saveActiveSessionToCloud,
+  getActiveSessionFromCloud,
+  deleteActiveSessionFromCloud,
 } from '@/lib/cloudStorage';
 
 // GET: Pull all data from cloud
@@ -25,6 +28,9 @@ export async function GET(request: NextRequest) {
     } else if (type === 'session-history') {
       const history = await getSessionHistoryFromCloud(userId);
       return NextResponse.json({ sessionHistory: history });
+    } else if (type === 'active-session') {
+      const session = await getActiveSessionFromCloud(userId);
+      return NextResponse.json({ activeSession: session });
     }
     return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
   } catch (error: any) {
@@ -51,6 +57,9 @@ export async function POST(request: NextRequest) {
     } else if (type === 'session-history') {
       await saveSessionHistoryToCloud(userId, data);
       return NextResponse.json({ success: true });
+    } else if (type === 'active-session') {
+      await saveActiveSessionToCloud(userId, data);
+      return NextResponse.json({ success: true });
     }
     return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
   } catch (error: any) {
@@ -68,12 +77,18 @@ export async function DELETE(request: NextRequest) {
 
   const userId = session.user.id;
   const setId = request.nextUrl.searchParams.get('setId');
-
-  if (!setId) {
-    return NextResponse.json({ error: 'setId required' }, { status: 400 });
-  }
+  const deleteType = request.nextUrl.searchParams.get('type');
 
   try {
+    if (deleteType === 'active-session') {
+      await deleteActiveSessionFromCloud(userId);
+      return NextResponse.json({ success: true });
+    }
+
+    if (!setId) {
+      return NextResponse.json({ error: 'setId required' }, { status: 400 });
+    }
+
     await deleteQuestionSetFromCloud(userId, setId);
     return NextResponse.json({ success: true });
   } catch (error: any) {

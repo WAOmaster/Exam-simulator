@@ -20,6 +20,7 @@ const defaultSessionMetrics: SessionMetrics = {
 };
 
 interface ExamState {
+  _hasHydrated: boolean;
   questions: Question[];
   currentQuestionIndex: number;
   userAnswers: Map<number, UserAnswer>;
@@ -70,11 +71,15 @@ interface ExamState {
   loadQuestionSets: (sets: QuestionSet[]) => void;
   addQuestionSet: (set: QuestionSet) => void;
   removeQuestionSet: (id: string) => void;
+
+  // Session restore
+  restoreSession: (data: import('./types').ActiveSessionData) => void;
 }
 
 export const useExamStore = create<ExamState>()(
   persist(
     (set, get) => ({
+      _hasHydrated: false,
       questions: [],
       currentQuestionIndex: 0,
       userAnswers: new Map(),
@@ -324,6 +329,27 @@ export const useExamStore = create<ExamState>()(
           availableQuestionSets: state.availableQuestionSets.filter(s => s.id !== id),
         });
       },
+
+      restoreSession: (data) =>
+        set({
+          questions: data.questions,
+          userAnswers: new Map(data.userAnswers),
+          currentQuestionIndex: data.currentQuestionIndex,
+          currentQuestionSetId: data.currentQuestionSetId,
+          examStartTime: data.examStartTime,
+          examDuration: data.examDuration,
+          mode: data.mode,
+          useTimer: data.useTimer,
+          learnWithAI: data.learnWithAI,
+          reviewAnswers: data.reviewAnswers,
+          cognitiveCompanion: data.cognitiveCompanion,
+          socraticMode: data.socraticMode,
+          sessionMetrics: data.sessionMetrics,
+          questionViewTimes: new Map(data.questionViewTimes),
+          selectionChanges: new Map(data.selectionChanges),
+          isExamStarted: true,
+          isExamCompleted: false,
+        }),
     }),
     {
       name: 'exam-generator-storage',
@@ -337,6 +363,10 @@ export const useExamStore = create<ExamState>()(
         currentQuestionIndex: state.currentQuestionIndex,
         mode: state.mode,
         useTimer: state.useTimer,
+        learnWithAI: state.learnWithAI,
+        reviewAnswers: state.reviewAnswers,
+        cognitiveCompanion: state.cognitiveCompanion,
+        socraticMode: state.socraticMode,
         currentQuestionSetId: state.currentQuestionSetId,
         availableQuestionSets: state.availableQuestionSets,
         sessionMetrics: state.sessionMetrics,
@@ -345,6 +375,9 @@ export const useExamStore = create<ExamState>()(
         diagnosisResults: Array.from(state.diagnosisResults.entries()),
       }),
       onRehydrateStorage: () => (state) => {
+        if (state) {
+          state._hasHydrated = true;
+        }
         if (state && Array.isArray(state.userAnswers)) {
           state.userAnswers = new Map(state.userAnswers as any);
         }
@@ -361,3 +394,5 @@ export const useExamStore = create<ExamState>()(
     }
   )
 );
+
+export const useHasHydrated = () => useExamStore((s) => s._hasHydrated);

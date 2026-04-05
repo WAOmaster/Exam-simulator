@@ -148,6 +148,25 @@ export interface ScrapeResponse {
 }
 
 // Session metrics for enhanced tracking (Cognitive Companion, Socratic Mode)
+export interface ActiveSessionData {
+  questions: Question[];
+  userAnswers: [number, any][];
+  currentQuestionIndex: number;
+  currentQuestionSetId: string | null;
+  examStartTime: number | null;
+  examDuration: number;
+  mode: 'practice' | 'exam';
+  useTimer: boolean;
+  learnWithAI: boolean;
+  reviewAnswers: boolean;
+  cognitiveCompanion: boolean;
+  socraticMode: boolean;
+  sessionMetrics: SessionMetrics;
+  questionViewTimes: [number, number][];
+  selectionChanges: [number, number][];
+  savedAt: number;
+}
+
 export interface SessionMetrics {
   totalTimeSpent: number;
   averageResponseTime: number;

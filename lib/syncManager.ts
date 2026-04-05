@@ -1,6 +1,6 @@
 'use client';
 
-import { QuestionSet } from './types';
+import { QuestionSet, ActiveSessionData } from './types';
 
 export type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error' | 'offline';
 
@@ -70,6 +70,45 @@ export async function pullSessionHistoryFromCloud(): Promise<unknown[] | null> {
     return data.sessionHistory || [];
   } catch {
     return null;
+  }
+}
+
+// ── Active Session Operations ─────────────────────────────────────────────
+
+export async function pushActiveSessionToCloud(
+  sessionData: ActiveSessionData
+): Promise<boolean> {
+  try {
+    const res = await fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'active-session', data: sessionData }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function pullActiveSessionFromCloud(): Promise<ActiveSessionData | null> {
+  try {
+    const res = await fetch('/api/sync?type=active-session');
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.activeSession || null;
+  } catch {
+    return null;
+  }
+}
+
+export async function clearActiveSessionFromCloud(): Promise<boolean> {
+  try {
+    const res = await fetch('/api/sync?type=active-session', {
+      method: 'DELETE',
+    });
+    return res.ok;
+  } catch {
+    return false;
   }
 }
 
