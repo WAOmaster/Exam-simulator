@@ -281,6 +281,8 @@ export default function LibraryPage() {
                     questionSet={questionSet}
                     onStart={handleStartExam}
                     onDelete={handleDeleteSet}
+                    isActiveSession={isExamStarted && !isExamCompleted && currentQuestionSetId === questionSet.id && activeQuestions.length > 0 && userAnswers.size < activeQuestions.length}
+                    activeProgress={isExamStarted && !isExamCompleted && currentQuestionSetId === questionSet.id ? { answered: userAnswers.size, total: activeQuestions.length, mode: activeMode } : undefined}
                   />
                 </motion.div>
               ))}

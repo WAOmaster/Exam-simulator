@@ -190,7 +190,7 @@ export default function Home() {
       {/* ===== Main Content ===== */}
       <div className="relative z-10">
         {/* ===== RESUME BANNER (local active session) ===== */}
-        {isExamStarted && !isExamCompleted && questions.length > 0 && (
+        {isExamStarted && !isExamCompleted && questions.length > 0 && userAnswers.size < questions.length && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}

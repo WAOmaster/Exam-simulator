@@ -2,16 +2,18 @@
 
 import { useState } from 'react';
 import { QuestionSet } from '@/lib/types';
-import { Calendar, FileText, TrendingUp, Play, Trash2, Globe, Lock, Download } from 'lucide-react';
+import { Calendar, FileText, TrendingUp, Play, Trash2, Globe, Lock, Download, RotateCcw } from 'lucide-react';
 import ExportDialog from './ExportDialog';
 
 interface QuestionSetCardProps {
   questionSet: QuestionSet;
   onStart: (questionSet: QuestionSet) => void;
   onDelete?: (questionSet: QuestionSet) => void;
+  isActiveSession?: boolean;
+  activeProgress?: { answered: number; total: number; mode: string };
 }
 
-export default function QuestionSetCard({ questionSet, onStart, onDelete }: QuestionSetCardProps) {
+export default function QuestionSetCard({ questionSet, onStart, onDelete, isActiveSession, activeProgress }: QuestionSetCardProps) {
   const [showExportDialog, setShowExportDialog] = useState(false);
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -30,7 +32,14 @@ export default function QuestionSetCard({ questionSet, onStart, onDelete }: Ques
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6 hover:shadow-lg transition-all hover:border-blue-500 dark:hover:border-blue-400">
+    <div className={`bg-white dark:bg-gray-800 rounded-lg border p-4 sm:p-6 hover:shadow-lg transition-all ${isActiveSession ? 'border-amber-400 dark:border-amber-500 ring-1 ring-amber-300 dark:ring-amber-600' : 'border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400'}`}>
+      {/* Active session badge */}
+      {isActiveSession && activeProgress && (
+        <div className="mb-3 flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg text-xs text-amber-700 dark:text-amber-300 font-medium">
+          <RotateCcw className="w-3.5 h-3.5" />
+          {activeProgress.answered}/{activeProgress.total} answered · {activeProgress.mode} in progress
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-start justify-between mb-2 sm:mb-3">
         <div className="flex-1 min-w-0">
@@ -146,10 +155,10 @@ export default function QuestionSetCard({ questionSet, onStart, onDelete }: Ques
       <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button
           onClick={() => onStart(questionSet)}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 text-white rounded-lg font-medium transition-colors ${isActiveSession ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600'}`}
         >
-          <Play className="w-4 h-4" />
-          Start Exam
+          {isActiveSession ? <RotateCcw className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+          {isActiveSession ? 'Resume' : 'Start Exam'}
         </button>
 
         <button
