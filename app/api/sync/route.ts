@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
   } catch (error: any) {
-    console.error('Sync POST error:', error);
+    console.error('Sync POST error:', error?.message, error?.stack);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
