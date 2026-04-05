@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { put, list } from '@vercel/blob';
+import { put, list, del } from '@vercel/blob';
 
 export async function GET() {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
@@ -19,18 +19,22 @@ export async function GET() {
     diagnostics.listError = e.message;
   }
 
-  // Test put (no access field — store is private, SDK handles it)
+  // Test put with private access
   try {
     const blob = await put('test/ping.txt', 'hello', {
+      access: 'private',
       addRandomSuffix: false,
       token,
-    } as any);
+    });
     diagnostics.putWorks = true;
     diagnostics.putUrl = blob.url;
+
+    // Clean up test blob
+    await del(blob.url, { token });
+    diagnostics.deleteWorks = true;
   } catch (e: any) {
     diagnostics.putWorks = false;
     diagnostics.putError = e.message;
-    diagnostics.putErrorFull = e.toString();
   }
 
   return NextResponse.json(diagnostics);
