@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { put, list, del } from '@vercel/blob';
+import { put, list, del, get } from '@vercel/blob';
 
 export async function GET() {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
@@ -28,6 +28,22 @@ export async function GET() {
     });
     diagnostics.putWorks = true;
     diagnostics.putUrl = blob.url;
+
+    // Test get (read private blob)
+    try {
+      const result = await get(blob.url, { access: 'private', token });
+      if (result) {
+        const text = await new Response(result.stream).text();
+        diagnostics.getWorks = true;
+        diagnostics.getContent = text;
+      } else {
+        diagnostics.getWorks = false;
+        diagnostics.getError = 'get returned null';
+      }
+    } catch (e: any) {
+      diagnostics.getWorks = false;
+      diagnostics.getError = e.message;
+    }
 
     // Clean up test blob
     await del(blob.url, { token });
