@@ -1,4 +1,4 @@
-import { put, list, del, getDownloadUrl } from '@vercel/blob';
+import { put, list, del, get } from '@vercel/blob';
 import { QuestionSet, ActiveSessionData } from './types';
 
 // Blob path pattern: users/{userId}/question-sets/{setId}.json
@@ -7,6 +7,14 @@ const BLOB_PREFIX = 'users';
 
 function getBlobToken(): string | undefined {
   return process.env.BLOB_READ_WRITE_TOKEN;
+}
+
+async function readBlobJson<T>(blobUrl: string): Promise<T> {
+  const token = getBlobToken();
+  const result = await get(blobUrl, { access: 'private', token });
+  if (!result) throw new Error(`Blob not found: ${blobUrl}`);
+  const text = await new Response(result.stream).text();
+  return JSON.parse(text) as T;
 }
 
 // ── Question Sets ──────────────────────────────────────────────────────────
@@ -35,10 +43,8 @@ export async function getAllQuestionSetsFromCloud(
     const result = await list({ prefix, cursor, token });
     for (const blob of result.blobs) {
       try {
-        const downloadUrl = await getDownloadUrl(blob.url, { token });
-        const response = await fetch(downloadUrl);
-        const data = await response.json();
-        sets.push(data as QuestionSet);
+        const data = await readBlobJson<QuestionSet>(blob.url);
+        sets.push(data);
       } catch (err) {
         console.error(`Failed to fetch blob ${blob.pathname}:`, err);
       }
@@ -97,15 +103,13 @@ export async function getActiveSessionFromCloud(
   if (blobs.length === 0) return null;
 
   try {
-    const downloadUrl = await getDownloadUrl(blobs[0].url, { token });
-    const response = await fetch(downloadUrl);
-    const data = await response.json();
+    const data = await readBlobJson<ActiveSessionData>(blobs[0].url);
     // Ignore stale sessions older than 7 days
     if (data.savedAt && Date.now() - data.savedAt > 7 * 24 * 60 * 60 * 1000) {
       await deleteActiveSessionFromCloud(userId);
       return null;
     }
-    return data as ActiveSessionData;
+    return data;
   } catch {
     return null;
   }
@@ -130,9 +134,7 @@ export async function getSessionHistoryFromCloud(
   if (blobs.length === 0) return [];
 
   try {
-    const downloadUrl = await getDownloadUrl(blobs[0].url, { token });
-    const response = await fetch(downloadUrl);
-    return await response.json();
+    return await readBlobJson<unknown[]>(blobs[0].url);
   } catch {
     return [];
   }
