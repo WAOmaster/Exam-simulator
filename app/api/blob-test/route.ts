@@ -19,13 +19,12 @@ export async function GET() {
     diagnostics.listError = e.message;
   }
 
-  // Test put
+  // Test put (no access field — store is private, SDK handles it)
   try {
     const blob = await put('test/ping.txt', 'hello', {
-      access: 'private',
       addRandomSuffix: false,
       token,
-    });
+    } as any);
     diagnostics.putWorks = true;
     diagnostics.putUrl = blob.url;
   } catch (e: any) {
