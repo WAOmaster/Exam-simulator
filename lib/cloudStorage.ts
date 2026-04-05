@@ -1,4 +1,4 @@
-import { put, list, del } from '@vercel/blob';
+import { put, list, del, getDownloadUrl } from '@vercel/blob';
 import { QuestionSet, ActiveSessionData } from './types';
 
 // Blob path pattern: users/{userId}/question-sets/{setId}.json
@@ -17,9 +17,10 @@ export async function saveQuestionSetToCloud(
 ): Promise<void> {
   const path = `${BLOB_PREFIX}/${userId}/question-sets/${questionSet.id}.json`;
   await put(path, JSON.stringify(questionSet), {
+    access: 'private',
     addRandomSuffix: false,
     token: getBlobToken(),
-  } as any);
+  });
 }
 
 export async function getAllQuestionSetsFromCloud(
@@ -27,14 +28,15 @@ export async function getAllQuestionSetsFromCloud(
 ): Promise<QuestionSet[]> {
   const prefix = `${BLOB_PREFIX}/${userId}/question-sets/`;
   const sets: QuestionSet[] = [];
+  const token = getBlobToken();
 
   let cursor: string | undefined;
   do {
-    const result = await list({ prefix, cursor, token: getBlobToken() });
+    const result = await list({ prefix, cursor, token });
     for (const blob of result.blobs) {
       try {
-        const readUrl = (blob as any).downloadUrl || blob.url;
-        const response = await fetch(readUrl);
+        const downloadUrl = await getDownloadUrl(blob.url, { token });
+        const response = await fetch(downloadUrl);
         const data = await response.json();
         sets.push(data as QuestionSet);
       } catch (err) {
@@ -66,9 +68,10 @@ export async function saveSessionHistoryToCloud(
 ): Promise<void> {
   const path = `${BLOB_PREFIX}/${userId}/session-history.json`;
   await put(path, JSON.stringify(history), {
+    access: 'private',
     addRandomSuffix: false,
     token: getBlobToken(),
-  } as any);
+  });
 }
 
 // ── Active Session ────────────────────────────────────────────────────────
@@ -79,21 +82,23 @@ export async function saveActiveSessionToCloud(
 ): Promise<void> {
   const path = `${BLOB_PREFIX}/${userId}/active-session.json`;
   await put(path, JSON.stringify(sessionData), {
+    access: 'private',
     addRandomSuffix: false,
     token: getBlobToken(),
-  } as any);
+  });
 }
 
 export async function getActiveSessionFromCloud(
   userId: string
 ): Promise<ActiveSessionData | null> {
   const prefix = `${BLOB_PREFIX}/${userId}/active-session.json`;
-  const { blobs } = await list({ prefix, token: getBlobToken() });
+  const token = getBlobToken();
+  const { blobs } = await list({ prefix, token });
   if (blobs.length === 0) return null;
 
   try {
-    const readUrl = (blobs[0] as any).downloadUrl || blobs[0].url;
-    const response = await fetch(readUrl);
+    const downloadUrl = await getDownloadUrl(blobs[0].url, { token });
+    const response = await fetch(downloadUrl);
     const data = await response.json();
     // Ignore stale sessions older than 7 days
     if (data.savedAt && Date.now() - data.savedAt > 7 * 24 * 60 * 60 * 1000) {
@@ -120,12 +125,13 @@ export async function getSessionHistoryFromCloud(
   userId: string
 ): Promise<unknown[]> {
   const prefix = `${BLOB_PREFIX}/${userId}/session-history.json`;
-  const { blobs } = await list({ prefix, token: getBlobToken() });
+  const token = getBlobToken();
+  const { blobs } = await list({ prefix, token });
   if (blobs.length === 0) return [];
 
   try {
-    const readUrl = (blobs[0] as any).downloadUrl || blobs[0].url;
-    const response = await fetch(readUrl);
+    const downloadUrl = await getDownloadUrl(blobs[0].url, { token });
+    const response = await fetch(downloadUrl);
     return await response.json();
   } catch {
     return [];
