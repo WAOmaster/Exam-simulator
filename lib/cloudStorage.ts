@@ -5,6 +5,10 @@ import { QuestionSet, ActiveSessionData } from './types';
 
 const BLOB_PREFIX = 'users';
 
+function getBlobToken(): string | undefined {
+  return process.env.BLOB_READ_WRITE_TOKEN;
+}
+
 // ── Question Sets ──────────────────────────────────────────────────────────
 
 export async function saveQuestionSetToCloud(
@@ -12,9 +16,12 @@ export async function saveQuestionSetToCloud(
   questionSet: QuestionSet
 ): Promise<void> {
   const path = `${BLOB_PREFIX}/${userId}/question-sets/${questionSet.id}.json`;
+  const token = getBlobToken();
+  console.log('[CloudStorage] put question-set, path:', path, 'token exists:', !!token, 'token length:', token?.length);
   await put(path, JSON.stringify(questionSet), {
     access: 'public',
     addRandomSuffix: false,
+    token,
   });
 }
 
@@ -26,7 +33,7 @@ export async function getAllQuestionSetsFromCloud(
 
   let cursor: string | undefined;
   do {
-    const result = await list({ prefix, cursor });
+    const result = await list({ prefix, cursor, token: getBlobToken() });
     for (const blob of result.blobs) {
       try {
         const response = await fetch(blob.url);
@@ -47,9 +54,9 @@ export async function deleteQuestionSetFromCloud(
   setId: string
 ): Promise<void> {
   const prefix = `${BLOB_PREFIX}/${userId}/question-sets/${setId}.json`;
-  const { blobs } = await list({ prefix });
+  const { blobs } = await list({ prefix, token: getBlobToken() });
   for (const blob of blobs) {
-    await del(blob.url);
+    await del(blob.url, { token: getBlobToken() });
   }
 }
 
@@ -63,6 +70,7 @@ export async function saveSessionHistoryToCloud(
   await put(path, JSON.stringify(history), {
     access: 'public',
     addRandomSuffix: false,
+    token: getBlobToken(),
   });
 }
 
@@ -76,6 +84,7 @@ export async function saveActiveSessionToCloud(
   await put(path, JSON.stringify(sessionData), {
     access: 'public',
     addRandomSuffix: false,
+    token: getBlobToken(),
   });
 }
 
@@ -83,7 +92,7 @@ export async function getActiveSessionFromCloud(
   userId: string
 ): Promise<ActiveSessionData | null> {
   const prefix = `${BLOB_PREFIX}/${userId}/active-session.json`;
-  const { blobs } = await list({ prefix });
+  const { blobs } = await list({ prefix, token: getBlobToken() });
   if (blobs.length === 0) return null;
 
   try {
@@ -104,9 +113,9 @@ export async function deleteActiveSessionFromCloud(
   userId: string
 ): Promise<void> {
   const prefix = `${BLOB_PREFIX}/${userId}/active-session.json`;
-  const { blobs } = await list({ prefix });
+  const { blobs } = await list({ prefix, token: getBlobToken() });
   for (const blob of blobs) {
-    await del(blob.url);
+    await del(blob.url, { token: getBlobToken() });
   }
 }
 
@@ -114,7 +123,7 @@ export async function getSessionHistoryFromCloud(
   userId: string
 ): Promise<unknown[]> {
   const prefix = `${BLOB_PREFIX}/${userId}/session-history.json`;
-  const { blobs } = await list({ prefix });
+  const { blobs } = await list({ prefix, token: getBlobToken() });
   if (blobs.length === 0) return [];
 
   try {
