@@ -8,6 +8,7 @@ import { parseInlineImages } from '@/lib/parseInlineImages';
 import { useExamStore } from '@/lib/store';
 import { parseAnswers, getCorrectOptionTexts } from '@/lib/multiAnswer';
 import ZoomableImage from './ZoomableImage';
+import QuestionImages from './QuestionImages';
 
 interface EvaluationPaneProps {
   isOpen: boolean;
@@ -220,14 +221,7 @@ export default function EvaluationPane({
               {answerImages && answerImages.length > 0 && (
                 <div className="mb-6 space-y-2">
                   <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Answer</p>
-                  {answerImages.map((src, i) => (
-                    <ZoomableImage
-                      key={`eval-ans-${i}`}
-                      src={src}
-                      alt={`Answer image ${i + 1}`}
-                      gallery={evalGallery}
-                    />
-                  ))}
+                  <QuestionImages images={answerImages} gallery={evalGallery} altPrefix="Answer image" />
                 </div>
               )}
 

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { parseInlineImages } from '@/lib/parseInlineImages';
 import ZoomableImage from '@/components/ZoomableImage';
+import QuestionImages from '@/components/QuestionImages';
 import ReviewStats from '@/components/ReviewStats';
 import {
   getReviewQueue,
@@ -358,7 +359,7 @@ export default function ReviewPage() {
                 const reviewGallery = buildReviewGallery(currentQuestion);
                 return (
                   <>
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-6">
+                    <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6 leading-relaxed">
                       {renderInlineWithImages(currentQuestion.question, reviewGallery)}
                     </h2>
 
@@ -372,16 +373,8 @@ export default function ReviewPage() {
                       const extras = currentQuestion.images.filter(u => !inlineUrls.has(u));
                       if (extras.length === 0) return null;
                       return (
-                        <div className="mb-6 space-y-3">
-                          {extras.map((src, i) => (
-                            <ZoomableImage
-                              key={`rev-q-img-${i}`}
-                              src={src}
-                              alt={`Question image ${i + 1}`}
-                              gallery={reviewGallery}
-                              maxHeightClass="max-h-80"
-                            />
-                          ))}
+                        <div className="mb-6">
+                          <QuestionImages images={extras} gallery={reviewGallery} altPrefix="Question image" />
                         </div>
                       );
                     })()}
@@ -467,14 +460,11 @@ export default function ReviewPage() {
               {showResult && currentQuestion.answerImages && currentQuestion.answerImages.length > 0 && (
                 <div className="mt-6 space-y-2">
                   <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Answer</p>
-                  {currentQuestion.answerImages.map((src, i) => (
-                    <ZoomableImage
-                      key={`rev-ans-${i}`}
-                      src={src}
-                      alt={`Answer image ${i + 1}`}
-                      gallery={buildReviewGallery(currentQuestion)}
-                    />
-                  ))}
+                  <QuestionImages
+                    images={currentQuestion.answerImages}
+                    gallery={buildReviewGallery(currentQuestion)}
+                    altPrefix="Answer image"
+                  />
                 </div>
               )}
 

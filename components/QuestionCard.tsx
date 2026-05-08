@@ -2,11 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, XCircle, Loader2, BookOpen, Eye, ChevronDown } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, BookOpen, Eye } from 'lucide-react';
 import { Question } from '@/lib/types';
 import { isOptionSelected, isCorrectOption, parseAnswers } from '@/lib/multiAnswer';
 import { parseInlineImages } from '@/lib/parseInlineImages';
 import ZoomableImage from './ZoomableImage';
+import QuestionImages from './QuestionImages';
 
 const IMAGE_BASED_TYPES = new Set<NonNullable<Question['type']>>(['hotspot', 'drag-and-drop']);
 
@@ -73,7 +74,6 @@ export default function QuestionCard({
 
   const isImageBased = !!question.type && IMAGE_BASED_TYPES.has(question.type);
   const [revealed, setRevealed] = useState(false);
-  const [expandedExtras, setExpandedExtras] = useState(false);
   const gallery = useMemo(() => collectQuestionGallery(question), [question]);
 
   const getOptionStyle = (optionId: string) => {
@@ -170,7 +170,7 @@ export default function QuestionCard({
         </div>
 
         {/* Question text (parses inline [IMAGE: <url>] markers) */}
-        <div className="text-base sm:text-xl md:text-2xl font-display leading-relaxed text-foreground">
+        <div className="text-sm sm:text-base md:text-lg font-medium leading-relaxed text-foreground">
           {renderQuestionBody(question.question, gallery)}
         </div>
 
@@ -195,26 +195,9 @@ export default function QuestionCard({
           );
           const extras = question.images.filter(u => !inlineUrls.has(u));
           if (extras.length === 0) return null;
-          // Hotspot/drag-and-drop questions can carry many screenshots — show
-          // first 2 inline and stash the rest behind a Show-all toggle.
-          const collapseThreshold = 3;
-          const visible = expandedExtras || extras.length <= collapseThreshold ? extras : extras.slice(0, 2);
-          const hidden = extras.length - visible.length;
           return (
-            <div className="mt-4 space-y-3">
-              {visible.map((src, i) => (
-                <ZoomableImage key={`q-img-${i}`} src={src} alt={`Question image ${i + 1}`} gallery={gallery} />
-              ))}
-              {hidden > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setExpandedExtras(true)}
-                  className="w-full py-2.5 px-4 rounded-xl border border-dashed border-card-border text-sm text-muted-foreground hover:bg-muted/40 transition flex items-center justify-center gap-2"
-                >
-                  <ChevronDown className="w-4 h-4" />
-                  Show {hidden} more image{hidden === 1 ? '' : 's'}
-                </button>
-              )}
+            <div className="mt-4">
+              <QuestionImages images={extras} gallery={gallery} altPrefix="Question image" />
             </div>
           );
         })()}
@@ -238,9 +221,7 @@ export default function QuestionCard({
           {(revealed || isSubmitted) && question.answerImages && question.answerImages.length > 0 && (
             <div className="space-y-3">
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Answer</p>
-              {question.answerImages.map((src, i) => (
-                <ZoomableImage key={`a-img-${i}`} src={src} alt={`Answer image ${i + 1}`} gallery={gallery} />
-              ))}
+              <QuestionImages images={question.answerImages} gallery={gallery} altPrefix="Answer image" />
             </div>
           )}
 
@@ -316,7 +297,7 @@ export default function QuestionCard({
               </div>
 
               {/* Option text */}
-              <span className="flex-1 text-sm sm:text-base leading-relaxed">
+              <span className="flex-1 text-sm leading-relaxed">
                 {option.text}
               </span>
 
