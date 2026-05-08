@@ -103,7 +103,7 @@ export default function QuestionCard({
   const useImageGrid = gallery.length >= 3;
 
   const getOptionStyle = (optionId: string) => {
-    const baseStyle = "w-full text-left p-4 rounded-xl transition-all duration-200";
+    const baseStyle = "w-full text-left px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg transition-all duration-200";
     const selected = isOptionSelected(optionId, selectedAnswer);
     const correct = isCorrectOption(optionId, question.correctAnswer);
 
@@ -173,10 +173,10 @@ export default function QuestionCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="card-paper p-4 sm:p-6 md:p-8"
+      className="card-paper p-4 sm:p-5 md:p-6"
     >
       {/* Question Header */}
-      <div className="mb-4 sm:mb-6">
+      <div className="mb-3 sm:mb-4">
         <div className="flex items-center justify-between mb-3 sm:mb-5">
           {/* Question number badge */}
           <div className="flex items-center gap-3">
@@ -303,7 +303,7 @@ export default function QuestionCard({
       )}
 
       {/* Options - Bubble sheet style */}
-      <div className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
+      <div className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-5">
         {question.options.map((option, index) => (
           <motion.button
             key={option.id}
@@ -316,10 +316,10 @@ export default function QuestionCard({
             disabled={isSubmitted}
             className={getOptionStyle(option.id)}
           >
-            <div className="flex items-center gap-2.5 sm:gap-4">
+            <div className="flex items-center gap-2.5 sm:gap-3">
               {/* Bubble-style option indicator */}
               <div className={`
-                flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center
+                flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center
                 font-mono font-bold text-xs sm:text-sm transition-all duration-200
                 ${isOptionSelected(option.id, selectedAnswer)
                   ? isSubmitted
