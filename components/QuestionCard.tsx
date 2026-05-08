@@ -1,9 +1,71 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, XCircle, Loader2, BookOpen } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, BookOpen, Eye } from 'lucide-react';
 import { Question } from '@/lib/types';
 import { isOptionSelected, isCorrectOption, parseAnswers } from '@/lib/multiAnswer';
+import { parseInlineImages } from '@/lib/parseInlineImages';
+import ZoomableImage from './ZoomableImage';
+import QuestionImages from './QuestionImages';
+
+const IMAGE_BASED_TYPES = new Set<NonNullable<Question['type']>>(['hotspot', 'drag-and-drop']);
+const HOTSPOT_TEXT_RE = /^\s*(HOTSPOT|DRAG[\s-]+(AND[\s-]+)?DROP)\b/i;
+
+/** Detect image-based questions even if `q.type` was lost during older imports. */
+function isImageBasedQuestion(q: Question): boolean {
+  if (q.type && IMAGE_BASED_TYPES.has(q.type)) return true;
+  // Empty option list + at least one image → can't be a normal MCQ
+  if (q.options.length === 0 && ((q.images?.length ?? 0) > 0 || hasInlineImageMarker(q.question))) {
+    return true;
+  }
+  // Text begins with "HOTSPOT -" / "DRAG DROP -" header
+  if (HOTSPOT_TEXT_RE.test(q.question)) return true;
+  return false;
+}
+
+function hasInlineImageMarker(text: string): boolean {
+  return parseInlineImages(text).some((p) => p.kind === 'img');
+}
+
+/** Build a deduped list of every image associated with a question, in display order. */
+function collectQuestionGallery(question: Question): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  const push = (url?: string) => {
+    if (!url) return;
+    if (seen.has(url)) return;
+    seen.add(url);
+    out.push(url);
+  };
+  for (const p of parseInlineImages(question.question)) {
+    if (p.kind === 'img') push(p.value);
+  }
+  question.images?.forEach(push);
+  question.answerImages?.forEach(push);
+  return out;
+}
+
+/**
+ * Render question text. When `hideInlineImages` is true, inline `[IMAGE:]`
+ * markers are dropped from the rendered output so the caller can show them
+ * as a thumbnail grid below — avoids burying text under 5+ stacked images.
+ */
+function renderQuestionBody(text: string, gallery: string[], hideInlineImages = false) {
+  const parts = parseInlineImages(text);
+  if (parts.length === 0) return text;
+  return parts.map((p, i) => {
+    if (p.kind === 'text') {
+      return <span key={i} className="whitespace-pre-wrap">{p.value}</span>;
+    }
+    if (hideInlineImages) return null;
+    return (
+      <span key={i} className="block my-3">
+        <ZoomableImage src={p.value} alt="Question diagram" gallery={gallery} />
+      </span>
+    );
+  });
+}
 
 interface QuestionCardProps {
   question: Question;
@@ -33,8 +95,15 @@ export default function QuestionCard({
   requiredAnswerCount = 1,
 }: QuestionCardProps) {
 
+  const isImageBased = isImageBasedQuestion(question);
+  const [revealed, setRevealed] = useState(false);
+  const gallery = useMemo(() => collectQuestionGallery(question), [question]);
+  // Switch to thumbnail-grid layout when the total image count would
+  // otherwise dominate the page (≥3 images between markers + extras).
+  const useImageGrid = gallery.length >= 3;
+
   const getOptionStyle = (optionId: string) => {
-    const baseStyle = "w-full text-left p-4 rounded-xl transition-all duration-200";
+    const baseStyle = "w-full text-left px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg transition-all duration-200";
     const selected = isOptionSelected(optionId, selectedAnswer);
     const correct = isCorrectOption(optionId, question.correctAnswer);
 
@@ -104,10 +173,10 @@ export default function QuestionCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="card-paper p-4 sm:p-6 md:p-8"
+      className="card-paper p-4 sm:p-5 md:p-6"
     >
       {/* Question Header */}
-      <div className="mb-4 sm:mb-6">
+      <div className="mb-3 sm:mb-4">
         <div className="flex items-center justify-between mb-3 sm:mb-5">
           {/* Question number badge */}
           <div className="flex items-center gap-3">
@@ -126,10 +195,10 @@ export default function QuestionCard({
           </span>
         </div>
 
-        {/* Question text */}
-        <h2 className="text-base sm:text-xl md:text-2xl font-display leading-relaxed text-foreground">
-          {question.question}
-        </h2>
+        {/* Question text (parses inline [IMAGE: <url>] markers) */}
+        <div className="text-sm sm:text-base md:text-lg font-medium leading-relaxed text-foreground">
+          {renderQuestionBody(question.question, gallery, useImageGrid)}
+        </div>
 
         {/* Spatial image (AI-generated for spatial-* question types) */}
         {question.spatialImage && (
@@ -141,8 +210,89 @@ export default function QuestionCard({
             />
           </div>
         )}
+
+        {/* Question images. When `useImageGrid`, the gallery includes inline
+            marker images too (already stripped from the text above). Otherwise
+            we just render the extras that weren't already inlined. */}
+        {(() => {
+          if (useImageGrid) {
+            // Exclude any answer-only images from the question gallery — they
+            // belong with the Reveal Answer block, not above the options.
+            const answerSet = new Set(question.answerImages || []);
+            const questionImgs = gallery.filter((u) => !answerSet.has(u));
+            if (questionImgs.length === 0) return null;
+            return (
+              <div className="mt-4">
+                <QuestionImages images={questionImgs} gallery={gallery} altPrefix="Question image" />
+              </div>
+            );
+          }
+          // Inline path: render only `images` URLs not already inlined as markers.
+          if (!question.images || question.images.length === 0) return null;
+          const inlineUrls = new Set(
+            parseInlineImages(question.question).filter((p) => p.kind === 'img').map((p) => p.value)
+          );
+          const extras = question.images.filter((u) => !inlineUrls.has(u));
+          if (extras.length === 0) return null;
+          return (
+            <div className="mt-4">
+              <QuestionImages images={extras} gallery={gallery} altPrefix="Question image" />
+            </div>
+          );
+        })()}
       </div>
 
+      {/* Image-based question (hotspot / drag-and-drop): show "Reveal Answer"
+          and self-grade buttons instead of option list. */}
+      {isImageBased ? (
+        <div className="space-y-4 mb-6 sm:mb-8">
+          {!isSubmitted && !revealed && (
+            <button
+              type="button"
+              onClick={() => setRevealed(true)}
+              className="w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold text-base sm:text-lg btn-primary flex items-center justify-center gap-2"
+            >
+              <Eye className="w-5 h-5" />
+              Reveal Answer
+            </button>
+          )}
+
+          {(revealed || isSubmitted) && question.answerImages && question.answerImages.length > 0 && (
+            <div className="space-y-3">
+              <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Answer</p>
+              <QuestionImages images={question.answerImages} gallery={gallery} altPrefix="Answer image" />
+            </div>
+          )}
+
+          {(revealed || isSubmitted) && question.explanation && (
+            <div className="p-4 rounded-xl bg-muted/40 border border-card-border whitespace-pre-wrap text-sm sm:text-base">
+              {renderQuestionBody(question.explanation, gallery)}
+            </div>
+          )}
+
+          {revealed && !isSubmitted && (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={() => { onAnswerSelect('SELF:correct'); setTimeout(onSubmit, 0); }}
+                className="flex-1 py-3 px-4 rounded-xl font-semibold bg-accent-green text-white hover:opacity-90 transition flex items-center justify-center gap-2"
+              >
+                <CheckCircle2 className="w-5 h-5" />
+                I got it right
+              </button>
+              <button
+                type="button"
+                onClick={() => { onAnswerSelect('SELF:incorrect'); setTimeout(onSubmit, 0); }}
+                className="flex-1 py-3 px-4 rounded-xl font-semibold bg-accent-red text-white hover:opacity-90 transition flex items-center justify-center gap-2"
+              >
+                <XCircle className="w-5 h-5" />
+                I got it wrong
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+      <>
       {/* Multi-answer instruction */}
       {multiAnswer && !isSubmitted && (
         <div className="flex items-center gap-2 mb-3 px-1">
@@ -153,7 +303,7 @@ export default function QuestionCard({
       )}
 
       {/* Options - Bubble sheet style */}
-      <div className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
+      <div className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-5">
         {question.options.map((option, index) => (
           <motion.button
             key={option.id}
@@ -166,10 +316,10 @@ export default function QuestionCard({
             disabled={isSubmitted}
             className={getOptionStyle(option.id)}
           >
-            <div className="flex items-center gap-2.5 sm:gap-4">
+            <div className="flex items-center gap-2.5 sm:gap-3">
               {/* Bubble-style option indicator */}
               <div className={`
-                flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center
+                flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center
                 font-mono font-bold text-xs sm:text-sm transition-all duration-200
                 ${isOptionSelected(option.id, selectedAnswer)
                   ? isSubmitted
@@ -186,7 +336,7 @@ export default function QuestionCard({
               </div>
 
               {/* Option text */}
-              <span className="flex-1 text-sm sm:text-base leading-relaxed">
+              <span className="flex-1 text-sm leading-relaxed">
                 {option.text}
               </span>
 
@@ -238,6 +388,8 @@ export default function QuestionCard({
         >
           Answer recorded • Continue to next question
         </motion.div>
+      )}
+      </>
       )}
     </motion.div>
   );

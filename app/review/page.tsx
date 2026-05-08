@@ -14,7 +14,14 @@ import {
   Target,
   RotateCcw,
   Zap,
+  Eye,
+  ExternalLink,
+  MessageSquare,
+  FileText,
 } from 'lucide-react';
+import { parseInlineImages } from '@/lib/parseInlineImages';
+import ZoomableImage from '@/components/ZoomableImage';
+import QuestionImages from '@/components/QuestionImages';
 import ReviewStats from '@/components/ReviewStats';
 import {
   getReviewQueue,
@@ -38,6 +45,61 @@ interface Question {
   explanation?: string;
   category?: string;
   difficulty?: string;
+  type?: string;
+  images?: string[];
+  answerImages?: string[];
+  explanationSource?: string;
+  explanationVotes?: number;
+  sourceUrl?: string;
+}
+
+const IMAGE_BASED_REVIEW = new Set(['hotspot', 'drag-and-drop']);
+const HOTSPOT_TEXT_RE_REVIEW = /^\s*(HOTSPOT|DRAG[\s-]+(AND[\s-]+)?DROP)\b/i;
+
+function isImageBasedReview(q: Question): boolean {
+  if (q?.type && IMAGE_BASED_REVIEW.has(q.type)) return true;
+  if ((!q.options || q.options.length === 0) && ((q.images?.length ?? 0) > 0 || hasInlineImageMarkerR(q.question))) return true;
+  if (HOTSPOT_TEXT_RE_REVIEW.test(q.question)) return true;
+  return false;
+}
+
+function hasInlineImageMarkerR(text: string): boolean {
+  return parseInlineImages(text).some((p) => p.kind === 'img');
+}
+
+function buildReviewGallery(q: Question): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  const push = (u?: string) => {
+    if (!u || seen.has(u)) return;
+    seen.add(u);
+    out.push(u);
+  };
+  for (const p of parseInlineImages(q.question)) {
+    if (p.kind === 'img') push(p.value);
+  }
+  q.images?.forEach(push);
+  q.answerImages?.forEach(push);
+  for (const p of parseInlineImages(q.explanation || '')) {
+    if (p.kind === 'img') push(p.value);
+  }
+  return out;
+}
+
+function renderInlineWithImages(text: string, gallery: string[], hideInlineImages = false) {
+  const parts = parseInlineImages(text);
+  if (parts.length === 0) return text;
+  return parts.map((p, i) => {
+    if (p.kind === 'text') {
+      return <span key={i} className="whitespace-pre-wrap">{p.value}</span>;
+    }
+    if (hideInlineImages) return null;
+    return (
+      <span key={i} className="block my-3">
+        <ZoomableImage src={p.value} alt="Question image" gallery={gallery} maxHeightClass="max-h-72" />
+      </span>
+    );
+  });
 }
 
 export default function ReviewPage() {
@@ -306,13 +368,44 @@ export default function ReviewPage() {
                 )}
               </div>
 
-              {/* Question Text */}
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-6">
-                {currentQuestion.question}
-              </h2>
+              {/* Question Text (parses [IMAGE: <url>] markers) */}
+              {(() => {
+                const reviewGallery = buildReviewGallery(currentQuestion);
+                const useGrid = reviewGallery.length >= 3;
+                const answerSet = new Set(currentQuestion.answerImages || []);
+                const questionImgs = reviewGallery.filter((u) => !answerSet.has(u));
+                return (
+                  <>
+                    <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6 leading-relaxed">
+                      {renderInlineWithImages(currentQuestion.question, reviewGallery, useGrid)}
+                    </h2>
+
+                    {useGrid && questionImgs.length > 0 && (
+                      <div className="mb-6">
+                        <QuestionImages images={questionImgs} gallery={reviewGallery} altPrefix="Question image" />
+                      </div>
+                    )}
+
+                    {!useGrid && currentQuestion.images && currentQuestion.images.length > 0 && (() => {
+                      const inlineUrls = new Set(
+                        parseInlineImages(currentQuestion.question)
+                          .filter(p => p.kind === 'img')
+                          .map(p => p.value)
+                      );
+                      const extras = currentQuestion.images.filter(u => !inlineUrls.has(u));
+                      if (extras.length === 0) return null;
+                      return (
+                        <div className="mb-6">
+                          <QuestionImages images={extras} gallery={reviewGallery} altPrefix="Question image" />
+                        </div>
+                      );
+                    })()}
+                  </>
+                );
+              })()}
 
               {/* Multi-answer instruction */}
-              {isMultiAnswer(currentQuestion.correctAnswer, currentQuestion.question) && !showResult && (
+              {!isImageBasedReview(currentQuestion) && isMultiAnswer(currentQuestion.correctAnswer, currentQuestion.question) && !showResult && (
                 <div className="flex items-center gap-2 mb-3 px-1">
                   <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
                     Select {getRequiredAnswerCount(currentQuestion.correctAnswer, currentQuestion.question)} answers
@@ -320,9 +413,9 @@ export default function ReviewPage() {
                 </div>
               )}
 
-              {/* Options */}
+              {/* Options (suppressed for image-based questions) */}
               <div className="space-y-3">
-                {currentQuestion.options.map((option) => {
+                {!isImageBasedReview(currentQuestion) && currentQuestion.options.map((option) => {
                   const isSelected = isOptionSelected(option.id, selectedAnswer);
                   const isCorrectOpt = isCorrectOption(option.id, currentQuestion.correctAnswer);
 
@@ -385,22 +478,72 @@ export default function ReviewPage() {
                 })}
               </div>
 
+              {/* Answer images (hotspot / drag-and-drop) */}
+              {showResult && currentQuestion.answerImages && currentQuestion.answerImages.length > 0 && (
+                <div className="mt-6 space-y-2">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Answer</p>
+                  <QuestionImages
+                    images={currentQuestion.answerImages}
+                    gallery={buildReviewGallery(currentQuestion)}
+                    altPrefix="Answer image"
+                  />
+                </div>
+              )}
+
               {/* Explanation */}
               {showResult && currentQuestion.explanation && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg"
+                  className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg space-y-3"
                 >
-                  <p className="text-blue-800 dark:text-blue-200 text-sm">
-                    {currentQuestion.explanation}
-                  </p>
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <p className="text-xs font-semibold text-blue-900 dark:text-blue-200 uppercase tracking-wide">Explanation</p>
+                    {currentQuestion.explanationSource === 'community-comment' && (
+                      <span className="inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700">
+                        <MessageSquare className="w-3 h-3" />
+                        Top community comment
+                        {typeof currentQuestion.explanationVotes === 'number' && currentQuestion.explanationVotes > 0 && (
+                          <span className="font-semibold"> · {currentQuestion.explanationVotes}</span>
+                        )}
+                      </span>
+                    )}
+                    {currentQuestion.explanationSource === 'answer-description' && (
+                      <span className="inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700">
+                        <FileText className="w-3 h-3" />
+                        Official
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-blue-800 dark:text-blue-200 text-sm">
+                    {renderInlineWithImages(currentQuestion.explanation, buildReviewGallery(currentQuestion))}
+                  </div>
+                  {currentQuestion.sourceUrl && (
+                    <a
+                      href={currentQuestion.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      View on ExamTopics
+                    </a>
+                  )}
                 </motion.div>
               )}
 
               {/* Actions */}
               <div className="mt-6">
                 {!showResult ? (
+                  isImageBasedReview(currentQuestion) ? (
+                    <button
+                      onClick={() => { setSelectedAnswer('SELF:correct'); handleSubmit(); }}
+                      className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg font-medium hover:from-indigo-600 hover:to-purple-600 transition-all flex items-center justify-center gap-2"
+                    >
+                      <Eye className="w-5 h-5" />
+                      Reveal Answer
+                    </button>
+                  ) : (
                   <button
                     onClick={handleSubmit}
                     disabled={!selectedAnswer || (currentQuestion && isMultiAnswer(currentQuestion.correctAnswer, currentQuestion.question) && selectedAnswer.split(',').filter(Boolean).length < getRequiredAnswerCount(currentQuestion.correctAnswer, currentQuestion.question))}
@@ -409,6 +552,7 @@ export default function ReviewPage() {
                     Show Answer
                     <ArrowRight className="w-5 h-5" />
                   </button>
+                  )
                 ) : (
                   <div className="space-y-4">
                     <p className="text-center text-sm text-gray-600 dark:text-gray-400">

@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader2, CheckCircle, XCircle, Brain, ExternalLink, ShieldCheck } from 'lucide-react';
+import { X, Loader2, CheckCircle, XCircle, Brain, ExternalLink, ShieldCheck, MessageSquare, FileText } from 'lucide-react';
 import { formatExplanation } from '@/lib/formatExplanation';
+import { parseInlineImages } from '@/lib/parseInlineImages';
 import { useExamStore } from '@/lib/store';
 import { parseAnswers, getCorrectOptionTexts } from '@/lib/multiAnswer';
+import ZoomableImage from './ZoomableImage';
+import QuestionImages from './QuestionImages';
 
 interface EvaluationPaneProps {
   isOpen: boolean;
@@ -17,6 +20,35 @@ interface EvaluationPaneProps {
   isCorrect: boolean;
   explanation?: string; // Pre-generated explanation from the question
   questionId?: number; // For saving fetched explanations
+  // ExamTopics extensions
+  explanationSource?: string;
+  explanationVotes?: number;
+  sourceUrl?: string;
+  answerImages?: string[];
+}
+
+function renderExplanationWithImages(text: string, gallery: string[]) {
+  const parts = parseInlineImages(text);
+  if (parts.length === 0 || parts.every(p => p.kind === 'text')) {
+    return formatExplanation(text);
+  }
+  return (
+    <div className="space-y-3">
+      {parts.map((p, i) =>
+        p.kind === 'text' ? (
+          <div key={i}>{formatExplanation(p.value)}</div>
+        ) : (
+          <ZoomableImage
+            key={i}
+            src={p.value}
+            alt="Explanation image"
+            gallery={gallery}
+            maxHeightClass="max-h-72"
+          />
+        )
+      )}
+    </div>
+  );
 }
 
 export default function EvaluationPane({
@@ -29,8 +61,28 @@ export default function EvaluationPane({
   isCorrect,
   explanation: preGeneratedExplanation,
   questionId,
+  explanationSource,
+  explanationVotes,
+  sourceUrl,
+  answerImages,
 }: EvaluationPaneProps) {
   const [explanation, setExplanation] = useState('');
+  // Build the lightbox gallery once per render: answer images first, then
+  // any inline `[IMAGE:]` markers from the explanation, deduped.
+  const evalGallery = (() => {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    const push = (u?: string) => {
+      if (!u || seen.has(u)) return;
+      seen.add(u);
+      out.push(u);
+    };
+    answerImages?.forEach(push);
+    for (const p of parseInlineImages(preGeneratedExplanation || explanation || '')) {
+      if (p.kind === 'img') push(p.value);
+    }
+    return out;
+  })();
   const [sources, setSources] = useState<Array<{ title: string; url: string }>>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -165,11 +217,36 @@ export default function EvaluationPane({
                 </div>
               )}
 
+              {/* Answer images (hotspot / drag-and-drop) */}
+              {answerImages && answerImages.length > 0 && (
+                <div className="mb-6 space-y-2">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Answer</p>
+                  <QuestionImages images={answerImages} gallery={evalGallery} altPrefix="Answer image" />
+                </div>
+              )}
+
               {/* AI Explanation */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                  Explanation
-                </h3>
+                <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Explanation
+                  </h3>
+                  {explanationSource === 'community-comment' && (
+                    <span className="inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700">
+                      <MessageSquare className="w-3 h-3" />
+                      Top community comment
+                      {typeof explanationVotes === 'number' && explanationVotes > 0 && (
+                        <span className="font-semibold"> · {explanationVotes} votes</span>
+                      )}
+                    </span>
+                  )}
+                  {explanationSource === 'answer-description' && (
+                    <span className="inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700">
+                      <FileText className="w-3 h-3" />
+                      Official answer description
+                    </span>
+                  )}
+                </div>
 
                 {loading && (
                   <div className="flex items-center justify-center py-8">
@@ -188,7 +265,21 @@ export default function EvaluationPane({
 
                 {!loading && !error && explanation && (
                   <div className="prose dark:prose-invert max-w-none">
-                    {formatExplanation(explanation)}
+                    {renderExplanationWithImages(explanation, evalGallery)}
+                  </div>
+                )}
+
+                {sourceUrl && (
+                  <div className="mt-4">
+                    <a
+                      href={sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      View on ExamTopics
+                    </a>
                   </div>
                 )}
               </div>

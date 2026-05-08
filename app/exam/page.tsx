@@ -453,6 +453,10 @@ export default function ExamPage() {
             isCorrect={answersMatch(selectedAnswer, currentQuestion.correctAnswer)}
             explanation={currentQuestion.explanation}
             questionId={currentQuestion.id}
+            explanationSource={currentQuestion.explanationSource}
+            explanationVotes={currentQuestion.explanationVotes}
+            sourceUrl={currentQuestion.sourceUrl}
+            answerImages={currentQuestion.answerImages}
           />
         )}
 

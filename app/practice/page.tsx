@@ -12,8 +12,116 @@ import SocraticDialogue from '@/components/SocraticDialogue';
 import InteractiveLearningPlan from '@/components/InteractiveLearningPlan';
 import LiveStatsOverlay from '@/components/LiveStatsOverlay';
 import { cognitiveQueue } from '@/lib/cognitiveQueue';
-import { ChevronLeft, ChevronRight, Home, AlertCircle, MessageCircle, BarChart3, Brain } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Home, AlertCircle, MessageCircle, BarChart3, Brain, Eye, CheckCircle2, XCircle } from 'lucide-react';
 import { answersMatch, isOptionSelected, isCorrectOption, isMultiAnswer, getRequiredAnswerCount, toggleAnswer } from '@/lib/multiAnswer';
+import { parseInlineImages } from '@/lib/parseInlineImages';
+import ZoomableImage from '@/components/ZoomableImage';
+import QuestionImages from '@/components/QuestionImages';
+
+const IMAGE_BASED_PRACTICE = new Set(['hotspot', 'drag-and-drop']);
+const HOTSPOT_TEXT_RE = /^\s*(HOTSPOT|DRAG[\s-]+(AND[\s-]+)?DROP)\b/i;
+
+function isImageBasedPractice(q: any): boolean {
+  if (q?.type && IMAGE_BASED_PRACTICE.has(q.type)) return true;
+  if ((!q?.options || q.options.length === 0) && ((q?.images?.length ?? 0) > 0 || hasInlineImageMarker(q?.question || ''))) return true;
+  if (q?.question && HOTSPOT_TEXT_RE.test(q.question)) return true;
+  return false;
+}
+
+function hasInlineImageMarker(text: string): boolean {
+  return parseInlineImages(text).some((p) => p.kind === 'img');
+}
+
+function buildPracticeGallery(q: { question: string; images?: string[]; answerImages?: string[]; explanation?: string }): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  const push = (u?: string) => { if (u && !seen.has(u)) { seen.add(u); out.push(u); } };
+  for (const p of parseInlineImages(q.question)) if (p.kind === 'img') push(p.value);
+  q.images?.forEach(push);
+  q.answerImages?.forEach(push);
+  for (const p of parseInlineImages(q.explanation || '')) if (p.kind === 'img') push(p.value);
+  return out;
+}
+
+function renderPracticeBody(text: string, gallery: string[], hideInlineImages = false) {
+  const parts = parseInlineImages(text);
+  if (parts.length === 0) return text;
+  return parts.map((p, i) => {
+    if (p.kind === 'text') {
+      return <span key={i} className="whitespace-pre-wrap">{p.value}</span>;
+    }
+    if (hideInlineImages) return null;
+    return (
+      <span key={i} className="block my-3">
+        <ZoomableImage src={p.value} alt="Question image" gallery={gallery} maxHeightClass="max-h-72" />
+      </span>
+    );
+  });
+}
+
+function PracticeHotspotReveal({
+  question,
+  gallery,
+  isAnsweredAlready,
+  onSelfGrade,
+}: {
+  question: { answerImages?: string[]; explanation?: string };
+  gallery: string[];
+  isAnsweredAlready: boolean;
+  onSelfGrade: (verdict: 'SELF:correct' | 'SELF:incorrect') => void;
+}) {
+  const [revealed, setRevealed] = useState(isAnsweredAlready);
+  const showAnswer = revealed || isAnsweredAlready;
+
+  return (
+    <div className="space-y-4">
+      {!showAnswer && (
+        <button
+          type="button"
+          onClick={() => setRevealed(true)}
+          className="w-full py-3 px-4 rounded-lg font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 transition flex items-center justify-center gap-2"
+        >
+          <Eye className="w-5 h-5" />
+          Reveal Answer
+        </button>
+      )}
+
+      {showAnswer && question.answerImages && question.answerImages.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Answer</p>
+          <QuestionImages images={question.answerImages} gallery={gallery} altPrefix="Answer image" />
+        </div>
+      )}
+
+      {showAnswer && question.explanation && (
+        <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/40 border border-gray-200 dark:border-gray-600 text-sm whitespace-pre-wrap">
+          {renderPracticeBody(question.explanation, gallery)}
+        </div>
+      )}
+
+      {showAnswer && !isAnsweredAlready && (
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            type="button"
+            onClick={() => onSelfGrade('SELF:correct')}
+            className="flex-1 py-3 px-4 rounded-lg font-semibold bg-green-600 text-white hover:bg-green-700 transition flex items-center justify-center gap-2"
+          >
+            <CheckCircle2 className="w-5 h-5" />
+            I got it right
+          </button>
+          <button
+            type="button"
+            onClick={() => onSelfGrade('SELF:incorrect')}
+            className="flex-1 py-3 px-4 rounded-lg font-semibold bg-red-600 text-white hover:bg-red-700 transition flex items-center justify-center gap-2"
+          >
+            <XCircle className="w-5 h-5" />
+            I got it wrong
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function PracticePage() {
   const router = useRouter();
@@ -364,24 +472,65 @@ export default function PracticePage() {
 
             {/* Question Card */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 mb-4 sm:mb-6">
-              <div className="mb-3 sm:mb-4">
-                <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Question {currentQuestionIndex + 1} of {questions.length}
-                </span>
-                <h2 className="text-base sm:text-xl font-semibold text-gray-800 dark:text-gray-100 mt-1.5 sm:mt-2">
-                  {currentQuestion.question}
-                </h2>
-              </div>
+              {(() => {
+                const practiceGallery = buildPracticeGallery(currentQuestion);
+                const isImageBased = isImageBasedPractice(currentQuestion);
+                const useImageGrid = practiceGallery.length >= 3;
+                const answerImgsSet = new Set((currentQuestion as any).answerImages || []);
+                const questionImgs = practiceGallery.filter((u) => !answerImgsSet.has(u));
+                const inlineMarkerUrls = new Set(
+                  parseInlineImages(currentQuestion.question)
+                    .filter((p) => p.kind === 'img')
+                    .map((p) => p.value)
+                );
+                const inlineExtras = ((currentQuestion as any).images || []).filter(
+                  (u: string) => !inlineMarkerUrls.has(u)
+                );
+                const isAnsweredAlready = userAnswers.has(currentQuestion.id);
 
-              {isMultiAnswer(currentQuestion.correctAnswer, currentQuestion.question) && !userAnswers.has(currentQuestion.id) && (
-                <div className="mb-2 px-1">
-                  <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
-                    Select {getRequiredAnswerCount(currentQuestion.correctAnswer, currentQuestion.question)} answers
-                  </span>
-                </div>
-              )}
+                return (
+                  <>
+                    <div className="mb-3 sm:mb-4">
+                      <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
+                        Question {currentQuestionIndex + 1} of {questions.length}
+                      </span>
+                      <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mt-1.5 sm:mt-2 leading-relaxed">
+                        {renderPracticeBody(currentQuestion.question, practiceGallery, useImageGrid)}
+                      </h2>
+                      {useImageGrid && questionImgs.length > 0 && (
+                        <div className="mt-4">
+                          <QuestionImages images={questionImgs} gallery={practiceGallery} altPrefix="Question image" />
+                        </div>
+                      )}
+                      {!useImageGrid && inlineExtras.length > 0 && (
+                        <div className="mt-4">
+                          <QuestionImages images={inlineExtras} gallery={practiceGallery} altPrefix="Question image" />
+                        </div>
+                      )}
+                    </div>
 
-              <div className="space-y-2 sm:space-y-3">
+                    {/* Hotspot / drag-and-drop: Reveal Answer + self-grade */}
+                    {isImageBased ? (
+                      <PracticeHotspotReveal
+                        question={currentQuestion as any}
+                        gallery={practiceGallery}
+                        isAnsweredAlready={isAnsweredAlready}
+                        onSelfGrade={(verdict) => handleAnswerSelect(verdict)}
+                      />
+                    ) : null}
+
+                    {!isImageBased && isMultiAnswer(currentQuestion.correctAnswer, currentQuestion.question) && !isAnsweredAlready && (
+                      <div className="mb-2 px-1">
+                        <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                          Select {getRequiredAnswerCount(currentQuestion.correctAnswer, currentQuestion.question)} answers
+                        </span>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+
+              <div className={`space-y-2 sm:space-y-3 ${isImageBasedPractice(currentQuestion) ? 'hidden' : ''}`}>
                 {currentQuestion.options.map((option) => {
                   const isSelected = isOptionSelected(option.id, selectedAnswer);
                   const isCorrect = isCorrectOption(option.id, currentQuestion.correctAnswer);
@@ -519,6 +668,10 @@ export default function PracticePage() {
             isCorrect={answersMatch(selectedAnswer, currentQuestion.correctAnswer)}
             explanation={currentQuestion.explanation}
             questionId={currentQuestion.id}
+            explanationSource={(currentQuestion as any).explanationSource}
+            explanationVotes={(currentQuestion as any).explanationVotes}
+            sourceUrl={(currentQuestion as any).sourceUrl}
+            answerImages={(currentQuestion as any).answerImages}
           />
         )}
 
