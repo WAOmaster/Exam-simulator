@@ -7,6 +7,7 @@ import { formatExplanation } from '@/lib/formatExplanation';
 import { parseInlineImages } from '@/lib/parseInlineImages';
 import { useExamStore } from '@/lib/store';
 import { parseAnswers, getCorrectOptionTexts } from '@/lib/multiAnswer';
+import ZoomableImage from './ZoomableImage';
 
 interface EvaluationPaneProps {
   isOpen: boolean;
@@ -25,22 +26,23 @@ interface EvaluationPaneProps {
   answerImages?: string[];
 }
 
-function renderExplanationWithImages(text: string) {
+function renderExplanationWithImages(text: string, gallery: string[]) {
   const parts = parseInlineImages(text);
-  if (parts.length === 0) return formatExplanation(text);
-  // No markers? Fast path through the existing formatter.
-  if (parts.every(p => p.kind === 'text')) return formatExplanation(text);
+  if (parts.length === 0 || parts.every(p => p.kind === 'text')) {
+    return formatExplanation(text);
+  }
   return (
     <div className="space-y-3">
       {parts.map((p, i) =>
         p.kind === 'text' ? (
           <div key={i}>{formatExplanation(p.value)}</div>
         ) : (
-          <img
+          <ZoomableImage
             key={i}
             src={p.value}
             alt="Explanation image"
-            className="max-w-full rounded-lg border border-gray-200 dark:border-gray-600"
+            gallery={gallery}
+            maxHeightClass="max-h-72"
           />
         )
       )}
@@ -64,6 +66,22 @@ export default function EvaluationPane({
   answerImages,
 }: EvaluationPaneProps) {
   const [explanation, setExplanation] = useState('');
+  // Build the lightbox gallery once per render: answer images first, then
+  // any inline `[IMAGE:]` markers from the explanation, deduped.
+  const evalGallery = (() => {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    const push = (u?: string) => {
+      if (!u || seen.has(u)) return;
+      seen.add(u);
+      out.push(u);
+    };
+    answerImages?.forEach(push);
+    for (const p of parseInlineImages(preGeneratedExplanation || explanation || '')) {
+      if (p.kind === 'img') push(p.value);
+    }
+    return out;
+  })();
   const [sources, setSources] = useState<Array<{ title: string; url: string }>>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -203,11 +221,11 @@ export default function EvaluationPane({
                 <div className="mb-6 space-y-2">
                   <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Answer</p>
                   {answerImages.map((src, i) => (
-                    <img
+                    <ZoomableImage
                       key={`eval-ans-${i}`}
                       src={src}
                       alt={`Answer image ${i + 1}`}
-                      className="max-w-full rounded-lg border border-gray-200 dark:border-gray-600"
+                      gallery={evalGallery}
                     />
                   ))}
                 </div>
@@ -253,7 +271,7 @@ export default function EvaluationPane({
 
                 {!loading && !error && explanation && (
                   <div className="prose dark:prose-invert max-w-none">
-                    {renderExplanationWithImages(explanation)}
+                    {renderExplanationWithImages(explanation, evalGallery)}
                   </div>
                 )}
 

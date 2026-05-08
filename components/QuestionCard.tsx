@@ -1,27 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, XCircle, Loader2, BookOpen, Eye } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, BookOpen, Eye, ChevronDown } from 'lucide-react';
 import { Question } from '@/lib/types';
 import { isOptionSelected, isCorrectOption, parseAnswers } from '@/lib/multiAnswer';
 import { parseInlineImages } from '@/lib/parseInlineImages';
+import ZoomableImage from './ZoomableImage';
 
 const IMAGE_BASED_TYPES = new Set<NonNullable<Question['type']>>(['hotspot', 'drag-and-drop']);
 
-function renderQuestionBody(text: string) {
+/** Build a deduped list of every image associated with a question, in display order. */
+function collectQuestionGallery(question: Question): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  const push = (url?: string) => {
+    if (!url) return;
+    if (seen.has(url)) return;
+    seen.add(url);
+    out.push(url);
+  };
+  for (const p of parseInlineImages(question.question)) {
+    if (p.kind === 'img') push(p.value);
+  }
+  question.images?.forEach(push);
+  question.answerImages?.forEach(push);
+  return out;
+}
+
+/** Render question text with inline `[IMAGE: <url>]` markers replaced by zoomable images. */
+function renderQuestionBody(text: string, gallery: string[]) {
   const parts = parseInlineImages(text);
   if (parts.length === 0) return text;
   return parts.map((p, i) =>
     p.kind === 'text' ? (
       <span key={i} className="whitespace-pre-wrap">{p.value}</span>
     ) : (
-      <img
-        key={i}
-        src={p.value}
-        alt="Question diagram"
-        className="my-3 max-w-full rounded-xl border border-card-border"
-      />
+      <span key={i} className="block my-3">
+        <ZoomableImage src={p.value} alt="Question diagram" gallery={gallery} />
+      </span>
     )
   );
 }
@@ -56,6 +73,8 @@ export default function QuestionCard({
 
   const isImageBased = !!question.type && IMAGE_BASED_TYPES.has(question.type);
   const [revealed, setRevealed] = useState(false);
+  const [expandedExtras, setExpandedExtras] = useState(false);
+  const gallery = useMemo(() => collectQuestionGallery(question), [question]);
 
   const getOptionStyle = (optionId: string) => {
     const baseStyle = "w-full text-left p-4 rounded-xl transition-all duration-200";
@@ -151,9 +170,9 @@ export default function QuestionCard({
         </div>
 
         {/* Question text (parses inline [IMAGE: <url>] markers) */}
-        <h2 className="text-base sm:text-xl md:text-2xl font-display leading-relaxed text-foreground">
-          {renderQuestionBody(question.question)}
-        </h2>
+        <div className="text-base sm:text-xl md:text-2xl font-display leading-relaxed text-foreground">
+          {renderQuestionBody(question.question, gallery)}
+        </div>
 
         {/* Spatial image (AI-generated for spatial-* question types) */}
         {question.spatialImage && (
@@ -167,7 +186,7 @@ export default function QuestionCard({
         )}
 
         {/* Question images (top-level, for diagrams not embedded as markers).
-            Skip if every URL is already inline as an [IMAGE:] marker. */}
+            Skip URLs already inline as [IMAGE:] markers. */}
         {question.images && question.images.length > 0 && (() => {
           const inlineUrls = new Set(
             parseInlineImages(question.question)
@@ -176,16 +195,26 @@ export default function QuestionCard({
           );
           const extras = question.images.filter(u => !inlineUrls.has(u));
           if (extras.length === 0) return null;
+          // Hotspot/drag-and-drop questions can carry many screenshots — show
+          // first 2 inline and stash the rest behind a Show-all toggle.
+          const collapseThreshold = 3;
+          const visible = expandedExtras || extras.length <= collapseThreshold ? extras : extras.slice(0, 2);
+          const hidden = extras.length - visible.length;
           return (
             <div className="mt-4 space-y-3">
-              {extras.map((src, i) => (
-                <img
-                  key={`q-img-${i}`}
-                  src={src}
-                  alt={`Question image ${i + 1}`}
-                  className="max-w-full rounded-xl border border-card-border"
-                />
+              {visible.map((src, i) => (
+                <ZoomableImage key={`q-img-${i}`} src={src} alt={`Question image ${i + 1}`} gallery={gallery} />
               ))}
+              {hidden > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setExpandedExtras(true)}
+                  className="w-full py-2.5 px-4 rounded-xl border border-dashed border-card-border text-sm text-muted-foreground hover:bg-muted/40 transition flex items-center justify-center gap-2"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                  Show {hidden} more image{hidden === 1 ? '' : 's'}
+                </button>
+              )}
             </div>
           );
         })()}
@@ -210,19 +239,14 @@ export default function QuestionCard({
             <div className="space-y-3">
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Answer</p>
               {question.answerImages.map((src, i) => (
-                <img
-                  key={`a-img-${i}`}
-                  src={src}
-                  alt={`Answer image ${i + 1}`}
-                  className="max-w-full rounded-xl border border-card-border"
-                />
+                <ZoomableImage key={`a-img-${i}`} src={src} alt={`Answer image ${i + 1}`} gallery={gallery} />
               ))}
             </div>
           )}
 
           {(revealed || isSubmitted) && question.explanation && (
             <div className="p-4 rounded-xl bg-muted/40 border border-card-border whitespace-pre-wrap text-sm sm:text-base">
-              {renderQuestionBody(question.explanation)}
+              {renderQuestionBody(question.explanation, gallery)}
             </div>
           )}
 

@@ -20,6 +20,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { parseInlineImages } from '@/lib/parseInlineImages';
+import ZoomableImage from '@/components/ZoomableImage';
 import ReviewStats from '@/components/ReviewStats';
 import {
   getReviewQueue,
@@ -53,19 +54,35 @@ interface Question {
 
 const IMAGE_BASED_REVIEW = new Set(['hotspot', 'drag-and-drop']);
 
-function renderInlineWithImages(text: string) {
+function buildReviewGallery(q: Question): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  const push = (u?: string) => {
+    if (!u || seen.has(u)) return;
+    seen.add(u);
+    out.push(u);
+  };
+  for (const p of parseInlineImages(q.question)) {
+    if (p.kind === 'img') push(p.value);
+  }
+  q.images?.forEach(push);
+  q.answerImages?.forEach(push);
+  for (const p of parseInlineImages(q.explanation || '')) {
+    if (p.kind === 'img') push(p.value);
+  }
+  return out;
+}
+
+function renderInlineWithImages(text: string, gallery: string[]) {
   const parts = parseInlineImages(text);
   if (parts.length === 0) return text;
   return parts.map((p, i) =>
     p.kind === 'text' ? (
       <span key={i} className="whitespace-pre-wrap">{p.value}</span>
     ) : (
-      <img
-        key={i}
-        src={p.value}
-        alt="Question image"
-        className="my-3 max-w-full rounded-lg border border-gray-200 dark:border-gray-600"
-      />
+      <span key={i} className="block my-3">
+        <ZoomableImage src={p.value} alt="Question image" gallery={gallery} maxHeightClass="max-h-72" />
+      </span>
     )
   );
 }
@@ -337,30 +354,38 @@ export default function ReviewPage() {
               </div>
 
               {/* Question Text (parses [IMAGE: <url>] markers) */}
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-6">
-                {renderInlineWithImages(currentQuestion.question)}
-              </h2>
-
-              {/* Top-level question images not already inlined as markers */}
-              {currentQuestion.images && currentQuestion.images.length > 0 && (() => {
-                const inlineUrls = new Set(
-                  parseInlineImages(currentQuestion.question)
-                    .filter(p => p.kind === 'img')
-                    .map(p => p.value)
-                );
-                const extras = currentQuestion.images.filter(u => !inlineUrls.has(u));
-                if (extras.length === 0) return null;
+              {(() => {
+                const reviewGallery = buildReviewGallery(currentQuestion);
                 return (
-                  <div className="mb-6 space-y-3">
-                    {extras.map((src, i) => (
-                      <img
-                        key={`rev-q-img-${i}`}
-                        src={src}
-                        alt={`Question image ${i + 1}`}
-                        className="max-w-full rounded-lg border border-gray-200 dark:border-gray-600"
-                      />
-                    ))}
-                  </div>
+                  <>
+                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-6">
+                      {renderInlineWithImages(currentQuestion.question, reviewGallery)}
+                    </h2>
+
+                    {/* Top-level question images not already inlined as markers */}
+                    {currentQuestion.images && currentQuestion.images.length > 0 && (() => {
+                      const inlineUrls = new Set(
+                        parseInlineImages(currentQuestion.question)
+                          .filter(p => p.kind === 'img')
+                          .map(p => p.value)
+                      );
+                      const extras = currentQuestion.images.filter(u => !inlineUrls.has(u));
+                      if (extras.length === 0) return null;
+                      return (
+                        <div className="mb-6 space-y-3">
+                          {extras.map((src, i) => (
+                            <ZoomableImage
+                              key={`rev-q-img-${i}`}
+                              src={src}
+                              alt={`Question image ${i + 1}`}
+                              gallery={reviewGallery}
+                              maxHeightClass="max-h-80"
+                            />
+                          ))}
+                        </div>
+                      );
+                    })()}
+                  </>
                 );
               })()}
 
@@ -443,11 +468,11 @@ export default function ReviewPage() {
                 <div className="mt-6 space-y-2">
                   <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Answer</p>
                   {currentQuestion.answerImages.map((src, i) => (
-                    <img
+                    <ZoomableImage
                       key={`rev-ans-${i}`}
                       src={src}
                       alt={`Answer image ${i + 1}`}
-                      className="max-w-full rounded-lg border border-gray-200 dark:border-gray-600"
+                      gallery={buildReviewGallery(currentQuestion)}
                     />
                   ))}
                 </div>
@@ -479,7 +504,7 @@ export default function ReviewPage() {
                     )}
                   </div>
                   <div className="text-blue-800 dark:text-blue-200 text-sm">
-                    {renderInlineWithImages(currentQuestion.explanation)}
+                    {renderInlineWithImages(currentQuestion.explanation, buildReviewGallery(currentQuestion))}
                   </div>
                   {currentQuestion.sourceUrl && (
                     <a
