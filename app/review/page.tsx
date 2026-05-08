@@ -54,6 +54,18 @@ interface Question {
 }
 
 const IMAGE_BASED_REVIEW = new Set(['hotspot', 'drag-and-drop']);
+const HOTSPOT_TEXT_RE_REVIEW = /^\s*(HOTSPOT|DRAG[\s-]+(AND[\s-]+)?DROP)\b/i;
+
+function isImageBasedReview(q: Question): boolean {
+  if (q?.type && IMAGE_BASED_REVIEW.has(q.type)) return true;
+  if ((!q.options || q.options.length === 0) && ((q.images?.length ?? 0) > 0 || hasInlineImageMarkerR(q.question))) return true;
+  if (HOTSPOT_TEXT_RE_REVIEW.test(q.question)) return true;
+  return false;
+}
+
+function hasInlineImageMarkerR(text: string): boolean {
+  return parseInlineImages(text).some((p) => p.kind === 'img');
+}
 
 function buildReviewGallery(q: Question): string[] {
   const seen = new Set<string>();
@@ -74,18 +86,20 @@ function buildReviewGallery(q: Question): string[] {
   return out;
 }
 
-function renderInlineWithImages(text: string, gallery: string[]) {
+function renderInlineWithImages(text: string, gallery: string[], hideInlineImages = false) {
   const parts = parseInlineImages(text);
   if (parts.length === 0) return text;
-  return parts.map((p, i) =>
-    p.kind === 'text' ? (
-      <span key={i} className="whitespace-pre-wrap">{p.value}</span>
-    ) : (
+  return parts.map((p, i) => {
+    if (p.kind === 'text') {
+      return <span key={i} className="whitespace-pre-wrap">{p.value}</span>;
+    }
+    if (hideInlineImages) return null;
+    return (
       <span key={i} className="block my-3">
         <ZoomableImage src={p.value} alt="Question image" gallery={gallery} maxHeightClass="max-h-72" />
       </span>
-    )
-  );
+    );
+  });
 }
 
 export default function ReviewPage() {
@@ -357,14 +371,22 @@ export default function ReviewPage() {
               {/* Question Text (parses [IMAGE: <url>] markers) */}
               {(() => {
                 const reviewGallery = buildReviewGallery(currentQuestion);
+                const useGrid = reviewGallery.length >= 3;
+                const answerSet = new Set(currentQuestion.answerImages || []);
+                const questionImgs = reviewGallery.filter((u) => !answerSet.has(u));
                 return (
                   <>
                     <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6 leading-relaxed">
-                      {renderInlineWithImages(currentQuestion.question, reviewGallery)}
+                      {renderInlineWithImages(currentQuestion.question, reviewGallery, useGrid)}
                     </h2>
 
-                    {/* Top-level question images not already inlined as markers */}
-                    {currentQuestion.images && currentQuestion.images.length > 0 && (() => {
+                    {useGrid && questionImgs.length > 0 && (
+                      <div className="mb-6">
+                        <QuestionImages images={questionImgs} gallery={reviewGallery} altPrefix="Question image" />
+                      </div>
+                    )}
+
+                    {!useGrid && currentQuestion.images && currentQuestion.images.length > 0 && (() => {
                       const inlineUrls = new Set(
                         parseInlineImages(currentQuestion.question)
                           .filter(p => p.kind === 'img')
@@ -383,7 +405,7 @@ export default function ReviewPage() {
               })()}
 
               {/* Multi-answer instruction */}
-              {!IMAGE_BASED_REVIEW.has(currentQuestion.type || '') && isMultiAnswer(currentQuestion.correctAnswer, currentQuestion.question) && !showResult && (
+              {!isImageBasedReview(currentQuestion) && isMultiAnswer(currentQuestion.correctAnswer, currentQuestion.question) && !showResult && (
                 <div className="flex items-center gap-2 mb-3 px-1">
                   <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
                     Select {getRequiredAnswerCount(currentQuestion.correctAnswer, currentQuestion.question)} answers
@@ -393,7 +415,7 @@ export default function ReviewPage() {
 
               {/* Options (suppressed for image-based questions) */}
               <div className="space-y-3">
-                {!IMAGE_BASED_REVIEW.has(currentQuestion.type || '') && currentQuestion.options.map((option) => {
+                {!isImageBasedReview(currentQuestion) && currentQuestion.options.map((option) => {
                   const isSelected = isOptionSelected(option.id, selectedAnswer);
                   const isCorrectOpt = isCorrectOption(option.id, currentQuestion.correctAnswer);
 
@@ -513,7 +535,7 @@ export default function ReviewPage() {
               {/* Actions */}
               <div className="mt-6">
                 {!showResult ? (
-                  IMAGE_BASED_REVIEW.has(currentQuestion.type || '') ? (
+                  isImageBasedReview(currentQuestion) ? (
                     <button
                       onClick={() => { setSelectedAnswer('SELF:correct'); handleSubmit(); }}
                       className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg font-medium hover:from-indigo-600 hover:to-purple-600 transition-all flex items-center justify-center gap-2"

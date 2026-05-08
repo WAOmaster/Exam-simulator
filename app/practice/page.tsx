@@ -19,6 +19,18 @@ import ZoomableImage from '@/components/ZoomableImage';
 import QuestionImages from '@/components/QuestionImages';
 
 const IMAGE_BASED_PRACTICE = new Set(['hotspot', 'drag-and-drop']);
+const HOTSPOT_TEXT_RE = /^\s*(HOTSPOT|DRAG[\s-]+(AND[\s-]+)?DROP)\b/i;
+
+function isImageBasedPractice(q: any): boolean {
+  if (q?.type && IMAGE_BASED_PRACTICE.has(q.type)) return true;
+  if ((!q?.options || q.options.length === 0) && ((q?.images?.length ?? 0) > 0 || hasInlineImageMarker(q?.question || ''))) return true;
+  if (q?.question && HOTSPOT_TEXT_RE.test(q.question)) return true;
+  return false;
+}
+
+function hasInlineImageMarker(text: string): boolean {
+  return parseInlineImages(text).some((p) => p.kind === 'img');
+}
 
 function buildPracticeGallery(q: { question: string; images?: string[]; answerImages?: string[]; explanation?: string }): string[] {
   const seen = new Set<string>();
@@ -31,18 +43,20 @@ function buildPracticeGallery(q: { question: string; images?: string[]; answerIm
   return out;
 }
 
-function renderPracticeBody(text: string, gallery: string[]) {
+function renderPracticeBody(text: string, gallery: string[], hideInlineImages = false) {
   const parts = parseInlineImages(text);
   if (parts.length === 0) return text;
-  return parts.map((p, i) =>
-    p.kind === 'text' ? (
-      <span key={i} className="whitespace-pre-wrap">{p.value}</span>
-    ) : (
+  return parts.map((p, i) => {
+    if (p.kind === 'text') {
+      return <span key={i} className="whitespace-pre-wrap">{p.value}</span>;
+    }
+    if (hideInlineImages) return null;
+    return (
       <span key={i} className="block my-3">
         <ZoomableImage src={p.value} alt="Question image" gallery={gallery} maxHeightClass="max-h-72" />
       </span>
-    )
-  );
+    );
+  });
 }
 
 function PracticeHotspotReveal({
@@ -460,13 +474,16 @@ export default function PracticePage() {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 mb-4 sm:mb-6">
               {(() => {
                 const practiceGallery = buildPracticeGallery(currentQuestion);
-                const isImageBased = IMAGE_BASED_PRACTICE.has((currentQuestion as any).type || '');
+                const isImageBased = isImageBasedPractice(currentQuestion);
+                const useImageGrid = practiceGallery.length >= 3;
+                const answerImgsSet = new Set((currentQuestion as any).answerImages || []);
+                const questionImgs = practiceGallery.filter((u) => !answerImgsSet.has(u));
                 const inlineMarkerUrls = new Set(
                   parseInlineImages(currentQuestion.question)
                     .filter((p) => p.kind === 'img')
                     .map((p) => p.value)
                 );
-                const extraImages = ((currentQuestion as any).images || []).filter(
+                const inlineExtras = ((currentQuestion as any).images || []).filter(
                   (u: string) => !inlineMarkerUrls.has(u)
                 );
                 const isAnsweredAlready = userAnswers.has(currentQuestion.id);
@@ -478,11 +495,16 @@ export default function PracticePage() {
                         Question {currentQuestionIndex + 1} of {questions.length}
                       </span>
                       <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mt-1.5 sm:mt-2 leading-relaxed">
-                        {renderPracticeBody(currentQuestion.question, practiceGallery)}
+                        {renderPracticeBody(currentQuestion.question, practiceGallery, useImageGrid)}
                       </h2>
-                      {extraImages.length > 0 && (
+                      {useImageGrid && questionImgs.length > 0 && (
                         <div className="mt-4">
-                          <QuestionImages images={extraImages} gallery={practiceGallery} altPrefix="Question image" />
+                          <QuestionImages images={questionImgs} gallery={practiceGallery} altPrefix="Question image" />
+                        </div>
+                      )}
+                      {!useImageGrid && inlineExtras.length > 0 && (
+                        <div className="mt-4">
+                          <QuestionImages images={inlineExtras} gallery={practiceGallery} altPrefix="Question image" />
                         </div>
                       )}
                     </div>
@@ -508,7 +530,7 @@ export default function PracticePage() {
                 );
               })()}
 
-              <div className={`space-y-2 sm:space-y-3 ${IMAGE_BASED_PRACTICE.has((currentQuestion as any).type || '') ? 'hidden' : ''}`}>
+              <div className={`space-y-2 sm:space-y-3 ${isImageBasedPractice(currentQuestion) ? 'hidden' : ''}`}>
                 {currentQuestion.options.map((option) => {
                   const isSelected = isOptionSelected(option.id, selectedAnswer);
                   const isCorrect = isCorrectOption(option.id, currentQuestion.correctAnswer);

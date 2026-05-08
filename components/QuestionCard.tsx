@@ -10,6 +10,23 @@ import ZoomableImage from './ZoomableImage';
 import QuestionImages from './QuestionImages';
 
 const IMAGE_BASED_TYPES = new Set<NonNullable<Question['type']>>(['hotspot', 'drag-and-drop']);
+const HOTSPOT_TEXT_RE = /^\s*(HOTSPOT|DRAG[\s-]+(AND[\s-]+)?DROP)\b/i;
+
+/** Detect image-based questions even if `q.type` was lost during older imports. */
+function isImageBasedQuestion(q: Question): boolean {
+  if (q.type && IMAGE_BASED_TYPES.has(q.type)) return true;
+  // Empty option list + at least one image → can't be a normal MCQ
+  if (q.options.length === 0 && ((q.images?.length ?? 0) > 0 || hasInlineImageMarker(q.question))) {
+    return true;
+  }
+  // Text begins with "HOTSPOT -" / "DRAG DROP -" header
+  if (HOTSPOT_TEXT_RE.test(q.question)) return true;
+  return false;
+}
+
+function hasInlineImageMarker(text: string): boolean {
+  return parseInlineImages(text).some((p) => p.kind === 'img');
+}
 
 /** Build a deduped list of every image associated with a question, in display order. */
 function collectQuestionGallery(question: Question): string[] {
@@ -29,19 +46,25 @@ function collectQuestionGallery(question: Question): string[] {
   return out;
 }
 
-/** Render question text with inline `[IMAGE: <url>]` markers replaced by zoomable images. */
-function renderQuestionBody(text: string, gallery: string[]) {
+/**
+ * Render question text. When `hideInlineImages` is true, inline `[IMAGE:]`
+ * markers are dropped from the rendered output so the caller can show them
+ * as a thumbnail grid below — avoids burying text under 5+ stacked images.
+ */
+function renderQuestionBody(text: string, gallery: string[], hideInlineImages = false) {
   const parts = parseInlineImages(text);
   if (parts.length === 0) return text;
-  return parts.map((p, i) =>
-    p.kind === 'text' ? (
-      <span key={i} className="whitespace-pre-wrap">{p.value}</span>
-    ) : (
+  return parts.map((p, i) => {
+    if (p.kind === 'text') {
+      return <span key={i} className="whitespace-pre-wrap">{p.value}</span>;
+    }
+    if (hideInlineImages) return null;
+    return (
       <span key={i} className="block my-3">
         <ZoomableImage src={p.value} alt="Question diagram" gallery={gallery} />
       </span>
-    )
-  );
+    );
+  });
 }
 
 interface QuestionCardProps {
@@ -72,9 +95,12 @@ export default function QuestionCard({
   requiredAnswerCount = 1,
 }: QuestionCardProps) {
 
-  const isImageBased = !!question.type && IMAGE_BASED_TYPES.has(question.type);
+  const isImageBased = isImageBasedQuestion(question);
   const [revealed, setRevealed] = useState(false);
   const gallery = useMemo(() => collectQuestionGallery(question), [question]);
+  // Switch to thumbnail-grid layout when the total image count would
+  // otherwise dominate the page (≥3 images between markers + extras).
+  const useImageGrid = gallery.length >= 3;
 
   const getOptionStyle = (optionId: string) => {
     const baseStyle = "w-full text-left p-4 rounded-xl transition-all duration-200";
@@ -171,7 +197,7 @@ export default function QuestionCard({
 
         {/* Question text (parses inline [IMAGE: <url>] markers) */}
         <div className="text-sm sm:text-base md:text-lg font-medium leading-relaxed text-foreground">
-          {renderQuestionBody(question.question, gallery)}
+          {renderQuestionBody(question.question, gallery, useImageGrid)}
         </div>
 
         {/* Spatial image (AI-generated for spatial-* question types) */}
@@ -185,15 +211,28 @@ export default function QuestionCard({
           </div>
         )}
 
-        {/* Question images (top-level, for diagrams not embedded as markers).
-            Skip URLs already inline as [IMAGE:] markers. */}
-        {question.images && question.images.length > 0 && (() => {
+        {/* Question images. When `useImageGrid`, the gallery includes inline
+            marker images too (already stripped from the text above). Otherwise
+            we just render the extras that weren't already inlined. */}
+        {(() => {
+          if (useImageGrid) {
+            // Exclude any answer-only images from the question gallery — they
+            // belong with the Reveal Answer block, not above the options.
+            const answerSet = new Set(question.answerImages || []);
+            const questionImgs = gallery.filter((u) => !answerSet.has(u));
+            if (questionImgs.length === 0) return null;
+            return (
+              <div className="mt-4">
+                <QuestionImages images={questionImgs} gallery={gallery} altPrefix="Question image" />
+              </div>
+            );
+          }
+          // Inline path: render only `images` URLs not already inlined as markers.
+          if (!question.images || question.images.length === 0) return null;
           const inlineUrls = new Set(
-            parseInlineImages(question.question)
-              .filter(p => p.kind === 'img')
-              .map(p => p.value)
+            parseInlineImages(question.question).filter((p) => p.kind === 'img').map((p) => p.value)
           );
-          const extras = question.images.filter(u => !inlineUrls.has(u));
+          const extras = question.images.filter((u) => !inlineUrls.has(u));
           if (extras.length === 0) return null;
           return (
             <div className="mt-4">
