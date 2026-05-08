@@ -8,11 +8,20 @@ export interface Question {
   category: string;
   difficulty: 'easy' | 'medium' | 'hard';
   type?: 'multiple-choice' | 'true-false' | 'scenario' | 'hotspot' | 'drag-and-drop'
+       | 'multi-select' | 'yes-no-scenario'
        | 'verbal-analogy' | 'sentence-completion' | 'antonym' | 'syllogism'
        | 'number-series' | 'word-problem' | 'attention-to-detail'
        | 'spatial-next-in-series' | 'spatial-matrix' | 'spatial-odd-one-out';
   // AI-generated spatial image (base64 data URL, present for spatial-* question types)
   spatialImage?: string;
+  // ExamTopics scraper extensions
+  images?: string[];
+  answerImages?: string[];
+  explanationSource?: string;
+  explanationVotes?: number;
+  caseStudyId?: string;
+  caseStudySize?: number;
+  sourceUrl?: string;
 }
 
 // Question set types
@@ -37,11 +46,7 @@ export interface QuestionSetMetadata {
     medium: number;
     hard: number;
   };
-  questionTypes: {
-    'multiple-choice': number;
-    'true-false': number;
-    'scenario': number;
-  };
+  questionTypes: Record<string, number>;
   topics: string[];
   processingMode?: 'extracted' | 'generated'; // How questions were created
   sourceInfo?: {

@@ -12,6 +12,15 @@ interface JsonImportDialogProps {
   existingIds: string[];
 }
 
+const IMAGE_BASED_TYPES = new Set(['hotspot', 'drag-drop', 'drag-and-drop']);
+
+function normalizeQuestionType(raw: any): Question['type'] {
+  if (typeof raw !== 'string' || !raw) return 'multiple-choice';
+  // Scraper emits 'drag-drop'; the simulator's enum uses 'drag-and-drop'
+  if (raw === 'drag-drop') return 'drag-and-drop';
+  return raw as Question['type'];
+}
+
 function validateQuestions(data: any[]): { valid: Question[]; errors: string[] } {
   const errors: string[] = [];
   const valid: Question[] = [];
@@ -28,14 +37,30 @@ function validateQuestions(data: any[]): { valid: Question[]; errors: string[] }
       errors.push(`Q${idx}: Missing or invalid "question" field`);
       continue;
     }
-    if (!Array.isArray(q.options) || q.options.length < 2) {
-      errors.push(`Q${idx}: Missing or invalid "options" (need at least 2)`);
+
+    // Scraper writes `questionType`; older fixtures use `type`. Prefer the new field.
+    const resolvedType = normalizeQuestionType(q.questionType ?? q.type);
+    const isImageBased = IMAGE_BASED_TYPES.has(String(q.questionType ?? q.type ?? '')) ||
+      resolvedType === 'hotspot' || resolvedType === 'drag-and-drop';
+
+    if (!Array.isArray(q.options)) {
+      errors.push(`Q${idx}: Missing "options" field`);
       continue;
     }
-    if (!q.correctAnswer || typeof q.correctAnswer !== 'string') {
+    if (q.options.length < 2 && !isImageBased) {
+      errors.push(`Q${idx}: "options" must have at least 2 items (or set questionType to hotspot/drag-drop)`);
+      continue;
+    }
+    if (!isImageBased && (!q.correctAnswer || typeof q.correctAnswer !== 'string')) {
       errors.push(`Q${idx}: Missing or invalid "correctAnswer" field`);
       continue;
     }
+
+    // For hotspot/drag-drop with no answer choices, use a sentinel so
+    // the runtime score path (answersMatch) treats the user's self-grade
+    // ("SELF:correct" vs "SELF:incorrect") consistently.
+    const rawCorrect = typeof q.correctAnswer === 'string' ? q.correctAnswer : '';
+    const correctAnswer = isImageBased && !rawCorrect ? 'SELF:correct' : rawCorrect;
 
     // Normalize the question
     valid.push({
@@ -45,11 +70,18 @@ function validateQuestions(data: any[]): { valid: Question[]; errors: string[] }
         id: opt.id || String.fromCharCode(65 + oi),
         text: opt.text || String(opt),
       })),
-      correctAnswer: q.correctAnswer,
+      correctAnswer,
       explanation: q.explanation || '',
       category: q.category || 'Imported',
       difficulty: ['easy', 'medium', 'hard'].includes(q.difficulty) ? q.difficulty : 'medium',
-      type: q.type || 'multiple-choice',
+      type: resolvedType,
+      ...(Array.isArray(q.images) && q.images.length > 0 ? { images: q.images.filter((s: any) => typeof s === 'string') } : {}),
+      ...(Array.isArray(q.answerImages) && q.answerImages.length > 0 ? { answerImages: q.answerImages.filter((s: any) => typeof s === 'string') } : {}),
+      ...(typeof q.explanationSource === 'string' && q.explanationSource ? { explanationSource: q.explanationSource } : {}),
+      ...(typeof q.explanationVotes === 'number' ? { explanationVotes: q.explanationVotes } : {}),
+      ...(typeof q.caseStudyId === 'string' && q.caseStudyId ? { caseStudyId: q.caseStudyId } : {}),
+      ...(typeof q.caseStudySize === 'number' && q.caseStudySize > 1 ? { caseStudySize: q.caseStudySize } : {}),
+      ...(typeof q.sourceUrl === 'string' && q.sourceUrl ? { sourceUrl: q.sourceUrl } : {}),
     });
   }
 
@@ -64,18 +96,14 @@ function buildQuestionSet(
   fileName: string
 ): QuestionSet {
   const difficultyDistribution = { easy: 0, medium: 0, hard: 0 };
-  const questionTypes: Record<string, number> = { 'multiple-choice': 0, 'true-false': 0, 'scenario': 0 };
+  const questionTypes: Record<string, number> = {};
 
   for (const q of questions) {
     if (q.difficulty in difficultyDistribution) {
       difficultyDistribution[q.difficulty as keyof typeof difficultyDistribution]++;
     }
     const qType = q.type || 'multiple-choice';
-    if (qType in questionTypes) {
-      questionTypes[qType]++;
-    } else {
-      questionTypes['multiple-choice']++;
-    }
+    questionTypes[qType] = (questionTypes[qType] || 0) + 1;
   }
 
   const topics = [...new Set(questions.map(q => q.category).filter(Boolean))];
@@ -289,10 +317,13 @@ export default function JsonImportDialog({ isOpen, onClose, onImport, existingId
 {`[
   {
     "question": "...",
+    "questionType": "multiple-choice",
     "options": [{"id":"A","text":"..."}],
-    "correctAnswer": "A",
+    "correctAnswer": "A",          // or "E,F" for multi-select
     "explanation": "...",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "images": [],                   // optional, supports hotspot/diagrams
+    "sourceUrl": ""                 // optional
   }
 ]`}
                     </pre>

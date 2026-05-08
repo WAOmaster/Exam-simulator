@@ -1,9 +1,30 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, XCircle, Loader2, BookOpen } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, BookOpen, Eye } from 'lucide-react';
 import { Question } from '@/lib/types';
 import { isOptionSelected, isCorrectOption, parseAnswers } from '@/lib/multiAnswer';
+import { parseInlineImages } from '@/lib/parseInlineImages';
+
+const IMAGE_BASED_TYPES = new Set<NonNullable<Question['type']>>(['hotspot', 'drag-and-drop']);
+
+function renderQuestionBody(text: string) {
+  const parts = parseInlineImages(text);
+  if (parts.length === 0) return text;
+  return parts.map((p, i) =>
+    p.kind === 'text' ? (
+      <span key={i} className="whitespace-pre-wrap">{p.value}</span>
+    ) : (
+      <img
+        key={i}
+        src={p.value}
+        alt="Question diagram"
+        className="my-3 max-w-full rounded-xl border border-card-border"
+      />
+    )
+  );
+}
 
 interface QuestionCardProps {
   question: Question;
@@ -32,6 +53,9 @@ export default function QuestionCard({
   multiAnswer = false,
   requiredAnswerCount = 1,
 }: QuestionCardProps) {
+
+  const isImageBased = !!question.type && IMAGE_BASED_TYPES.has(question.type);
+  const [revealed, setRevealed] = useState(false);
 
   const getOptionStyle = (optionId: string) => {
     const baseStyle = "w-full text-left p-4 rounded-xl transition-all duration-200";
@@ -126,9 +150,9 @@ export default function QuestionCard({
           </span>
         </div>
 
-        {/* Question text */}
+        {/* Question text (parses inline [IMAGE: <url>] markers) */}
         <h2 className="text-base sm:text-xl md:text-2xl font-display leading-relaxed text-foreground">
-          {question.question}
+          {renderQuestionBody(question.question)}
         </h2>
 
         {/* Spatial image (AI-generated for spatial-* question types) */}
@@ -141,8 +165,90 @@ export default function QuestionCard({
             />
           </div>
         )}
+
+        {/* Question images (top-level, for diagrams not embedded as markers).
+            Skip if every URL is already inline as an [IMAGE:] marker. */}
+        {question.images && question.images.length > 0 && (() => {
+          const inlineUrls = new Set(
+            parseInlineImages(question.question)
+              .filter(p => p.kind === 'img')
+              .map(p => p.value)
+          );
+          const extras = question.images.filter(u => !inlineUrls.has(u));
+          if (extras.length === 0) return null;
+          return (
+            <div className="mt-4 space-y-3">
+              {extras.map((src, i) => (
+                <img
+                  key={`q-img-${i}`}
+                  src={src}
+                  alt={`Question image ${i + 1}`}
+                  className="max-w-full rounded-xl border border-card-border"
+                />
+              ))}
+            </div>
+          );
+        })()}
       </div>
 
+      {/* Image-based question (hotspot / drag-and-drop): show "Reveal Answer"
+          and self-grade buttons instead of option list. */}
+      {isImageBased ? (
+        <div className="space-y-4 mb-6 sm:mb-8">
+          {!isSubmitted && !revealed && (
+            <button
+              type="button"
+              onClick={() => setRevealed(true)}
+              className="w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold text-base sm:text-lg btn-primary flex items-center justify-center gap-2"
+            >
+              <Eye className="w-5 h-5" />
+              Reveal Answer
+            </button>
+          )}
+
+          {(revealed || isSubmitted) && question.answerImages && question.answerImages.length > 0 && (
+            <div className="space-y-3">
+              <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Answer</p>
+              {question.answerImages.map((src, i) => (
+                <img
+                  key={`a-img-${i}`}
+                  src={src}
+                  alt={`Answer image ${i + 1}`}
+                  className="max-w-full rounded-xl border border-card-border"
+                />
+              ))}
+            </div>
+          )}
+
+          {(revealed || isSubmitted) && question.explanation && (
+            <div className="p-4 rounded-xl bg-muted/40 border border-card-border whitespace-pre-wrap text-sm sm:text-base">
+              {renderQuestionBody(question.explanation)}
+            </div>
+          )}
+
+          {revealed && !isSubmitted && (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={() => { onAnswerSelect('SELF:correct'); setTimeout(onSubmit, 0); }}
+                className="flex-1 py-3 px-4 rounded-xl font-semibold bg-accent-green text-white hover:opacity-90 transition flex items-center justify-center gap-2"
+              >
+                <CheckCircle2 className="w-5 h-5" />
+                I got it right
+              </button>
+              <button
+                type="button"
+                onClick={() => { onAnswerSelect('SELF:incorrect'); setTimeout(onSubmit, 0); }}
+                className="flex-1 py-3 px-4 rounded-xl font-semibold bg-accent-red text-white hover:opacity-90 transition flex items-center justify-center gap-2"
+              >
+                <XCircle className="w-5 h-5" />
+                I got it wrong
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+      <>
       {/* Multi-answer instruction */}
       {multiAnswer && !isSubmitted && (
         <div className="flex items-center gap-2 mb-3 px-1">
@@ -238,6 +344,8 @@ export default function QuestionCard({
         >
           Answer recorded • Continue to next question
         </motion.div>
+      )}
+      </>
       )}
     </motion.div>
   );
