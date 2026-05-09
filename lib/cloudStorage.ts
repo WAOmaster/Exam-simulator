@@ -1,5 +1,5 @@
 import { put, list, del, get } from '@vercel/blob';
-import { QuestionSet, ActiveSessionData } from './types';
+import { QuestionSet, ActiveSessionData, SharedQuestionSet } from './types';
 
 // Blob path pattern: users/{userId}/question-sets/{setId}.json
 
@@ -119,6 +119,49 @@ export async function deleteActiveSessionFromCloud(
   userId: string
 ): Promise<void> {
   const prefix = `${BLOB_PREFIX}/${userId}/active-session.json`;
+  const { blobs } = await list({ prefix, token: getBlobToken() });
+  for (const blob of blobs) {
+    await del(blob.url, { token: getBlobToken() });
+  }
+}
+
+// ── Sharing ────────────────────────────────────────────────────────────────
+
+const SHARES_PREFIX = 'shares';
+
+export async function saveShare(share: SharedQuestionSet): Promise<void> {
+  const path = `${SHARES_PREFIX}/${share.sharedWithEmail.toLowerCase()}/${share.id}.json`;
+  await put(path, JSON.stringify(share), {
+    access: 'private',
+    addRandomSuffix: false,
+    token: getBlobToken(),
+  });
+}
+
+export async function getSharesForUser(userEmail: string): Promise<SharedQuestionSet[]> {
+  const prefix = `${SHARES_PREFIX}/${userEmail.toLowerCase()}/`;
+  const shares: SharedQuestionSet[] = [];
+  const token = getBlobToken();
+
+  let cursor: string | undefined;
+  do {
+    const result = await list({ prefix, cursor, token });
+    for (const blob of result.blobs) {
+      try {
+        const data = await readBlobJson<SharedQuestionSet>(blob.url);
+        shares.push(data);
+      } catch (err) {
+        console.error(`Failed to fetch share blob ${blob.pathname}:`, err);
+      }
+    }
+    cursor = result.hasMore ? result.cursor : undefined;
+  } while (cursor);
+
+  return shares;
+}
+
+export async function deleteShareBlob(shareId: string, recipientEmail: string): Promise<void> {
+  const prefix = `${SHARES_PREFIX}/${recipientEmail.toLowerCase()}/${shareId}.json`;
   const { blobs } = await list({ prefix, token: getBlobToken() });
   for (const blob of blobs) {
     await del(blob.url, { token: getBlobToken() });

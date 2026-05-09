@@ -2,18 +2,29 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
-import { Library as LibraryIcon, ArrowLeft, Search, Filter, Loader2, AlertCircle, Upload, RefreshCw } from 'lucide-react';
+import {
+  Library as LibraryIcon, ArrowLeft, Search, Filter, Loader2,
+  AlertCircle, Upload, RefreshCw, Share2, UserCircle2, Calendar, BookOpen, CheckCircle, X
+} from 'lucide-react';
 import QuestionSetCard from '@/components/QuestionSetCard';
 import ExamSetupModal from '@/components/ExamSetupModal';
 import JsonImportDialog from '@/components/JsonImportDialog';
 import { useExamStore } from '@/lib/store';
-import { QuestionSet } from '@/lib/types';
+import { QuestionSet, SharedQuestionSet } from '@/lib/types';
 import { useSyncContext } from '@/components/SyncProvider';
 
 export default function LibraryPage() {
   const router = useRouter();
-  const { loadQuestionSets, setCurrentQuestionSet, startExam, resetExam, availableQuestionSets, addQuestionSet, isExamStarted, isExamCompleted, currentQuestionSetId, mode: activeMode, userAnswers, questions: activeQuestions } = useExamStore();
+  const { data: session } = useSession();
+  const {
+    loadQuestionSets, setCurrentQuestionSet, startExam, resetExam,
+    availableQuestionSets, addQuestionSet, removeQuestionSet,
+    isExamStarted, isExamCompleted, currentQuestionSetId,
+    mode: activeMode, userAnswers, questions: activeQuestions,
+    sharedWithMeSets, setSharedWithMeSets, dismissSharedSet,
+  } = useExamStore();
   const { syncStatus } = useSyncContext();
 
   const [questionSets, setQuestionSets] = useState<QuestionSet[]>([]);
@@ -26,16 +37,27 @@ export default function LibraryPage() {
   const [selectedQuestionSet, setSelectedQuestionSet] = useState<QuestionSet | null>(null);
   const [showImportDialog, setShowImportDialog] = useState(false);
 
+  // Shared-with-me state
+  const [sharedLoading, setSharedLoading] = useState(false);
+  const [savingShareId, setSavingShareId] = useState<string | null>(null);
+  const [dismissingShareId, setDismissingShareId] = useState<string | null>(null);
+
   // Load question sets from store on mount
   useEffect(() => {
     fetchQuestionSets();
   }, [availableQuestionSets]);
 
+  // Fetch shared-with-me sets when signed in
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetchSharedSets();
+    }
+  }, [session?.user?.email]);
+
   // Filter question sets when search or filter changes
   useEffect(() => {
     let filtered = questionSets;
 
-    // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -46,7 +68,6 @@ export default function LibraryPage() {
       );
     }
 
-    // Apply subject filter
     if (filterSubject !== 'all') {
       filtered = filtered.filter((set) => set.subject === filterSubject);
     }
@@ -57,10 +78,7 @@ export default function LibraryPage() {
   const fetchQuestionSets = async () => {
     setIsLoading(true);
     setError('');
-
     try {
-      // Load from Zustand store (localStorage) instead of server API
-      // This works on Vercel's read-only filesystem
       setQuestionSets(availableQuestionSets);
     } catch (err: any) {
       setError(err.message || 'Failed to load question sets');
@@ -69,15 +87,30 @@ export default function LibraryPage() {
     }
   };
 
+  const fetchSharedSets = async () => {
+    setSharedLoading(true);
+    try {
+      const res = await fetch('/api/share');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.shares) {
+          setSharedWithMeSets(data.shares);
+        }
+      }
+    } catch {
+      // silently ignore — shared sets may just not load
+    } finally {
+      setSharedLoading(false);
+    }
+  };
+
   const handleStartExam = (questionSet: QuestionSet) => {
-    // If there's an active session for this question set, offer to resume
     if (isExamStarted && !isExamCompleted && currentQuestionSetId === questionSet.id && activeQuestions.length > 0) {
       if (confirm(`You have an active ${activeMode} session for "${questionSet.title}" (${userAnswers.size}/${activeQuestions.length} answered). Resume?`)) {
         router.push(activeMode === 'practice' ? '/practice' : '/exam');
         return;
       }
     }
-    // Open setup modal for new session
     setSelectedQuestionSet(questionSet);
     setShowSetupModal(true);
   };
@@ -92,42 +125,20 @@ export default function LibraryPage() {
     examDuration: number;
   }) => {
     if (!selectedQuestionSet) return;
-
-    // First reset the exam
     resetExam();
-
-    // Then load the questions from the selected question set
-    loadQuestionSets(questionSets); // Ensure question sets are in store
-    setCurrentQuestionSet(selectedQuestionSet.id); // Set questions from the set
-
-    // Now start the exam with the configured settings
+    loadQuestionSets(questionSets);
+    setCurrentQuestionSet(selectedQuestionSet.id);
     startExam(config.examDuration, config.mode, config.useTimer, config.learnWithAI, config.reviewAnswers, config.cognitiveCompanion, config.socraticMode);
-
-    // Close modal
     setShowSetupModal(false);
-
-    // Navigate to appropriate page
     router.push(config.mode === 'practice' ? '/practice' : '/exam');
   };
 
   const handleDeleteSet = async (questionSet: QuestionSet) => {
-    if (!confirm(`Are you sure you want to delete "${questionSet.title}"?`)) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/library?id=${questionSet.id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete question set');
-      }
-
-      // Refresh the list
-      await fetchQuestionSets();
-    } catch (err: any) {
-      alert(err.message || 'Failed to delete question set');
+    if (!confirm(`Are you sure you want to delete "${questionSet.title}"?`)) return;
+    removeQuestionSet(questionSet.id);
+    // Also remove from cloud backup if signed in
+    if (session?.user?.id) {
+      fetch(`/api/sync?setId=${questionSet.id}`, { method: 'DELETE' }).catch(() => {});
     }
   };
 
@@ -135,8 +146,41 @@ export default function LibraryPage() {
     addQuestionSet(questionSet);
   };
 
-  // Get unique subjects for filter
+  const handleSaveSharedSet = async (share: SharedQuestionSet) => {
+    setSavingShareId(share.id);
+    try {
+      const newSet: QuestionSet = {
+        ...share.questionSet,
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        description: share.questionSet.description
+          ? `${share.questionSet.description} (Shared by ${share.sharedByName})`
+          : `Shared by ${share.sharedByName}`,
+      };
+      addQuestionSet(newSet);
+      // Dismiss the share after saving
+      await handleDismissShare(share, false);
+    } finally {
+      setSavingShareId(null);
+    }
+  };
+
+  const handleDismissShare = async (share: SharedQuestionSet, confirm = true) => {
+    if (confirm && !window.confirm('Remove this shared set from your inbox?')) return;
+    setDismissingShareId(share.id);
+    try {
+      dismissSharedSet(share.id);
+      await fetch(`/api/share?shareId=${share.id}`, { method: 'DELETE' }).catch(() => {});
+    } finally {
+      setDismissingShareId(null);
+    }
+  };
+
   const subjects = ['all', ...new Set(questionSets.map((set) => set.subject))];
+
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -175,7 +219,6 @@ export default function LibraryPage() {
         {/* Search and Filter Bar */}
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -186,8 +229,6 @@ export default function LibraryPage() {
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-
-            {/* Subject Filter */}
             <div className="md:w-64 relative">
               <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <select
@@ -281,6 +322,7 @@ export default function LibraryPage() {
                     questionSet={questionSet}
                     onStart={handleStartExam}
                     onDelete={handleDeleteSet}
+                    onShare={session?.user ? () => {} : undefined}
                     isActiveSession={isExamStarted && !isExamCompleted && currentQuestionSetId === questionSet.id && activeQuestions.length > 0 && userAnswers.size < activeQuestions.length}
                     activeProgress={isExamStarted && !isExamCompleted && currentQuestionSetId === questionSet.id ? { answered: userAnswers.size, total: activeQuestions.length, mode: activeMode } : undefined}
                   />
@@ -288,6 +330,103 @@ export default function LibraryPage() {
               ))}
             </motion.div>
           </>
+        )}
+
+        {/* ── Shared with Me ───────────────────────────────────────────────── */}
+        {session?.user?.email && (sharedWithMeSets.length > 0 || sharedLoading) && (
+          <div className="mt-10">
+            <div className="flex items-center gap-2 mb-4">
+              <Share2 className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Shared with Me</h2>
+              {sharedLoading && <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />}
+              {!sharedLoading && sharedWithMeSets.length > 0 && (
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  ({sharedWithMeSets.length})
+                </span>
+              )}
+            </div>
+
+            {sharedWithMeSets.length === 0 && sharedLoading && (
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 py-4">
+                <Loader2 className="w-4 h-4 animate-spin" /> Loading shared sets...
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+              {sharedWithMeSets.map((share, index) => (
+                <motion.div
+                  key={share.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="bg-white dark:bg-gray-800 rounded-lg border border-blue-200 dark:border-blue-800 p-4 sm:p-5 hover:shadow-lg transition-all"
+                >
+                  {/* Shared-by banner */}
+                  <div className="flex items-center gap-2 mb-3 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg text-xs text-blue-700 dark:text-blue-300">
+                    <UserCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span className="truncate">Shared by <span className="font-medium">{share.sharedByName}</span></span>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1 line-clamp-2">
+                    {share.questionSet.title}
+                  </h3>
+                  {share.questionSet.description && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-3">
+                      {share.questionSet.description}
+                    </p>
+                  )}
+
+                  {/* Subject */}
+                  <div className="mb-3">
+                    <span className="inline-block px-2.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-full">
+                      {share.questionSet.subject}
+                    </span>
+                  </div>
+
+                  {/* Meta */}
+                  <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-4">
+                    <span className="flex items-center gap-1">
+                      <BookOpen className="w-3.5 h-3.5" />
+                      {share.questionSet.metadata.totalQuestions} questions
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {formatDate(share.sharedAt)}
+                    </span>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <button
+                      onClick={() => handleSaveSharedSet(share)}
+                      disabled={savingShareId === share.id || dismissingShareId === share.id}
+                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
+                    >
+                      {savingShareId === share.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <CheckCircle className="w-4 h-4" />
+                      )}
+                      Save to My Library
+                    </button>
+                    <button
+                      onClick={() => handleDismissShare(share)}
+                      disabled={savingShareId === share.id || dismissingShareId === share.id}
+                      className="px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm transition-colors"
+                      title="Dismiss"
+                    >
+                      {dismissingShareId === share.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <X className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
 

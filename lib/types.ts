@@ -110,6 +110,16 @@ export interface ContentSource {
   };
 }
 
+// Shared question set (email-based sharing)
+export interface SharedQuestionSet {
+  id: string;
+  questionSet: QuestionSet;
+  sharedByEmail: string;
+  sharedByName: string;
+  sharedWithEmail: string;
+  sharedAt: string;
+}
+
 // User preferences
 export interface UserPreferences {
   userId: string;
