@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Question, QuestionSet, SessionMetrics } from './types';
+import { Question, QuestionSet, SessionMetrics, SharedQuestionSet } from './types';
 import { DiagnosisResult } from './cognitiveQueue';
 
 export interface UserAnswer {
@@ -45,6 +45,7 @@ interface ExamState {
   // Question set management
   currentQuestionSetId: string | null;
   availableQuestionSets: QuestionSet[];
+  sharedWithMeSets: SharedQuestionSet[];
 
   // Actions
   setQuestions: (questions: Question[]) => void;
@@ -71,6 +72,10 @@ interface ExamState {
   loadQuestionSets: (sets: QuestionSet[]) => void;
   addQuestionSet: (set: QuestionSet) => void;
   removeQuestionSet: (id: string) => void;
+
+  // Sharing actions
+  setSharedWithMeSets: (sets: SharedQuestionSet[]) => void;
+  dismissSharedSet: (shareId: string) => void;
 
   // Session restore
   restoreSession: (data: import('./types').ActiveSessionData) => void;
@@ -104,6 +109,7 @@ export const useExamStore = create<ExamState>()(
       // Question set management
       currentQuestionSetId: null,
       availableQuestionSets: [],
+      sharedWithMeSets: [],
 
       setQuestions: (questions) => set({ questions }),
 
@@ -330,6 +336,13 @@ export const useExamStore = create<ExamState>()(
         });
       },
 
+      setSharedWithMeSets: (sets) => set({ sharedWithMeSets: sets }),
+
+      dismissSharedSet: (shareId) =>
+        set((state) => ({
+          sharedWithMeSets: state.sharedWithMeSets.filter(s => s.id !== shareId),
+        })),
+
       restoreSession: (data) =>
         set({
           questions: data.questions,
@@ -369,6 +382,7 @@ export const useExamStore = create<ExamState>()(
         socraticMode: state.socraticMode,
         currentQuestionSetId: state.currentQuestionSetId,
         availableQuestionSets: state.availableQuestionSets,
+        sharedWithMeSets: state.sharedWithMeSets,
         sessionMetrics: state.sessionMetrics,
         questionViewTimes: Array.from(state.questionViewTimes.entries()),
         selectionChanges: Array.from(state.selectionChanges.entries()),

@@ -2,19 +2,22 @@
 
 import { useState } from 'react';
 import { QuestionSet } from '@/lib/types';
-import { Calendar, FileText, TrendingUp, Play, Trash2, Globe, Lock, Download, RotateCcw } from 'lucide-react';
+import { Calendar, FileText, TrendingUp, Play, Trash2, Globe, Lock, Download, RotateCcw, Share2 } from 'lucide-react';
 import ExportDialog from './ExportDialog';
+import ShareDialog from './ShareDialog';
 
 interface QuestionSetCardProps {
   questionSet: QuestionSet;
   onStart: (questionSet: QuestionSet) => void;
   onDelete?: (questionSet: QuestionSet) => void;
+  onShare?: (questionSet: QuestionSet) => void;
   isActiveSession?: boolean;
   activeProgress?: { answered: number; total: number; mode: string };
 }
 
-export default function QuestionSetCard({ questionSet, onStart, onDelete, isActiveSession, activeProgress }: QuestionSetCardProps) {
+export default function QuestionSetCard({ questionSet, onStart, onDelete, onShare, isActiveSession, activeProgress }: QuestionSetCardProps) {
   const [showExportDialog, setShowExportDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -169,6 +172,16 @@ export default function QuestionSetCard({ questionSet, onStart, onDelete, isActi
           <Download className="w-4 h-4" />
         </button>
 
+        {onShare && (
+          <button
+            onClick={() => setShowShareDialog(true)}
+            className="px-4 py-2 border border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+            title="Share"
+          >
+            <Share2 className="w-4 h-4" />
+          </button>
+        )}
+
         {onDelete && (
           <button
             onClick={() => onDelete(questionSet)}
@@ -184,6 +197,13 @@ export default function QuestionSetCard({ questionSet, onStart, onDelete, isActi
       <ExportDialog
         isOpen={showExportDialog}
         onClose={() => setShowExportDialog(false)}
+        questionSet={questionSet}
+      />
+
+      {/* Share Dialog */}
+      <ShareDialog
+        isOpen={showShareDialog}
+        onClose={() => setShowShareDialog(false)}
         questionSet={questionSet}
       />
     </div>
