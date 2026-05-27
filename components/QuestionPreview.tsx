@@ -5,6 +5,7 @@ import { Question } from '@/lib/types';
 import { CheckCircle, Edit2 } from 'lucide-react';
 import { isCorrectOption } from '@/lib/multiAnswer';
 import QuestionEditModal from './QuestionEditModal';
+import RichText, { RichInline } from './RichContent';
 
 interface QuestionPreviewProps {
   questions: Question[];
@@ -53,9 +54,9 @@ export default function QuestionPreview({ questions, onEditQuestion }: QuestionP
                     </span>
                   )}
                 </div>
-                <p className="text-base font-medium text-gray-800 dark:text-gray-200">
-                  {question.question}
-                </p>
+                <div className="text-base font-medium text-gray-800 dark:text-gray-200">
+                  <RichText text={question.question} />
+                </div>
               </div>
               {onEditQuestion && (
                 <button
@@ -97,7 +98,7 @@ export default function QuestionPreview({ questions, onEditQuestion }: QuestionP
                           ? 'text-green-900 dark:text-green-100'
                           : 'text-gray-800 dark:text-gray-200'
                         }>
-                          {option.text}
+                          <RichInline text={option.text} />
                         </span>
                       </div>
                     </div>
@@ -112,9 +113,9 @@ export default function QuestionPreview({ questions, onEditQuestion }: QuestionP
                 <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">
                   Explanation:
                 </p>
-                <p className="text-sm text-blue-800 dark:text-blue-200">
-                  {question.explanation}
-                </p>
+                <div className="text-sm text-blue-800 dark:text-blue-200">
+                  <RichText text={question.explanation} />
+                </div>
               </div>
             )}
           </div>

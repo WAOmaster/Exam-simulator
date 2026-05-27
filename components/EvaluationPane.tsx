@@ -3,12 +3,11 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, CheckCircle, XCircle, Brain, ExternalLink, ShieldCheck, MessageSquare, FileText } from 'lucide-react';
-import { formatExplanation } from '@/lib/formatExplanation';
 import { parseInlineImages } from '@/lib/parseInlineImages';
 import { useExamStore } from '@/lib/store';
 import { parseAnswers, getCorrectOptionTexts } from '@/lib/multiAnswer';
-import ZoomableImage from './ZoomableImage';
 import QuestionImages from './QuestionImages';
+import RichText from './RichContent';
 
 interface EvaluationPaneProps {
   isOpen: boolean;
@@ -25,30 +24,6 @@ interface EvaluationPaneProps {
   explanationVotes?: number;
   sourceUrl?: string;
   answerImages?: string[];
-}
-
-function renderExplanationWithImages(text: string, gallery: string[]) {
-  const parts = parseInlineImages(text);
-  if (parts.length === 0 || parts.every(p => p.kind === 'text')) {
-    return formatExplanation(text);
-  }
-  return (
-    <div className="space-y-3">
-      {parts.map((p, i) =>
-        p.kind === 'text' ? (
-          <div key={i}>{formatExplanation(p.value)}</div>
-        ) : (
-          <ZoomableImage
-            key={i}
-            src={p.value}
-            alt="Explanation image"
-            gallery={gallery}
-            maxHeightClass="max-h-72"
-          />
-        )
-      )}
-    </div>
-  );
 }
 
 export default function EvaluationPane({
@@ -264,8 +239,8 @@ export default function EvaluationPane({
                 )}
 
                 {!loading && !error && explanation && (
-                  <div className="prose dark:prose-invert max-w-none">
-                    {renderExplanationWithImages(explanation, evalGallery)}
+                  <div className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                    <RichText text={explanation} gallery={evalGallery} />
                   </div>
                 )}
 

@@ -7,6 +7,7 @@ import {
   CCATOddOneOut,
   CCATAttentionTable,
 } from './CCATSpatialRenderer';
+import RichText, { RichInline } from '../RichContent';
 import { ChevronLeft, ChevronRight, Flag } from 'lucide-react';
 
 interface CCATExamScreenProps {
@@ -90,7 +91,7 @@ export default function CCATExamScreen({
       <div className="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-1">
           <span className="text-sm font-bold text-gray-800 dark:text-gray-200">Q {current + 1}</span>
-          <span className="text-sm text-gray-400 dark:text-gray-500"> / 50</span>
+          <span className="text-sm text-gray-400 dark:text-gray-500"> / {questions.length}</span>
         </div>
         {reviewMode ? (
           <span className="text-xs font-bold text-violet-600 dark:text-violet-400 bg-violet-100 dark:bg-violet-900/30 px-3 py-1 rounded-full">
@@ -110,7 +111,7 @@ export default function CCATExamScreen({
       <div className="h-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
         <div
           className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-300"
-          style={{ width: `${((current + 1) / 50) * 100}%` }}
+          style={{ width: `${((current + 1) / questions.length) * 100}%` }}
         />
       </div>
 
@@ -124,10 +125,10 @@ export default function CCATExamScreen({
         </span>
       </div>
 
-      {/* Question text */}
-      <p className="text-sm leading-relaxed whitespace-pre-line text-gray-900 dark:text-gray-100">
-        {q.question}
-      </p>
+      {/* Question text (code blocks, inline code, tables) */}
+      <div className="text-sm leading-relaxed text-gray-900 dark:text-gray-100">
+        <RichText text={q.question} />
+      </div>
 
       {/* AI-generated spatial image (image-based spatial questions) */}
       {q.spatialImage && (
@@ -178,7 +179,7 @@ export default function CCATExamScreen({
             <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${letterBubbleStyle(i)}`}>
               {String.fromCharCode(65 + i)}
             </span>
-            <span className="flex-1">{opt}</span>
+            <span className="flex-1"><RichInline text={opt} /></span>
             {reviewMode && i === q.correct && (
               <span className="ml-auto text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex-shrink-0">
                 ✓ Correct
@@ -197,9 +198,9 @@ export default function CCATExamScreen({
       {reviewMode && (
         <div className="mt-2 p-4 bg-blue-50/60 dark:bg-blue-900/10 rounded-lg border border-blue-200 dark:border-blue-800/50 border-l-4 border-l-blue-500">
           <p className="text-xs font-bold text-blue-700 dark:text-blue-300 mb-1">Explanation</p>
-          <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">
-            {q.explanation}
-          </p>
+          <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+            <RichText text={q.explanation} />
+          </div>
         </div>
       )}
 

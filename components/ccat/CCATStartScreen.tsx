@@ -3,22 +3,43 @@
 import { motion } from 'framer-motion';
 import { Brain, Clock, Target, BarChart3, AlertCircle, Play } from 'lucide-react';
 
-interface CCATStartScreenProps {
-  onStart: () => void;
+interface CCATDistributionItem {
+  name: string;
+  count: number;
+  color: string;
+  textColor: string;
 }
 
-export default function CCATStartScreen({ onStart }: CCATStartScreenProps) {
-  const details = [
-    { label: 'Total Questions', value: '50' },
-    { label: 'Time Limit', value: '15 Minutes' },
-    { label: 'Avg. Time / Q', value: '18 Seconds' },
-    { label: 'Scoring', value: 'No penalty for wrong answers' },
-  ];
+interface CCATStartScreenProps {
+  onStart: () => void;
+  title?: string;
+  subtitle?: string;
+  total?: number;
+  timeLabel?: string;
+  avgLabel?: string;
+  distribution?: CCATDistributionItem[];
+}
 
-  const distribution = [
-    { name: 'Verbal Ability', count: 18, color: 'bg-blue-500', textColor: 'text-blue-600 dark:text-blue-400' },
-    { name: 'Math & Logic', count: 21, color: 'bg-emerald-500', textColor: 'text-emerald-600 dark:text-emerald-400' },
-    { name: 'Spatial Reasoning', count: 11, color: 'bg-violet-500', textColor: 'text-violet-600 dark:text-violet-400' },
+const DEFAULT_DISTRIBUTION: CCATDistributionItem[] = [
+  { name: 'Verbal Ability', count: 18, color: 'bg-blue-500', textColor: 'text-blue-600 dark:text-blue-400' },
+  { name: 'Math & Logic', count: 21, color: 'bg-emerald-500', textColor: 'text-emerald-600 dark:text-emerald-400' },
+  { name: 'Spatial Reasoning', count: 11, color: 'bg-violet-500', textColor: 'text-violet-600 dark:text-violet-400' },
+];
+
+export default function CCATStartScreen({
+  onStart,
+  title = 'CCAT Practice Test',
+  subtitle = 'Criteria Cognitive Aptitude Test — Full-Length Simulated Exam',
+  total = 50,
+  timeLabel = '15 Minutes',
+  avgLabel = '18 Seconds',
+  distribution = DEFAULT_DISTRIBUTION,
+}: CCATStartScreenProps) {
+  const details = [
+    { label: 'Total Questions', value: String(total) },
+    { label: 'Time Limit', value: timeLabel },
+    { label: 'Avg. Time / Q', value: avgLabel },
+    { label: 'Scoring', value: 'No penalty for wrong answers' },
   ];
 
   return (
@@ -39,10 +60,10 @@ export default function CCATStartScreen({ onStart }: CCATStartScreenProps) {
           Practice Exam
         </p>
         <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-          CCAT Practice Test
+          {title}
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Criteria Cognitive Aptitude Test — Full-Length Simulated Exam
+          {subtitle}
         </p>
       </div>
 

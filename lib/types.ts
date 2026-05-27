@@ -1,3 +1,5 @@
+import { CellDescriptor, SpatialType } from './ccatTypes';
+
 // Core question types
 export interface Question {
   id: number;
@@ -14,6 +16,14 @@ export interface Question {
        | 'spatial-next-in-series' | 'spatial-matrix' | 'spatial-odd-one-out';
   // AI-generated spatial image (base64 data URL, present for spatial-* question types)
   spatialImage?: string;
+  // CCAT-style vector spatial questions (rendered from SVG shape descriptors)
+  spatial?: SpatialType;
+  seriesDescriptors?: (CellDescriptor | null)[];
+  optionDescriptors?: CellDescriptor[];
+  matrixDescriptors?: (CellDescriptor | null)[];
+  oddDescriptors?: CellDescriptor[];
+  attentionLeft?: string[];
+  attentionRight?: string[];
   // ExamTopics scraper extensions
   images?: string[];
   answerImages?: string[];

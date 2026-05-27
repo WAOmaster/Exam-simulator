@@ -6,8 +6,14 @@ import { CheckCircle2, XCircle, Loader2, BookOpen, Eye } from 'lucide-react';
 import { Question } from '@/lib/types';
 import { isOptionSelected, isCorrectOption, parseAnswers } from '@/lib/multiAnswer';
 import { parseInlineImages } from '@/lib/parseInlineImages';
-import ZoomableImage from './ZoomableImage';
 import QuestionImages from './QuestionImages';
+import RichText, { RichInline } from './RichContent';
+import {
+  CCATNextInSeries,
+  CCATMatrix,
+  CCATOddOneOut,
+  CCATAttentionTable,
+} from './ccat/CCATSpatialRenderer';
 
 const IMAGE_BASED_TYPES = new Set<NonNullable<Question['type']>>(['hotspot', 'drag-and-drop']);
 const HOTSPOT_TEXT_RE = /^\s*(HOTSPOT|DRAG[\s-]+(AND[\s-]+)?DROP)\b/i;
@@ -44,27 +50,6 @@ function collectQuestionGallery(question: Question): string[] {
   question.images?.forEach(push);
   question.answerImages?.forEach(push);
   return out;
-}
-
-/**
- * Render question text. When `hideInlineImages` is true, inline `[IMAGE:]`
- * markers are dropped from the rendered output so the caller can show them
- * as a thumbnail grid below — avoids burying text under 5+ stacked images.
- */
-function renderQuestionBody(text: string, gallery: string[], hideInlineImages = false) {
-  const parts = parseInlineImages(text);
-  if (parts.length === 0) return text;
-  return parts.map((p, i) => {
-    if (p.kind === 'text') {
-      return <span key={i} className="whitespace-pre-wrap">{p.value}</span>;
-    }
-    if (hideInlineImages) return null;
-    return (
-      <span key={i} className="block my-3">
-        <ZoomableImage src={p.value} alt="Question diagram" gallery={gallery} />
-      </span>
-    );
-  });
 }
 
 interface QuestionCardProps {
@@ -195,9 +180,9 @@ export default function QuestionCard({
           </span>
         </div>
 
-        {/* Question text (parses inline [IMAGE: <url>] markers) */}
+        {/* Question text (code blocks, inline code, tables, [IMAGE:] markers) */}
         <div className="text-sm sm:text-base md:text-lg font-medium leading-relaxed text-foreground">
-          {renderQuestionBody(question.question, gallery, useImageGrid)}
+          <RichText text={question.question} gallery={gallery} hideImages={useImageGrid} />
         </div>
 
         {/* Spatial image (AI-generated for spatial-* question types) */}
@@ -208,6 +193,28 @@ export default function QuestionCard({
               alt="Spatial pattern"
               className="max-w-full rounded-xl border border-card-border"
             />
+          </div>
+        )}
+
+        {/* CCAT-style vector spatial questions (rendered from shape descriptors) */}
+        {!question.spatialImage && question.spatial === 'attention' && question.attentionLeft && question.attentionRight && (
+          <div className="mt-4">
+            <CCATAttentionTable left={question.attentionLeft} right={question.attentionRight} />
+          </div>
+        )}
+        {!question.spatialImage && question.spatial === 'nextInSeries' && question.seriesDescriptors && question.optionDescriptors && (
+          <div className="mt-4">
+            <CCATNextInSeries descriptors={question.seriesDescriptors} optionDescriptors={question.optionDescriptors} />
+          </div>
+        )}
+        {!question.spatialImage && question.spatial === 'matrix' && question.matrixDescriptors && question.optionDescriptors && (
+          <div className="mt-4">
+            <CCATMatrix descriptors={question.matrixDescriptors} optionDescriptors={question.optionDescriptors} />
+          </div>
+        )}
+        {!question.spatialImage && question.spatial === 'oddOneOut' && question.oddDescriptors && (
+          <div className="mt-4">
+            <CCATOddOneOut descriptors={question.oddDescriptors} />
           </div>
         )}
 
@@ -265,8 +272,8 @@ export default function QuestionCard({
           )}
 
           {(revealed || isSubmitted) && question.explanation && (
-            <div className="p-4 rounded-xl bg-muted/40 border border-card-border whitespace-pre-wrap text-sm sm:text-base">
-              {renderQuestionBody(question.explanation, gallery)}
+            <div className="p-4 rounded-xl bg-muted/40 border border-card-border text-sm sm:text-base">
+              <RichText text={question.explanation} gallery={gallery} />
             </div>
           )}
 
@@ -335,10 +342,14 @@ export default function QuestionCard({
                 {optionLabels[index] || option.id}
               </div>
 
-              {/* Option text */}
-              <span className="flex-1 text-sm leading-relaxed">
-                {option.text}
-              </span>
+              {/* Option text (inline code / bold supported). Hide redundant
+                  single-letter text that just repeats the bubble label, e.g.
+                  CCAT spatial options whose visual choices are shown above. */}
+              {option.text !== (optionLabels[index] || option.id) && (
+                <span className="flex-1 text-sm leading-relaxed">
+                  <RichInline text={option.text} />
+                </span>
+              )}
 
               {/* Feedback icon */}
               <div className="flex-shrink-0">
