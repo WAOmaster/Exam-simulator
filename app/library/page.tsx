@@ -13,6 +13,7 @@ import ExamSetupModal from '@/components/ExamSetupModal';
 import JsonImportDialog from '@/components/JsonImportDialog';
 import { useExamStore } from '@/lib/store';
 import { QuestionSet, SharedQuestionSet } from '@/lib/types';
+import { isCcatSet } from '@/lib/ccatConvert';
 import { useSyncContext } from '@/components/SyncProvider';
 
 export default function LibraryPage() {
@@ -105,6 +106,12 @@ export default function LibraryPage() {
   };
 
   const handleStartExam = (questionSet: QuestionSet) => {
+    // CCAT-style sets (spatial / cognitive-aptitude questions) run through the
+    // dedicated CCAT flow with shape rendering, mini-map, and category scoring.
+    if (isCcatSet(questionSet)) {
+      router.push(`/ccat?set=${encodeURIComponent(questionSet.id)}`);
+      return;
+    }
     if (isExamStarted && !isExamCompleted && currentQuestionSetId === questionSet.id && activeQuestions.length > 0) {
       if (confirm(`You have an active ${activeMode} session for "${questionSet.title}" (${userAnswers.size}/${activeQuestions.length} answered). Resume?`)) {
         router.push(activeMode === 'practice' ? '/practice' : '/exam');

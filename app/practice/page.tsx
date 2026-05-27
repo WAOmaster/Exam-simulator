@@ -15,8 +15,8 @@ import { cognitiveQueue } from '@/lib/cognitiveQueue';
 import { ChevronLeft, ChevronRight, Home, AlertCircle, MessageCircle, BarChart3, Brain, Eye, CheckCircle2, XCircle } from 'lucide-react';
 import { answersMatch, isOptionSelected, isCorrectOption, isMultiAnswer, getRequiredAnswerCount, toggleAnswer } from '@/lib/multiAnswer';
 import { parseInlineImages } from '@/lib/parseInlineImages';
-import ZoomableImage from '@/components/ZoomableImage';
 import QuestionImages from '@/components/QuestionImages';
+import RichText, { RichInline } from '@/components/RichContent';
 
 const IMAGE_BASED_PRACTICE = new Set(['hotspot', 'drag-and-drop']);
 const HOTSPOT_TEXT_RE = /^\s*(HOTSPOT|DRAG[\s-]+(AND[\s-]+)?DROP)\b/i;
@@ -41,22 +41,6 @@ function buildPracticeGallery(q: { question: string; images?: string[]; answerIm
   q.answerImages?.forEach(push);
   for (const p of parseInlineImages(q.explanation || '')) if (p.kind === 'img') push(p.value);
   return out;
-}
-
-function renderPracticeBody(text: string, gallery: string[], hideInlineImages = false) {
-  const parts = parseInlineImages(text);
-  if (parts.length === 0) return text;
-  return parts.map((p, i) => {
-    if (p.kind === 'text') {
-      return <span key={i} className="whitespace-pre-wrap">{p.value}</span>;
-    }
-    if (hideInlineImages) return null;
-    return (
-      <span key={i} className="block my-3">
-        <ZoomableImage src={p.value} alt="Question image" gallery={gallery} maxHeightClass="max-h-72" />
-      </span>
-    );
-  });
 }
 
 function PracticeHotspotReveal({
@@ -94,8 +78,8 @@ function PracticeHotspotReveal({
       )}
 
       {showAnswer && question.explanation && (
-        <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/40 border border-gray-200 dark:border-gray-600 text-sm whitespace-pre-wrap">
-          {renderPracticeBody(question.explanation, gallery)}
+        <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/40 border border-gray-200 dark:border-gray-600 text-sm">
+          <RichText text={question.explanation} gallery={gallery} />
         </div>
       )}
 
@@ -494,9 +478,9 @@ export default function PracticePage() {
                       <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                         Question {currentQuestionIndex + 1} of {questions.length}
                       </span>
-                      <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mt-1.5 sm:mt-2 leading-relaxed">
-                        {renderPracticeBody(currentQuestion.question, practiceGallery, useImageGrid)}
-                      </h2>
+                      <div className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mt-1.5 sm:mt-2 leading-relaxed">
+                        <RichText text={currentQuestion.question} gallery={practiceGallery} hideImages={useImageGrid} />
+                      </div>
                       {useImageGrid && questionImgs.length > 0 && (
                         <div className="mt-4">
                           <QuestionImages images={questionImgs} gallery={practiceGallery} altPrefix="Question image" />
@@ -575,7 +559,7 @@ export default function PracticePage() {
                             ? 'text-red-900 dark:text-red-100'
                             : 'text-gray-800 dark:text-gray-200'
                         }`}>
-                          {option.text}
+                          <RichInline text={option.text} />
                         </span>
                       </div>
                     </button>

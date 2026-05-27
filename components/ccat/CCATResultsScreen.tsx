@@ -9,6 +9,7 @@ interface CCATResultsScreenProps {
   answers: (number | null)[];
   questions: CCATQuestion[];
   timeLeft: number;
+  totalTime?: number;
   onReview: (index?: number) => void;
   onRetake: () => void;
 }
@@ -24,16 +25,16 @@ function catScore(questions: CCATQuestion[], answers: (number | null)[], cat: st
   return { correct, total, pct: total ? Math.round((correct / total) * 100) : 0 };
 }
 
-function getGrade(score: number) {
-  if (score >= 36) return { label: 'Excellent', colorClass: 'text-emerald-600 dark:text-emerald-400', bgClass: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-700' };
-  if (score >= 25) return { label: 'Competitive', colorClass: 'text-amber-600 dark:text-amber-400', bgClass: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700' };
+function getGrade(pct: number) {
+  if (pct >= 72) return { label: 'Excellent', colorClass: 'text-emerald-600 dark:text-emerald-400', bgClass: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-700' };
+  if (pct >= 50) return { label: 'Competitive', colorClass: 'text-amber-600 dark:text-amber-400', bgClass: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700' };
   return { label: 'Keep Practicing', colorClass: 'text-rose-600 dark:text-rose-400', bgClass: 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-700' };
 }
 
-function getPercentile(score: number) {
-  return score <= 24
-    ? Math.round((score / 24) * 50)
-    : Math.round(50 + ((score - 24) / 26) * 50);
+function getPercentile(pct: number) {
+  return pct <= 48
+    ? Math.round((pct / 48) * 50)
+    : Math.round(50 + ((pct - 48) / 52) * 50);
 }
 
 export default function CCATResultsScreen({
@@ -41,17 +42,20 @@ export default function CCATResultsScreen({
   answers,
   questions,
   timeLeft,
+  totalTime = 900,
   onReview,
   onRetake,
 }: CCATResultsScreenProps) {
-  const grade = getGrade(score);
-  const percentile = getPercentile(score);
+  const total = questions.length;
+  const pct = total ? Math.round((score / total) * 100) : 0;
+  const grade = getGrade(pct);
+  const percentile = getPercentile(pct);
   const verbal = catScore(questions, answers, 'Verbal');
   const math = catScore(questions, answers, 'Math & Logic');
   const spatial = catScore(questions, answers, 'Spatial Reasoning');
 
-  const timeUsedMinutes = Math.floor((900 - timeLeft) / 60);
-  const timeUsedSeconds = (900 - timeLeft) % 60;
+  const timeUsedMinutes = Math.floor((totalTime - timeLeft) / 60);
+  const timeUsedSeconds = (totalTime - timeLeft) % 60;
 
   const categories = [
     { name: 'Verbal', score: verbal, colorClass: 'text-blue-600 dark:text-blue-400' },
@@ -86,7 +90,7 @@ export default function CCATResultsScreen({
         </div>
         <div className={`text-5xl font-black ${grade.colorClass}`}>
           {score}
-          <span className="text-2xl text-gray-400 dark:text-gray-500 font-medium">/50</span>
+          <span className="text-2xl text-gray-400 dark:text-gray-500 font-medium">/{total}</span>
         </div>
         <div className={`text-base font-bold ${grade.colorClass} mt-1`}>{grade.label}</div>
         <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
