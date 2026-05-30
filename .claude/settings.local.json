@@ -27,7 +27,10 @@
       "mcp__stitch__create_project",
       "mcp__stitch__upload_design_md",
       "mcp__stitch__create_design_system_from_design_md",
-      "mcp__stitch__list_design_systems"
+      "mcp__stitch__list_design_systems",
+      "mcp__stitch__generate_screen_from_text",
+      "mcp__stitch__list_screens",
+      "mcp__stitch__edit_screens"
     ],
     "deny": [],
     "ask": []
