@@ -22,7 +22,12 @@
       "Bash(git push:*)",
       "Bash(vercel logs:*)",
       "Bash(vercel ls:*)",
-      "mcp__d07e7649-2285-443f-80c8-b2f6d05a4073__get_runtime_logs"
+      "mcp__d07e7649-2285-443f-80c8-b2f6d05a4073__get_runtime_logs",
+      "mcp__stitch__list_projects",
+      "mcp__stitch__create_project",
+      "mcp__stitch__upload_design_md",
+      "mcp__stitch__create_design_system_from_design_md",
+      "mcp__stitch__list_design_systems"
     ],
     "deny": [],
     "ask": []
