@@ -15,6 +15,7 @@ import { useExamStore } from '@/lib/store';
 import { QuestionSet, SharedQuestionSet } from '@/lib/types';
 import { isCcatSet } from '@/lib/ccatConvert';
 import { useSyncContext } from '@/components/SyncProvider';
+import { pushQuestionSetToCloud } from '@/lib/syncManager';
 
 export default function LibraryPage() {
   const router = useRouter();
@@ -151,6 +152,12 @@ export default function LibraryPage() {
 
   const handleImportQuestionSet = (questionSet: QuestionSet) => {
     addQuestionSet(questionSet);
+    // Push to cloud immediately so it syncs to other devices on the same account.
+    // Without this, an imported set lives only in this device's localStorage until
+    // the next throttled/sign-in sync, so it never reaches other devices.
+    if (session?.user?.id) {
+      pushQuestionSetToCloud(questionSet).catch(() => {});
+    }
   };
 
   const handleSaveSharedSet = async (share: SharedQuestionSet) => {
@@ -166,6 +173,10 @@ export default function LibraryPage() {
           : `Shared by ${share.sharedByName}`,
       };
       addQuestionSet(newSet);
+      // Push to cloud immediately so the saved set syncs across the user's devices.
+      if (session?.user?.id) {
+        await pushQuestionSetToCloud(newSet).catch(() => {});
+      }
       // Dismiss the share after saving
       await handleDismissShare(share, false);
     } finally {
