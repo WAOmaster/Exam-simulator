@@ -27,6 +27,7 @@ export async function saveQuestionSetToCloud(
   await put(path, JSON.stringify(questionSet), {
     access: 'private',
     addRandomSuffix: false,
+    allowOverwrite: true,
     token: getBlobToken(),
   });
 }
@@ -76,6 +77,7 @@ export async function saveSessionHistoryToCloud(
   await put(path, JSON.stringify(history), {
     access: 'private',
     addRandomSuffix: false,
+    allowOverwrite: true,
     token: getBlobToken(),
   });
 }
@@ -90,6 +92,7 @@ export async function saveActiveSessionToCloud(
   await put(path, JSON.stringify(sessionData), {
     access: 'private',
     addRandomSuffix: false,
+    allowOverwrite: true,
     token: getBlobToken(),
   });
 }
@@ -134,6 +137,7 @@ export async function saveShare(share: SharedQuestionSet): Promise<void> {
   await put(path, JSON.stringify(share), {
     access: 'private',
     addRandomSuffix: false,
+    allowOverwrite: true,
     token: getBlobToken(),
   });
 }
