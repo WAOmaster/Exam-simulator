@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { Upload, CheckCircle, AlertCircle, ArrowLeft, Library, Loader2 } from 'lucide-react';
 import { useExamStore } from '@/lib/store';
+import { pushQuestionSetToCloud } from '@/lib/syncManager';
 import { Question, QuestionSet } from '@/lib/types';
 
 interface BatchConfig {
@@ -81,6 +83,7 @@ function buildQuestionSet(questions: Question[], config: BatchConfig): QuestionS
 
 export default function ImportPage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const { addQuestionSet, availableQuestionSets } = useExamStore();
 
   const [importing, setImporting] = useState<Record<string, boolean>>({});
@@ -105,6 +108,10 @@ export default function ImportPage() {
 
       const questionSet = buildQuestionSet(questions, config);
       addQuestionSet(questionSet);
+      // Push to cloud immediately so it syncs to the user's other devices.
+      if (session?.user?.id) {
+        await pushQuestionSetToCloud(questionSet).catch(() => {});
+      }
 
       setImported(prev => ({ ...prev, [config.id]: true }));
     } catch (err: any) {
