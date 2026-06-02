@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { put, list, del, get } from '@vercel/blob';
 
+// Lightweight, unauthenticated health check for the Vercel Blob store.
+// Verifies the token works and that put (incl. overwrite), get, and del
+// all succeed. Writes only to a throwaway test/ path.
 export async function GET() {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
   const diagnostics: Record<string, unknown> = {
@@ -19,15 +22,26 @@ export async function GET() {
     diagnostics.listError = e.message;
   }
 
-  // Test put with private access
+  // Test put with private access, twice, to exercise the same overwrite path
+  // the sync route uses (v2 throws on overwrite unless allowOverwrite is set).
   try {
-    const blob = await put('test/ping.txt', 'hello', {
-      access: 'private',
+    const opts = {
+      access: 'private' as const,
       addRandomSuffix: false,
+      allowOverwrite: true,
       token,
-    });
+    };
+    const blob = await put('test/ping.txt', 'hello', opts);
     diagnostics.putWorks = true;
     diagnostics.putUrl = blob.url;
+
+    try {
+      await put('test/ping.txt', 'hello-again', opts);
+      diagnostics.overwriteWorks = true;
+    } catch (e: any) {
+      diagnostics.overwriteWorks = false;
+      diagnostics.overwriteError = e.message;
+    }
 
     // Test get (read private blob)
     try {
