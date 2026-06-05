@@ -324,26 +324,62 @@ export default function Home() {
               </h1>
             </motion.div>
 
-            {/* Subtitle */}
+            {/* Subtitle — the README thesis, verbatim */}
             <motion.p
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.35, duration: 0.6 }}
-              className="text-base sm:text-lg md:text-xl hp-text-tertiary max-w-xl mx-auto mb-3 font-light px-2 sm:px-0"
+              className="font-display text-xl sm:text-2xl md:text-3xl hp-text-primary max-w-2xl mx-auto mb-4 px-2 sm:px-0 leading-snug"
             >
-              AI-powered practice exams that adapt to your learning
+              Understands the <span className="hp-icon-indigo italic">student</span>, not just the subject.
             </motion.p>
+
+            {/* Supporting line — Cognitive Companion positioning from README */}
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.42, duration: 0.6 }}
+              className="text-sm sm:text-base hp-text-tertiary max-w-xl mx-auto mb-6 font-light px-2 sm:px-0"
+            >
+              Turn any content into a practice exam — then let the Cognitive Companion
+              diagnose <span className="italic">why</span> you got it wrong and fix the gap.
+            </motion.p>
+
+            {/* Deep Think diagnosis chips — the three real misconception types (README §What Makes This Different) */}
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.55 }}
+              className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-7 px-2"
+            >
+              <span className="text-[11px] hp-text-quaternary font-medium uppercase tracking-wider hidden sm:inline">Deep Think diagnoses</span>
+              <span className="hidden sm:inline w-4 h-[1px]" style={{ backgroundColor: 'var(--hp-surface-border)' }} />
+              {[
+                { label: 'Silly mistake', dot: 'bg-amber-500 dark:bg-amber-400' },
+                { label: 'Conceptual misunderstanding', dot: 'bg-purple-500 dark:bg-purple-400' },
+                { label: 'Knowledge gap', dot: 'bg-rose-500 dark:bg-rose-400' },
+              ].map((chip) => (
+                <span
+                  key={chip.label}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium hp-text-secondary"
+                  style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)' }}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${chip.dot}`} />
+                  {chip.label}
+                </span>
+              ))}
+            </motion.div>
 
             {/* Powered by badge */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45, duration: 0.5 }}
+              transition={{ delay: 0.55, duration: 0.5 }}
               className="flex items-center justify-center gap-2 mb-12"
             >
               <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border" style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)' }}>
                 <Zap className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
-                <span className="text-xs hp-text-tertiary font-medium tracking-wide uppercase">Powered by Google Gemini</span>
+                <span className="text-xs hp-text-tertiary font-medium tracking-wide uppercase">Powered by Google Gemini 3</span>
               </div>
             </motion.div>
 
@@ -478,6 +514,86 @@ export default function Home() {
                 <ArrowRight className="w-4 h-4" />
               </div>
             </motion.button>
+          </div>
+        </section>
+
+        {/* ===== WHAT MAKES THIS DIFFERENT ===== */}
+        <section className="relative px-3 sm:px-4 pb-10 sm:pb-14">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.6 }}
+            >
+              {/* Section header */}
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 border border-indigo-500/10 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 hp-icon-indigo" />
+                </div>
+                <h2 className="text-xl sm:text-2xl font-bold hp-text-primary">What makes this different</h2>
+              </div>
+              <p className="hp-text-tertiary mb-8 ml-11 text-sm">
+                Most exam tools are binary — right or wrong. This one tells you why.
+              </p>
+
+              {/* Pillar grid — four differentiators from the README, verbatim */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+                {[
+                  {
+                    icon: Layers,
+                    iconClass: 'hp-icon-indigo',
+                    glow: 'from-indigo-500/5 dark:from-indigo-500/10',
+                    bgIcon: 'from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20',
+                    title: 'Universal Subject Support',
+                    desc: 'AWS certifications, high school biology, or LeetCode interviews — it adapts to your material.',
+                  },
+                  {
+                    icon: Brain,
+                    iconClass: 'hp-icon-purple',
+                    glow: 'from-purple-500/5 dark:from-purple-500/10',
+                    bgIcon: 'from-purple-500/10 to-pink-500/10 dark:from-purple-500/20 dark:to-pink-500/20',
+                    title: 'Deep Think Diagnostics',
+                    desc: 'Gemini 3 Pro analyzes your wrong answers — a silly mistake, a conceptual gap, or a knowledge gap.',
+                  },
+                  {
+                    icon: Eye,
+                    iconClass: 'hp-icon-cyan',
+                    glow: 'from-cyan-500/5 dark:from-cyan-500/10',
+                    bgIcon: 'from-cyan-500/10 to-teal-500/10 dark:from-cyan-500/20 dark:to-teal-500/20',
+                    title: 'Visible Reasoning',
+                    desc: 'You don’t just get the answer — you watch the AI break down your logic in real-time.',
+                  },
+                  {
+                    icon: BarChart3,
+                    iconClass: 'hp-icon-emerald',
+                    glow: 'from-emerald-500/5 dark:from-emerald-500/10',
+                    bgIcon: 'from-emerald-500/10 to-green-500/10 dark:from-emerald-500/20 dark:to-green-500/20',
+                    title: 'Dynamic Visualizations',
+                    desc: 'Struggling with a concept? It writes and runs Python to plot custom graphs on the fly.',
+                  },
+                ].map((pillar, i) => (
+                  <motion.div
+                    key={pillar.title}
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.06, duration: 0.4 }}
+                    className="action-card-shine group relative p-4 sm:p-5 rounded-2xl border backdrop-blur-sm transition-all duration-300"
+                    style={{ borderColor: 'var(--hp-surface-border)', backgroundColor: 'var(--hp-surface)', boxShadow: 'var(--hp-card-shadow)' }}
+                  >
+                    <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${pillar.glow} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                    <div className="relative z-10">
+                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${pillar.bgIcon} border flex items-center justify-center mb-3.5`} style={{ borderColor: 'var(--hp-surface-border)' }}>
+                        <pillar.icon className={`w-5 h-5 ${pillar.iconClass}`} />
+                      </div>
+                      <h3 className="text-sm sm:text-[15px] font-semibold hp-text-primary mb-1.5">{pillar.title}</h3>
+                      <p className="text-xs sm:text-sm hp-text-tertiary leading-relaxed">{pillar.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
           </div>
         </section>
 
