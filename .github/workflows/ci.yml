@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Informational for now: the repo has ~167 pre-existing lint errors.
+      # Flip to blocking once they're cleaned up.
+      - name: Lint (non-blocking)
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          # Dummy values so the build doesn't fail on missing secrets;
+          # no AI/auth/blob calls happen at build time.
+          GEMINI_API_KEY: ci-dummy
+          AUTH_SECRET: ci-dummy-secret
+
+      - name: Validate question import fixtures
+        run: npx tsx scripts/verify-import.mjs scripts/fixtures/sample-questions.json --strict

@@ -1,90 +1,66 @@
-// Standalone replica of validateQuestions() from JsonImportDialog.tsx,
-// run against the real scraper output to confirm 0 questions are dropped
-// and HOTSPOT is preserved with the SELF:correct sentinel.
+#!/usr/bin/env npx tsx
+// Validate a question JSON file with the SAME validator the app importer uses
+// (lib/validateQuestions.ts) — no more hand-synced replica.
+//
+// Usage:
+//   npm run questions:verify -- <file.json> [--strict]
+//   npx tsx scripts/verify-import.mjs <file.json> [--strict]
+//
+// --strict  exit non-zero if ANY question is dropped (used in CI)
 
 import fs from 'node:fs';
+import { validateQuestions } from '../lib/validateQuestions.ts';
 
-const IMAGE_BASED_TYPES = new Set(['hotspot', 'drag-drop', 'drag-and-drop']);
+const args = process.argv.slice(2);
+const strict = args.includes('--strict');
+const file = args.find(a => !a.startsWith('--'));
 
-function normalizeQuestionType(raw) {
-  if (typeof raw !== 'string' || !raw) return 'multiple-choice';
-  if (raw === 'drag-drop') return 'drag-and-drop';
-  return raw;
+if (!file) {
+  console.error('Usage: npx tsx scripts/verify-import.mjs <file.json> [--strict]');
+  process.exit(2);
 }
 
-function validateQuestions(data) {
-  const errors = [];
-  const valid = [];
-  for (let i = 0; i < data.length; i++) {
-    const q = data[i];
-    const idx = i + 1;
-    if (!q.question || typeof q.question !== 'string') {
-      errors.push(`Q${idx}: Missing or invalid "question" field`);
-      continue;
-    }
-    const resolvedType = normalizeQuestionType(q.questionType ?? q.type);
-    const isImageBased = IMAGE_BASED_TYPES.has(String(q.questionType ?? q.type ?? '')) ||
-      resolvedType === 'hotspot' || resolvedType === 'drag-and-drop';
-    if (!Array.isArray(q.options)) { errors.push(`Q${idx}: missing options`); continue; }
-    if (q.options.length < 2 && !isImageBased) { errors.push(`Q${idx}: options < 2`); continue; }
-    if (!isImageBased && (!q.correctAnswer || typeof q.correctAnswer !== 'string')) {
-      errors.push(`Q${idx}: missing correctAnswer`); continue;
-    }
-    const rawCorrect = typeof q.correctAnswer === 'string' ? q.correctAnswer : '';
-    const correctAnswer = isImageBased && !rawCorrect ? 'SELF:correct' : rawCorrect;
-    valid.push({
-      id: q.id ?? i + 1,
-      question: q.question,
-      options: q.options.map((opt, oi) => ({ id: opt.id || String.fromCharCode(65 + oi), text: opt.text || String(opt) })),
-      correctAnswer,
-      explanation: q.explanation || '',
-      category: q.category || 'Imported',
-      difficulty: ['easy', 'medium', 'hard'].includes(q.difficulty) ? q.difficulty : 'medium',
-      type: resolvedType,
-      ...(Array.isArray(q.images) && q.images.length > 0 ? { images: q.images } : {}),
-      ...(Array.isArray(q.answerImages) && q.answerImages.length > 0 ? { answerImages: q.answerImages } : {}),
-      ...(typeof q.explanationSource === 'string' && q.explanationSource ? { explanationSource: q.explanationSource } : {}),
-      ...(typeof q.explanationVotes === 'number' ? { explanationVotes: q.explanationVotes } : {}),
-      ...(typeof q.sourceUrl === 'string' && q.sourceUrl ? { sourceUrl: q.sourceUrl } : {}),
-    });
-  }
-  return { valid, errors };
+const raw = JSON.parse(fs.readFileSync(file, 'utf-8'));
+// Accept both a bare array and the { questions: [...] } wrapper, like the importer
+const questionsArray = Array.isArray(raw) ? raw : raw.questions;
+if (!Array.isArray(questionsArray)) {
+  console.error('❌ JSON must be an array of questions or an object with a "questions" field');
+  process.exit(1);
 }
 
-const path = 'F:/Dev/Examtopics_scraper/output/examtopics/CompTIA_sy0-701_google_20260508_080314.json';
-const raw = JSON.parse(fs.readFileSync(path, 'utf-8'));
-const { valid, errors } = validateQuestions(raw);
+const { valid, errors } = validateQuestions(questionsArray);
 
-console.log(`Input: ${raw.length} questions`);
+console.log(`Input:    ${questionsArray.length} questions`);
 console.log(`Imported: ${valid.length} questions (${errors.length} dropped)`);
-console.log('Errors:', errors);
+if (errors.length > 0) {
+  console.log('Errors:');
+  for (const err of errors) console.log(`  - ${err}`);
+}
+
 const byType = {};
 for (const q of valid) byType[q.type] = (byType[q.type] || 0) + 1;
 console.log('Type distribution:', byType);
 
 const hotspot = valid.find(q => q.type === 'hotspot');
-console.log('\nHOTSPOT present?', !!hotspot);
 if (hotspot) {
+  console.log('\nHOTSPOT sample:');
   console.log('  correctAnswer:', JSON.stringify(hotspot.correctAnswer));
   console.log('  options:', hotspot.options.length);
-  console.log('  images:', hotspot.images?.length);
-  console.log('  sourceUrl:', hotspot.sourceUrl);
+  console.log('  images:', hotspot.images?.length ?? 0);
 }
 
-const ms = valid.find(q => q.type === 'multi-select');
-console.log('\nMulti-select sample:');
-if (ms) {
-  console.log('  correctAnswer:', JSON.stringify(ms.correctAnswer));
-  console.log('  options:', ms.options.length);
-  console.log('  explanationSource:', ms.explanationSource, 'votes:', ms.explanationVotes);
+const multi = valid.find(q => typeof q.correctAnswer === 'string' && q.correctAnswer.includes(','));
+if (multi) {
+  console.log('\nMulti-answer sample:');
+  console.log('  correctAnswer:', JSON.stringify(multi.correctAnswer));
 }
 
-// Sanity check: answersMatch for SELF:correct sentinel
-import('../lib/multiAnswer.ts').catch(() => {
-  // can't import TS in pure node; replicate
-  function parseAnswers(a) { return a.split(',').map(s => s.trim()).filter(Boolean).sort(); }
-  function answersMatch(a, b) { const pa = parseAnswers(a); const pb = parseAnswers(b); return pa.length === pb.length && pa.every((v, i) => v === pb[i]); }
-  console.log('\nSelf-grade sentinel test:');
-  console.log('  SELF:correct vs SELF:correct ->', answersMatch('SELF:correct', 'SELF:correct'));
-  console.log('  SELF:incorrect vs SELF:correct ->', answersMatch('SELF:incorrect', 'SELF:correct'));
-});
+if (valid.length === 0) {
+  console.error('\n❌ No valid questions found');
+  process.exit(1);
+}
+if (strict && errors.length > 0) {
+  console.error(`\n❌ --strict: ${errors.length} question(s) dropped`);
+  process.exit(1);
+}
+console.log('\n✅ OK');

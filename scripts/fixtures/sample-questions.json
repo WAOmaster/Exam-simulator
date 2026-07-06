@@ -1,0 +1,69 @@
+[
+  {
+    "id": 1,
+    "question": "Which AWS service provides fully managed foundation models through a single API?",
+    "questionType": "multiple-choice",
+    "options": [
+      { "id": "A", "text": "Amazon Bedrock" },
+      { "id": "B", "text": "Amazon EC2" },
+      { "id": "C", "text": "AWS Lambda" },
+      { "id": "D", "text": "Amazon S3" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Amazon Bedrock exposes foundation models from multiple providers via one API.",
+    "category": "AWS - AIF-C01",
+    "difficulty": "easy",
+    "sourceUrl": "https://example.com/q1"
+  },
+  {
+    "id": 2,
+    "question": "True or False: Overfitting means a model performs well on training data but poorly on unseen data.",
+    "type": "true-false",
+    "options": [
+      { "id": "A", "text": "True" },
+      { "id": "B", "text": "False" }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Overfitting is exactly this generalization gap.",
+    "category": "ML Fundamentals",
+    "difficulty": "easy"
+  },
+  {
+    "id": 3,
+    "question": "HOTSPOT - Select and order the correct steps to develop a well-architected ML workload.",
+    "questionType": "hotspot",
+    "options": [],
+    "correctAnswer": "",
+    "explanation": "",
+    "category": "AWS - AIF-C01",
+    "difficulty": "medium",
+    "images": ["https://example.com/hotspot-question.png"],
+    "answerImages": ["https://example.com/hotspot-answer.png"]
+  },
+  {
+    "id": 4,
+    "question": "Which TWO practices reduce hallucinations in LLM output? (Choose two.)",
+    "questionType": "multi-select",
+    "options": [
+      { "id": "A", "text": "Retrieval-augmented generation" },
+      { "id": "B", "text": "Raising the temperature" },
+      { "id": "C", "text": "Grounding responses in source documents" },
+      { "id": "D", "text": "Removing the system prompt" }
+    ],
+    "correctAnswer": "A,C",
+    "explanation": "RAG and grounding both anchor the model to real sources.",
+    "category": "GenAI",
+    "difficulty": "hard",
+    "explanationSource": "community",
+    "explanationVotes": 12
+  },
+  {
+    "question": "PILOT is to AIRPLANE as CAPTAIN is to ____",
+    "type": "Analogy",
+    "options": ["Ship", "Ocean", "Crew", "Harbor"],
+    "correct": 0,
+    "explanation": "A pilot operates an airplane; a captain operates a ship.",
+    "category": "CCAT - Verbal",
+    "difficulty": "medium"
+  }
+]
