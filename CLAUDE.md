@@ -50,6 +50,22 @@ npm start
 npm run lint
 ```
 
+### Automation Scripts
+```bash
+npm run typecheck                          # tsc --noEmit
+npm run preflight                          # verify .env.local keys + live Gemini/Blob access (--offline to skip network)
+npm run questions:process -- <dump.json>   # clean → validate → batch any question dump (ExamTopics/Google/CCAT/clean)
+npm run questions:verify -- <file.json>    # validate a JSON file with the exact app-importer rules (--strict for CI)
+npm run deploy:verify                      # wait for Vercel deploy of HEAD, then smoke-test it (needs VERCEL_TOKEN)
+npm run deploy:now                         # vercel CLI deploy + smoke test, no commit needed (--prod for production)
+```
+
+Key points:
+- `lib/validateQuestions.ts` is the single source of truth for import validation — used by `JsonImportDialog.tsx`, `scripts/verify-import.mjs`, and `scripts/process-questions.mjs`. Never fork a copy of it.
+- CI (`.github/workflows/ci.yml`) runs typecheck, build, and fixture validation (`scripts/fixtures/sample-questions.json`) on every PR; lint is informational until pre-existing errors are cleaned up.
+- `questions:process` options: `--prefix`, `--out`, `--batch-size` (default 66, `0` = single file), `--category`, `--keep-unanswered`.
+- `deploy:verify` smoke-tests `/` and `/api/blob-test` by default; add endpoints with `--check /api/sync`. Env: `VERCEL_TOKEN` (required), `VERCEL_TEAM_ID`/`VERCEL_PROJECT` (optional).
+
 ## Architecture
 
 ### File Structure
